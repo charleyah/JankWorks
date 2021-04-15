@@ -65,30 +65,29 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public static int GetGLPointerType(this VertexAttributeFormat type)
         {
-            switch (type)
+            return type switch
             {
-                case VertexAttributeFormat.Byte: return GL_BYTE;
-                case VertexAttributeFormat.Short: return GL_SHORT;
-                case VertexAttributeFormat.Int: return GL_INT;
-                case VertexAttributeFormat.Float: return GL_FLOAT;
-                case VertexAttributeFormat.Double: return GL_DOUBLE;
+                VertexAttributeFormat.Byte => GL_BYTE,
+                VertexAttributeFormat.Short => GL_SHORT,
+                VertexAttributeFormat.Int => GL_INT,
+                VertexAttributeFormat.Float => GL_FLOAT,
+                VertexAttributeFormat.Double => GL_DOUBLE,
 
-                case VertexAttributeFormat.UByte: return GL_UNSIGNED_BYTE;
-                case VertexAttributeFormat.UShort: return GL_UNSIGNED_SHORT;
-                case VertexAttributeFormat.UInt: return GL_UNSIGNED_INT;
+                VertexAttributeFormat.UByte => GL_UNSIGNED_BYTE,
+                VertexAttributeFormat.UShort => GL_UNSIGNED_SHORT,
+                VertexAttributeFormat.UInt => GL_UNSIGNED_INT,
 
-                case VertexAttributeFormat.Vector2f: return GL_FLOAT;
-                case VertexAttributeFormat.Vector2i: return GL_INT;
+                VertexAttributeFormat.Vector2f => GL_FLOAT,
+                VertexAttributeFormat.Vector2i => GL_INT,
 
-                case VertexAttributeFormat.Vector3f: return GL_FLOAT;
-                case VertexAttributeFormat.Vector3i: return GL_INT;
+                VertexAttributeFormat.Vector3f => GL_FLOAT,
+                VertexAttributeFormat.Vector3i => GL_INT,
 
-                case VertexAttributeFormat.Vector4f: return GL_FLOAT;
-                case VertexAttributeFormat.Vector4i: return GL_INT;
+                VertexAttributeFormat.Vector4f => GL_FLOAT,
+                VertexAttributeFormat.Vector4i => GL_INT,
 
-
-                default: throw new NotImplementedException();
-            }
+                _ => throw new NotImplementedException()
+            };
         }
 
         public static int GetGLBufferUsage(this BufferUsage usage)
