@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="cupthink.png" />
+    <None Remove="frag.glsl" />
+    <None Remove="pog.png" />
+    <None Remove="punch.bmp" />
+    <None Remove="punchy.png" />
+    <None Remove="test.png" />
+    <None Remove="vert.glsl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="frag.glsl" />
+    <EmbeddedResource Include="punchy.png" />
+    <EmbeddedResource Include="test.png" />
+    <EmbeddedResource Include="vert.glsl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JankWorks.DotNet\JankWorks.DotNet.csproj" />
+    <ProjectReference Include="..\JankWorks.Glfw\JankWorks.Glfw.csproj" />
+    <ProjectReference Include="..\JankWorks.OpenGL\JankWorks.OpenGL.csproj" />
+    <ProjectReference Include="..\JankWorks\JankWorks.csproj" />
+  </ItemGroup>
+
+</Project>
