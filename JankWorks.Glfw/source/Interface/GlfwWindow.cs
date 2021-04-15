@@ -74,7 +74,7 @@ namespace JankWorks.Drivers.Glfw.Interface
                 var errorPtr = IntPtr.Zero;
                 glfwGetError(errorPtr);
                 var errorDesc = new CString(errorPtr);
-                throw new ApplicationException(errorDesc.ToString(Encoding.UTF8));
+                throw new ApplicationException(errorDesc);
             }
 
             this.SetupCallbacks();
