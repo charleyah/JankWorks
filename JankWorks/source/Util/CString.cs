@@ -6,7 +6,7 @@ namespace JankWorks.Util
     // the pinnacle of bad string implementations
     public readonly struct CString
     {
-        public static Encoding DefaultEncoding => Encoding.ASCII;
+        public static Encoding DefaultEncoding => Encoding.UTF8;
 
         private readonly unsafe byte* chars;
 
