@@ -53,7 +53,7 @@ namespace Sample
             using var window = Window.Create(windowSettings);
             using var device = GraphicsDevice.Create(surfaceSettings, window);
 
-            
+            Console.WriteLine(device.Info);
 
             
             using var buffer = device.CreateVertexBuffer<Vertex2>();

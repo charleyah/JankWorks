@@ -16,7 +16,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         private List<Sampler> samplers;
 
-        public GLShader(uint programId, GLGraphicsDevice device)
+        public GLShader(uint programId)
         {
             this.ProgramId = programId;
             this.samplers = new List<Sampler>(8);

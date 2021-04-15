@@ -5,8 +5,18 @@ using JankWorks.Drivers;
 
 namespace JankWorks.Graphics
 {
+    public record GraphicsDeviceInfo
+    (
+        string Name,
+        string Driver,
+        int MaxMultiSamples,
+        int MaxTextureUnits
+    );
+
     public abstract class GraphicsDevice : Surface
     {
+        public abstract GraphicsDeviceInfo Info { get; }
+
         protected IRenderTarget RenderTarget { get; private set; }
 
         protected GraphicsDevice(IRenderTarget renderTarget)
@@ -18,8 +28,6 @@ namespace JankWorks.Graphics
         public override void Activate() => this.RenderTarget.Activate();
         public override void Deactivate() => this.RenderTarget.Deactivate();
         public override void Display() => this.RenderTarget.Render();
-
-        public abstract int MaxTextureUnits { get; }
 
         public abstract Surface CreateSurface(SurfaceSettings settings);
         public abstract VertexBuffer<T> CreateVertexBuffer<T>() where T : unmanaged;

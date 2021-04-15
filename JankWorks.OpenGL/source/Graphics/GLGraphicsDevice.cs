@@ -6,6 +6,7 @@ using System.IO;
 using JankWorks.Drivers.OpenGL.Graphics;
 
 using JankWorks.Graphics;
+using JankWorks.Util;
 
 using static OpenGL.Constants;
 using static OpenGL.Functions;
@@ -35,23 +36,39 @@ namespace JankWorks.Drivers.OpenGL
             }
         }
 
-        public override int MaxTextureUnits
-        {
-            get
-            {
-                var maxTextures = 0;
-                unsafe { glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextures); }
-                return maxTextures;
-            }
-        }
+        public override GraphicsDeviceInfo Info => this.info;
 
         private Rectangle viewport;
         private RGBA clearColour;
+
+        private readonly GraphicsDeviceInfo info;
 
         public GLGraphicsDevice(SurfaceSettings settings, IRenderTarget renderTarget) : base(renderTarget)
         {
             this.Viewport = settings.Viewport;
             this.ClearColour = settings.ClearColour;
+
+            var maxTextures = 0;
+            unsafe { glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextures); }
+
+            this.info = this.GetDeviceInfo();
+        }
+
+        private GraphicsDeviceInfo GetDeviceInfo()
+        {
+            string name = new CString(glGetString(GL_RENDERER));
+            string driver = new CString(glGetString(GL_VERSION));
+
+            var maxTextures = 0;
+            var maxSamples = 0;
+
+            unsafe 
+            { 
+                glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextures);
+                glGetIntegerv(GL_MAX_SAMPLES, &maxSamples);
+            }
+         
+            return new GraphicsDeviceInfo(name, driver, maxSamples, maxTextures);
         }
 
         public override void Clear() => glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_ACCUM_BUFFER_BIT);
@@ -71,7 +88,7 @@ namespace JankWorks.Drivers.OpenGL
 
             var program = GlslCompiler.LinkProgram(vertexId, fragmentId, geometryId, true);
 
-            return new GLShader(program, this);
+            return new GLShader(program);
         }
 
         public override Shader CreateShader(ShaderFormat format, ReadOnlySpan<byte> vertex, ReadOnlySpan<byte> fragment, ReadOnlySpan<byte> geometry = default)
@@ -87,7 +104,7 @@ namespace JankWorks.Drivers.OpenGL
 
             var program = GlslCompiler.LinkProgram(vertexId, fragmentId, geometryId, true);
 
-            return new GLShader(program, this);
+            return new GLShader(program);
         }
 
         public override Shader CreateShader(ShaderFormat format, string vertex, string fragment, string geometry = null)
@@ -103,7 +120,7 @@ namespace JankWorks.Drivers.OpenGL
 
             var program = GlslCompiler.LinkProgram(vertexId, fragmentId, geometryId, true);
 
-            return new GLShader(program, this);
+            return new GLShader(program);
         }
 
         public override Texture2D CreateTexture2D() => new GLTexture2D();
