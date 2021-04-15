@@ -48,9 +48,6 @@ namespace JankWorks.Drivers.OpenGL
             this.Viewport = settings.Viewport;
             this.ClearColour = settings.ClearColour;
 
-            var maxTextures = 0;
-            unsafe { glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextures); }
-
             this.info = this.GetDeviceInfo();
         }
 
