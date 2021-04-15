@@ -52,17 +52,12 @@ namespace JankWorks.Drivers.OpenGL
         {
             this.Viewport = settings.Viewport;
             this.ClearColour = settings.ClearColour;
-
-            glEnable(GL_MULTISAMPLE);
         }
 
         public override void Clear() => glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_ACCUM_BUFFER_BIT);
 
-        public override void CopyToTexture(Texture2D texture)
-        {
-            throw new NotImplementedException();
-        }
-
+        public override void CopyToTexture(Texture2D texture) => throw new NotImplementedException();
+        
         public override Shader CreateShader(ShaderFormat format, Stream vertex, Stream fragment, Stream geometry = null)
         {
             if (!this.IsShaderFormatSupported(format))
@@ -127,42 +122,35 @@ namespace JankWorks.Drivers.OpenGL
         {
             var program = (GLShader)shader;
             program.Bind();
+            program.BindTextures();
             glDrawArrays(primitive.GetGLPrimitive(), offset, count);
-
-            var error = glGetError();
-
-            if(error != GL_NO_ERROR)
-            {
-                throw new Exception();
-            }
-
             program.UnBind();
         }
 
         public override void DrawPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int offset, int count, int instanceCount)
         {
-            var glProg = (GLShader)shader;
-            glProg.Bind();
-            glProg.BindTextures();
+            var program = (GLShader)shader;
+            program.Bind();
+            program.BindTextures();
             unsafe { glDrawArraysInstanced(primitive.GetGLPrimitive(), offset, count, instanceCount); }
-            glProg.UnBind();
+            program.UnBind();
         }
         public override void DrawIndexedPrimitives(Shader shader, DrawPrimitiveType primitive, int count)
         {
-            var glProg = (GLShader)shader;
-            glProg.Bind();
-            glProg.BindTextures();
+            var program = (GLShader)shader;
+            program.Bind();
+            program.BindTextures();
             unsafe { glDrawElements(primitive.GetGLPrimitive(), count, GL_UNSIGNED_INT, (void*)0); }
-            glProg.UnBind();
+            program.UnBind();
         }
 
         public override void DrawIndexedPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int count, int instanceCount)
         {
-            var glProg = (GLShader)shader;
-            glProg.Bind();
-            glProg.BindTextures();
+            var program = (GLShader)shader;
+            program.Bind();
+            program.BindTextures();
             unsafe { glDrawElementsInstanced(primitive.GetGLPrimitive(), count, GL_UNSIGNED_INT, (void*)0, instanceCount); }
-            glProg.UnBind();
+            program.UnBind();
         }
     }
 }
