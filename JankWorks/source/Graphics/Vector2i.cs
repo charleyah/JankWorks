@@ -18,7 +18,7 @@ namespace JankWorks.Graphics
             this.Y = y;
         }
 
-        public override string ToString() => $"X { this.X } Y { this.Y }";
+        public override string ToString() => $"{ nameof(Vector2i) } {{ X = { this.X }, Y = { this.Y } }}";
 
         public override int GetHashCode() => this.X.GetHashCode() ^ this.Y.GetHashCode();       
         public override bool Equals(object obj) => obj is Vector2i other && this == other;

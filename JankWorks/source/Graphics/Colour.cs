@@ -45,7 +45,7 @@ namespace JankWorks.Graphics
         public override bool Equals(object obj) => obj is RGBA other && this == other;
         public bool Equals(RGBA other) => this == other;
         public override int GetHashCode() => this.value.GetHashCode();
-        public override string ToString() => $"R{this.R} G{this.G} B{this.B} A{this.A}";
+        public override string ToString() => $"{nameof(RGBA)} {{ R = {this.R}, G = {this.G}, B = {this.B}, A = {this.A} }}";
         public static bool operator ==(RGBA left, RGBA right) => left.value == right.value;
         public static bool operator !=(RGBA left, RGBA right) => left.value != right.value;
 
@@ -123,7 +123,7 @@ namespace JankWorks.Graphics
         public override bool Equals(object obj) => obj is ARGB other && this == other;
         public bool Equals(ARGB other) => this == other;
         public override int GetHashCode() => this.value.GetHashCode();
-        public override string ToString() => $"A{this.A} R{this.R} G{this.G} B{this.B}";
+        public override string ToString() => $"{nameof(ARGB)} {{ A = {this.A}, R = {this.R}, G = {this.G}, B = {this.B} }}";
         public static bool operator ==(ARGB left, ARGB right) => left.value == right.value;
         public static bool operator !=(ARGB left, ARGB right) => left.value != right.value;
 
@@ -202,7 +202,7 @@ namespace JankWorks.Graphics
         public override bool Equals(object obj) => obj is BGRA other && this == other;
         public bool Equals(BGRA other) => this == other;
         public override int GetHashCode() => this.value.GetHashCode();
-        public override string ToString() => $"B{this.B} G{this.G} R{this.R} A{this.A}";
+        public override string ToString() => $"{nameof(BGRA)} {{ B = {this.B}, G = {this.G}, R = {this.R}, A = {this.A} }}";
         public static bool operator ==(BGRA left, BGRA right) => left.value == right.value;
         public static bool operator !=(BGRA left, BGRA right) => left.value != right.value;
 
@@ -281,7 +281,7 @@ namespace JankWorks.Graphics
         public override bool Equals(object obj) => obj is ABGR other && this == other;
         public bool Equals(ABGR other) => this == other;
         public override int GetHashCode() => this.value.GetHashCode();
-        public override string ToString() => $"A{this.A} B{this.B} G{this.G} R{this.R}";
+        public override string ToString() => $"{nameof(ABGR)} {{ A = {this.A}, B = {this.B}, G = {this.G}, R = {this.R} }}";
         public static bool operator ==(ABGR left, ABGR right) => left.value == right.value;
         public static bool operator !=(ABGR left, ABGR right) => left.value != right.value;
 
@@ -409,7 +409,7 @@ namespace JankWorks.Graphics
         public override bool Equals(object obj) => obj is RGBA32 other && this == other;
         public bool Equals(RGBA32 other) => this == other;
         public override int GetHashCode() => this.value.GetHashCode();
-        public override string ToString() => $"R{this.R} G{this.G} B{this.B} A{this.A}";
+        public override string ToString() => $"{nameof(RGBA32)} {{ R = {this.R}, G = {this.G}, B = {this.B}, A = {this.A} }}";
         public static bool operator ==(RGBA32 left, RGBA32 right) => left.value == right.value;
         public static bool operator !=(RGBA32 left, RGBA32 right) => left.value != right.value;
 
@@ -513,7 +513,7 @@ namespace JankWorks.Graphics
         public override bool Equals(object obj) => obj is ARGB32 other && this == other;
         public bool Equals(ARGB32 other) => this == other;
         public override int GetHashCode() => this.value.GetHashCode();
-        public override string ToString() => $"A{this.A} R{this.R} G{this.G} B{this.B}";
+        public override string ToString() => $"{nameof(ARGB32)} {{ A = {this.A}, R ={this.R}, G = {this.G}, B = {this.B} }}";
         public static bool operator ==(ARGB32 left, ARGB32 right) => left.value == right.value;
         public static bool operator !=(ARGB32 left, ARGB32 right) => left.value != right.value;
 
