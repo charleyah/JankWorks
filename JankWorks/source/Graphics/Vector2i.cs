@@ -19,6 +19,7 @@ namespace JankWorks.Graphics
         }
 
         public override string ToString() => $"X { this.X } Y { this.Y }";
+
         public override int GetHashCode() => this.X.GetHashCode() ^ this.Y.GetHashCode();       
         public override bool Equals(object obj) => obj is Vector2i other && this == other;
         public bool Equals(Vector2i other) => this == other;
@@ -35,6 +36,6 @@ namespace JankWorks.Graphics
 
         public static explicit operator Vector2i(Vector2 vec) => new Vector2i(Convert.ToInt32(vec.X), Convert.ToInt32(vec.Y));
 
-        public static explicit operator Vector2(Vector2i intVec) => new Vector2(Convert.ToSingle(intVec.X), Convert.ToSingle(intVec.Y));
+        public static explicit operator Vector2(Vector2i vec) => new Vector2(Convert.ToSingle(vec.X), Convert.ToSingle(vec.Y));
     }
 }
