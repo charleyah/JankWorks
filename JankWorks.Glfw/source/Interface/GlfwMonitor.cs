@@ -15,8 +15,7 @@ namespace JankWorks.Drivers.Glfw.Interface
         public GlfwMonitor(IntPtr handle)
         {
             this.Handle = handle;
-            var name = new CString(glfwGetMonitorName(handle));
-            this.Name = name.ToString(Encoding.UTF8);
+            this.Name = new CString(glfwGetMonitorName(handle));
         }
 
         public override VideoMode VideoMode
