@@ -16,7 +16,25 @@ namespace JankWorks.Graphics
 
         public abstract void CopyToTexture(Texture2D texture);
 
-        public abstract void Activate();
-        public abstract void Deactivate();
+        public abstract void DrawPrimitives(Shader shader, DrawPrimitiveType primitive, int offset, int count);
+        public abstract void DrawPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int offset, int count, int instanceCount);
+        public abstract void DrawIndexedPrimitives(Shader shader, DrawPrimitiveType primitive, int count);
+        public abstract void DrawIndexedPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int count, int instanceCount);
+    }
+
+    public enum DrawPrimitiveType
+    {
+        Points,
+        Lines,
+        LineStrip,
+        LineLoop,
+
+        Triangles,
+        TriangleStrip
     }
 }
+
+
+
+
+

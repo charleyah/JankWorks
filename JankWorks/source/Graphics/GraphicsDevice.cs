@@ -25,8 +25,8 @@ namespace JankWorks.Graphics
             this.RenderTarget.OnResize += (viewport) => this.Viewport = viewport;
         }
 
-        public override void Activate() => this.RenderTarget.Activate();
-        public override void Deactivate() => this.RenderTarget.Deactivate();
+        public void Activate() => this.RenderTarget.Activate();
+        public void Deactivate() => this.RenderTarget.Deactivate();
         public override void Display() => this.RenderTarget.Render();
 
         public abstract Surface CreateSurface(SurfaceSettings settings);
@@ -41,25 +41,9 @@ namespace JankWorks.Graphics
 
         public abstract Texture2D CreateTexture2D();
 
-        public abstract void DrawPrimitives(Shader shader, DrawPrimitiveType primitive, int offset, int count);
-        public abstract void DrawPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int offset, int count, int instanceCount);
-        public abstract void DrawIndexedPrimitives(Shader shader, DrawPrimitiveType primitive, int count);
-        public abstract void DrawIndexedPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int count, int instanceCount);
-
         public static GraphicsDevice Create(SurfaceSettings settings, IRenderTarget renderTarget)
         {
             return DriverConfiguration.Drivers.graphicsApi.CreateGraphicsDevice(settings, renderTarget);
         }
-    }
-
-    public enum DrawPrimitiveType
-    {
-        Points,
-        Lines,
-        LineStrip,
-        LineLoop,
-
-        Triangles,
-        TriangleStrip
     }
 }
