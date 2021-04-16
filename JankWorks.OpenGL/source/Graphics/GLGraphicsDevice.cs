@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.IO;
@@ -121,6 +122,19 @@ namespace JankWorks.Drivers.OpenGL
         }
 
         public override Texture2D CreateTexture2D() => new GLTexture2D();
+
+        public override Texture2D[] CreateTexture2Ds(int count)
+        {
+            var ids = new uint[count];
+            unsafe
+            {
+                fixed(uint* idsptr = ids)
+                {
+                    glGenTextures(count, idsptr);
+                }
+            }
+            return (from id in ids select new GLTexture2D(id)).ToArray();
+        }
 
         public override Surface CreateSurface(SurfaceSettings settings) => throw new NotImplementedException();
 

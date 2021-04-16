@@ -41,6 +41,8 @@ namespace JankWorks.Graphics
 
         public abstract Texture2D CreateTexture2D();
 
+        public abstract Texture2D[] CreateTexture2Ds(int count);
+
         public static GraphicsDevice Create(SurfaceSettings settings, IRenderTarget renderTarget)
         {
             return DriverConfiguration.Drivers.graphicsApi.CreateGraphicsDevice(settings, renderTarget);
