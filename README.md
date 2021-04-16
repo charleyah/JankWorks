@@ -209,6 +209,8 @@ while(window.IsOpen)
 
 We start by making our window visible, then we go into a loop for handling application events and drawing. In our loop we first process application events and then through the graphics device clear the surface/canvas. Next we execute our shader program by calling draw command on it by the graphics device, we specify we're drawing triangles and the number of vertices which is 3,one for each corner. Finally we render to the window via the display command.
 
+![](https://raw.githubusercontent.com/DangerRoss/JankWorks/main/Triangle/result.png)
+
 You can view the full source code [here](https://github.com/DangerRoss/JankWorks/blob/main/Triangle/Program.cs)
 
 
