@@ -14,16 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="cupthink.png" />
-    <None Remove="frag.glsl" />
-    <None Remove="pog.png" />
-    <None Remove="punch.bmp" />
-    <None Remove="punchy.png" />
-    <None Remove="test.png" />
-    <None Remove="vert.glsl" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="frag.glsl" />
     <EmbeddedResource Include="punchy.png" />
     <EmbeddedResource Include="test.png" />
