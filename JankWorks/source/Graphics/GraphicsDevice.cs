@@ -2,6 +2,7 @@
 using System.IO;
 
 using JankWorks.Drivers;
+using JankWorks.Drivers.Graphics;
 
 namespace JankWorks.Graphics
 {
@@ -9,13 +10,14 @@ namespace JankWorks.Graphics
     (
         string Name,
         string Driver,
+        GraphicsApi DriverApi,
         int MaxMultiSamples,
         int MaxTextureUnits
     );
 
     public abstract class GraphicsDevice : Surface
     {
-        public abstract GraphicsDeviceInfo Info { get; }
+        public abstract GraphicsDeviceInfo Info { get; } 
 
         protected IRenderTarget RenderTarget { get; private set; }
 

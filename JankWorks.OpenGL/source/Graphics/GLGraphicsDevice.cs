@@ -4,6 +4,8 @@ using System.Numerics;
 using System.Text;
 using System.IO;
 
+
+using JankWorks.Drivers.Graphics;
 using JankWorks.Drivers.OpenGL.Graphics;
 
 using JankWorks.Graphics;
@@ -66,7 +68,7 @@ namespace JankWorks.Drivers.OpenGL
                 glGetIntegerv(GL_MAX_SAMPLES, &maxSamples);
             }
          
-            return new GraphicsDeviceInfo(name, driver, maxSamples, maxTextures);
+            return new GraphicsDeviceInfo(name, driver, GraphicsApi.OpenGL, maxSamples, maxTextures);
         }
 
         public override void Clear() => glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_ACCUM_BUFFER_BIT);
