@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Runtime;
 using System.Drawing;
 using System.Drawing.Imaging;
 
 using JankWorks.Drivers.Graphics;
 using JankWorks.Graphics;
-
-using Image = System.Drawing.Image;
 
 namespace JankWorks.Drivers.DotNet.Graphics
 {
@@ -28,10 +25,8 @@ namespace JankWorks.Drivers.DotNet.Graphics
 
         public override void CopyTo(Texture2D texture)
         {
-            var format = this.bitmap.PixelFormat;
-
             var size = this.Size;
-            var data = this.bitmap.LockBits(new System.Drawing.Rectangle(0, 0, this.bitmap.Size.Width, this.bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var data = this.bitmap.LockBits(new System.Drawing.Rectangle(0, 0, size.X, size.Y), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
             try
             {
