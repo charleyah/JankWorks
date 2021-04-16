@@ -18,7 +18,7 @@ Here we are specifying assemblies to load that include drivers for JankWorks. As
 
 ### Creating Window and Graphics Device
 
-With Glfw and OpenGL loaded, we can do proceed to create a window to display our triangle and a graphics device to draw it.
+With Glfw and OpenGL drivers loaded, we can proceed to create a window to display our triangle and a graphics device to draw it.
 
 ```csharp
 var windowsettings = WindowSettings.Default;
