@@ -82,6 +82,7 @@ namespace JankWorks.Interface
         public virtual void Show() => this.ShowHandler.Notify();
         public virtual void Hide() => this.HideHandler.Notify();
 
+        public abstract void Close();
         public abstract void Focus();
 
         public abstract void EnableKeyRepeat(bool enable);

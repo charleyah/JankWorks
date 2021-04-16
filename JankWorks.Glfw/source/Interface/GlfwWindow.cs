@@ -184,6 +184,8 @@ namespace JankWorks.Drivers.Glfw.Interface
         }
 
         public override void EnableKeyRepeat(bool enable) => this.keyRepeatEnabled = enable;
+
+        public override void Close() => glfwSetWindowShouldClose(this.window, GLFW_TRUE);
         public override void Focus() => glfwFocusWindow(this.window);
         public override void Hide()
         {

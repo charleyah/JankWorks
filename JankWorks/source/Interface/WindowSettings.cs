@@ -23,7 +23,7 @@ namespace JankWorks.Interface
                     Title = Assembly.GetEntryAssembly().GetName().Name,
                     Monitor = primary,
                     VideoMode = primary.VideoMode,
-                    Style = WindowStyle.FullScreen,
+                    Style = WindowStyle.Borderless,
                     VSync = true,
                     ShowCursor = true
                 };

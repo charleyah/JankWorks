@@ -9,9 +9,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.Glfw", "JankWorks
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.OpenGL", "JankWorks.OpenGL\JankWorks.OpenGL.csproj", "{6561EB31-0885-4F4B-A229-31E01D826C7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JankWorks.DotNet", "JankWorks.DotNet\JankWorks.DotNet.csproj", "{4580DA38-07CB-481E-8EFD-725E029C740A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.DotNet", "JankWorks.DotNet\JankWorks.DotNet.csproj", "{4580DA38-07CB-481E-8EFD-725E029C740A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{39011062-4450-4493-A665-EC4ECDFA4FC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Sample\Sample.csproj", "{39011062-4450-4493-A665-EC4ECDFA4FC7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2A8F212A-B278-4D04-9954-D3BA10C209AD}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Triangle", "Triangle\Triangle.csproj", "{69A42AD0-F66B-4B5C-BB0F-8F9B1E514432}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +46,10 @@ Global
 		{39011062-4450-4493-A665-EC4ECDFA4FC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39011062-4450-4493-A665-EC4ECDFA4FC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39011062-4450-4493-A665-EC4ECDFA4FC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69A42AD0-F66B-4B5C-BB0F-8F9B1E514432}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69A42AD0-F66B-4B5C-BB0F-8F9B1E514432}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69A42AD0-F66B-4B5C-BB0F-8F9B1E514432}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69A42AD0-F66B-4B5C-BB0F-8F9B1E514432}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
