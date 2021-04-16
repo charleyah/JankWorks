@@ -116,7 +116,7 @@ The shader program will need to read two values from each vertex in the buffer, 
 
 - `Format` - defines the data type the shader should expect, this will match the type corresponding to the data member in the `Vertex` structure (e.g Position is `Vector2` which is two floats so the format is `Vector2f`). 
 - `Stride` - defines how many bytes are between each vertex in the buffer. We set this to the byte size of the `Vertex` structure.
-- `Offset` - defines where in the vertex memory the value is. For position this is zero as its the first value and for Colour we set it to the size of Position's data type as Colour proceeds it.
+- `Offset` - defines where in the vertex memory the value is. For Position this is zero as its the first value and for Colour we set it to the size of Position's data type as Colour proceeds it.
 - `Index` - specifies the location the shader will use to access the value.
 - `Usage` - Hint to the shader of what the value is being used for.
 
@@ -172,7 +172,7 @@ shader.SetVertexData(buffer, layout);
 
 Our shader program is now ready to be used by the graphics device.
 
-### On Last Thing
+### One Last Thing
 
 When we finally get to see our triangle its going to be on a full screen window, so lets make sure we have a way of closing the window.
 
@@ -207,7 +207,7 @@ while(window.IsOpen)
 }
 ```
 
-We start by making our window visible, then we go into a loop for handling application events and drawing. In our loop we first process application events and then through the graphics device clear the surface/canvas. Next we execute our shader program by calling draw command on it by the graphics device, we specify we're drawing triangles and the number of vertices which is 3,one for each corner. Finally we render to the window via the display command.
+We start by making our window visible, then we go into a loop for handling application events and drawing. In our loop we first process application events and then through the graphics device clear the surface/canvas. Next we execute our shader program by calling draw command on it by the graphics device, we specify we're drawing triangles and the number of vertices which is 3, one for each corner. Finally we render to the window via the display command.
 
 ![](https://raw.githubusercontent.com/DangerRoss/JankWorks/main/Triangle/result.png)
 
