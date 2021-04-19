@@ -45,6 +45,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 glBindBuffer(target, 0);
             }
         }
+
         public void CopyTo(int target, Span<T> destination)
         {
             if (this.ElementCount == 0)
@@ -71,6 +72,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 glBindBuffer(target, 0);
             }
         }
+
         public T[] Read(int target)
         {
             var data = new T[this.ElementCount];

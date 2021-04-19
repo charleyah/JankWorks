@@ -17,6 +17,7 @@ namespace JankWorks.Drivers.OpenGL
         public GraphicsApi GraphicsApi => GraphicsApi.OpenGL;
 
         private LibraryLoader loader;
+
         public Driver()
         {
             var system = SystemEnvironment.Current;

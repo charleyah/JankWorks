@@ -187,13 +187,13 @@ namespace JankWorks.Drivers.Glfw.Interface
 
         public override void Close() => glfwSetWindowShouldClose(this.window, GLFW_TRUE);
         public override void Focus() => glfwFocusWindow(this.window);
+
         public override void Hide()
         {
             base.Hide();
             glfwHideWindow(this.window);
 
         }
-
         public override void Show()
         {
             glfwShowWindow(this.window);
