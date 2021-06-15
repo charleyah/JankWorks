@@ -13,16 +13,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
     {
         public override RGBA ClearColour
         {
-            get => this.clearColour;
-            set
-            {
-                var vecColour = (Vector4)value;
-
-                glBindFramebuffer(GL_FRAMEBUFFER, this.fbo);
-                glClearColor(vecColour.X, vecColour.Y, vecColour.Z, vecColour.W);
-                glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                this.clearColour = value;
-            }
+            get => (RGBA)this.clearColour;
+            set => this.clearColour = (Vector4)value;
         }
 
         public override Rectangle Viewport
@@ -40,7 +32,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         public override Texture2D Texture => this.texture;
 
         private Rectangle viewport;
-        private RGBA clearColour;
+        private Vector4 clearColour;
 
         private uint fbo;
         private uint rbo;
@@ -49,11 +41,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public GLCanvas(SurfaceSettings settings)
         {
-            this.texture = new GLTexture2D();
-            this.texture.Filter = TextureFilter.Nearest;
-            this.texture.Wrap = TextureWrap.Clamp;
-            this.texture.SetPixels(settings.Size, ReadOnlySpan<RGBA>.Empty);
-
             unsafe
             {
                 uint id = 0;
@@ -66,36 +53,34 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
 
             glBindFramebuffer(GL_FRAMEBUFFER, this.fbo);
+
+            this.texture = new GLTexture2D();
+            this.texture.Filter = TextureFilter.Nearest;
+            this.texture.Wrap = TextureWrap.Clamp;
+            this.texture.SetPixels(settings.Size, ReadOnlySpan<RGBA>.Empty);
+
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this.texture.Id, 0);
 
             glBindRenderbuffer(GL_RENDERBUFFER, this.rbo);
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, settings.Size.X, settings.Size.Y);
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this.rbo);
 
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this.fbo);
-            uint buffers = GL_COLOR_ATTACHMENT0;
-            unsafe { glDrawBuffers(1, &buffers); }
-            
-
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             {
                 throw new Exception("framebuffer go oof");
             }
 
-            this.Viewport = new Rectangle(new Vector2i(0, 0), settings.Size);
-
-            var clearColour = (Vector4)settings.ClearColour;
-            glClearColor(clearColour.X, clearColour.Y, clearColour.Z, clearColour.W);
-
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
-            this.texture.UnBind();
+
+            this.Viewport = new Rectangle(new Vector2i(0, 0), settings.Size);
+            this.ClearColour = settings.ClearColour;
         }
 
         public override void Clear(ClearBitMask bits)
         {
             glBindFramebuffer(GL_FRAMEBUFFER, this.fbo);
+            glClearColor(this.clearColour.X, this.clearColour.Y, this.clearColour.Z, this.clearColour.W);
             glClear(bits.GetGLClearBits());
         }
 

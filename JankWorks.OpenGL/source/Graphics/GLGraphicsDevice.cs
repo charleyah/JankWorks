@@ -20,14 +20,8 @@ namespace JankWorks.Drivers.OpenGL
     {
         public override RGBA ClearColour
         {
-            get => this.clearColour;
-            set
-            {
-                var vecColour = (Vector4)value;
-                glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                glClearColor(vecColour.X, vecColour.Y, vecColour.Z, vecColour.W);
-                this.clearColour = value;
-            }
+            get => (RGBA)this.clearColour;
+            set => this.clearColour = (Vector4)value;            
         }
 
         public override Rectangle Viewport
@@ -44,7 +38,7 @@ namespace JankWorks.Drivers.OpenGL
         public override GraphicsDeviceInfo Info => this.info;
 
         private Rectangle viewport;
-        private RGBA clearColour;
+        private Vector4 clearColour;
 
         private readonly GraphicsDeviceInfo info;
 
@@ -52,7 +46,6 @@ namespace JankWorks.Drivers.OpenGL
         {
             this.Viewport = new Rectangle(new Vector2i(0, 0), settings.Size);
             this.ClearColour = settings.ClearColour;
-
             this.info = this.GetDeviceInfo();
         }
 
@@ -76,6 +69,7 @@ namespace JankWorks.Drivers.OpenGL
         public override void Clear(ClearBitMask bits)
         {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glClearColor(this.clearColour.X, this.clearColour.Y, this.clearColour.Z, this.clearColour.W);
             glClear(bits.GetGLClearBits());
         }
         
