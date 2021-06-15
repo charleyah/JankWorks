@@ -1,9 +1,10 @@
 ﻿using System.Drawing;
 using System.IO;
 
+using JankWorks.Graphics;
+
 using JankWorks.Drivers;
 using JankWorks.Drivers.Graphics;
-using JankWorks.Graphics;
 using JankWorks.Drivers.DotNet.Graphics;
 
 [assembly: JankWorksDriver(typeof(JankWorks.Drivers.DotNet.Driver))]
