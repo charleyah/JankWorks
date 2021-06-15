@@ -142,7 +142,7 @@ namespace JankWorks.Drivers.OpenGL
             return (from id in ids select new GLTexture2D(id)).ToArray();
         }
 
-        public override Canvas CreateCanvas(SurfaceSettings settings) => throw new NotImplementedException();
+        public override Canvas CreateCanvas(SurfaceSettings settings) => new GLCanvas(settings);
 
         public override VertexBuffer<T> CreateVertexBuffer<T>() => new GLVertexBuffer<T>();
 
