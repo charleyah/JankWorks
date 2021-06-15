@@ -49,7 +49,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public static int GetGLPrimitive(this DrawPrimitiveType primitive)
         {
-
             return primitive switch
             {
                 DrawPrimitiveType.Points => GL_POINTS,
@@ -100,6 +99,19 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
                 _ => throw new NotImplementedException()
             };
+        }
+
+        public static uint GetGLClearBits(this ClearBitMask mode)
+        {
+            uint value = 0;
+
+            if (mode.HasFlag(ClearBitMask.Colour)) { value |= GL_COLOR_BUFFER_BIT; }
+
+            if (mode.HasFlag(ClearBitMask.Depth)) { value |= GL_DEPTH_BUFFER_BIT; }
+
+            if (mode.HasFlag(ClearBitMask.Stencil)) { value |= GL_STENCIL_BUFFER_BIT; }
+
+            return value;
         }
     }
 }

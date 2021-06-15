@@ -9,21 +9,21 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 {
     sealed class GLTexture2D : Texture2D
     {
-        internal uint textureId;
+        internal uint Id;
 
         public GLTexture2D()
         {
             uint texid = 0;
             unsafe { glGenTextures(1, &texid); }
-            this.textureId = texid;
+            this.Id = texid;
         }
 
         public GLTexture2D(uint id)
         {
-            this.textureId = id;
+            this.Id = id;
         }
 
-        internal void Bind() => glBindTexture(GL_TEXTURE_2D, this.textureId);
+        internal void Bind() => glBindTexture(GL_TEXTURE_2D, this.Id);
 
         internal void UnBind() => glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -112,7 +112,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
         }
 
-        private void ApplyStates()
+        internal void ApplyStates()
         {
             switch (this.Wrap)
             {
@@ -159,7 +159,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.UnBind();
             unsafe
             {                
-                var id = this.textureId;
+                var id = this.Id;
                 glDeleteTextures(1, &id);
             }
 

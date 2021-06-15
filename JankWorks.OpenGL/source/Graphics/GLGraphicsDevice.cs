@@ -24,6 +24,7 @@ namespace JankWorks.Drivers.OpenGL
             set
             {
                 var vecColour = (Vector4)value;
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 glClearColor(vecColour.X, vecColour.Y, vecColour.Z, vecColour.W);
                 this.clearColour = value;
             }
@@ -34,6 +35,7 @@ namespace JankWorks.Drivers.OpenGL
             get => this.viewport;
             set
             {
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 glViewport(value.Position.X, value.Position.Y, value.Size.X, value.Size.Y);
                 this.viewport = value;
             }
@@ -48,7 +50,7 @@ namespace JankWorks.Drivers.OpenGL
 
         public GLGraphicsDevice(SurfaceSettings settings, IRenderTarget renderTarget) : base(renderTarget)
         {
-            this.Viewport = settings.Viewport;
+            this.Viewport = new Rectangle(new Vector2i(0, 0), settings.Size);
             this.ClearColour = settings.ClearColour;
 
             this.info = this.GetDeviceInfo();
@@ -71,9 +73,11 @@ namespace JankWorks.Drivers.OpenGL
             return new GraphicsDeviceInfo(name, driver, GraphicsApi.OpenGL, maxSamples, maxTextures);
         }
 
-        public override void Clear() => glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_ACCUM_BUFFER_BIT);
-
-        public override void CopyToTexture(Texture2D texture) => throw new NotImplementedException();
+        public override void Clear(ClearBitMask bits)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glClear(bits.GetGLClearBits());
+        }
         
         public override Shader CreateShader(ShaderFormat format, Stream vertex, Stream fragment, Stream geometry = null)
         {
@@ -138,7 +142,7 @@ namespace JankWorks.Drivers.OpenGL
             return (from id in ids select new GLTexture2D(id)).ToArray();
         }
 
-        public override Surface CreateSurface(SurfaceSettings settings) => throw new NotImplementedException();
+        public override Canvas CreateCanvas(SurfaceSettings settings) => throw new NotImplementedException();
 
         public override VertexBuffer<T> CreateVertexBuffer<T>() => new GLVertexBuffer<T>();
 
@@ -150,6 +154,7 @@ namespace JankWorks.Drivers.OpenGL
 
         public override void DrawPrimitives(Shader shader, DrawPrimitiveType primitive, int offset, int count)
         {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             var program = (GLShader)shader;
             program.Bind();
             program.BindTextures();
@@ -159,6 +164,7 @@ namespace JankWorks.Drivers.OpenGL
 
         public override void DrawPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int offset, int count, int instanceCount)
         {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             var program = (GLShader)shader;
             program.Bind();
             program.BindTextures();
@@ -167,6 +173,7 @@ namespace JankWorks.Drivers.OpenGL
         }
         public override void DrawIndexedPrimitives(Shader shader, DrawPrimitiveType primitive, int count)
         {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             var program = (GLShader)shader;
             program.Bind();
             program.BindTextures();
@@ -176,6 +183,7 @@ namespace JankWorks.Drivers.OpenGL
 
         public override void DrawIndexedPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int count, int instanceCount)
         {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             var program = (GLShader)shader;
             program.Bind();
             program.BindTextures();

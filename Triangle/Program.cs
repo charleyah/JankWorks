@@ -32,7 +32,7 @@ namespace Triangle
             var surfacesettings = new SurfaceSettings()
             {
                 ClearColour = Colour.Black,
-                Viewport = windowsettings.VideoMode.Viewport
+                Size = windowsettings.VideoMode.Viewport.Size
             };
 
             using var window = Window.Create(windowsettings);

@@ -15,7 +15,6 @@ namespace JankWorks.Graphics
         public abstract void SetPixels(Vector2i size, ReadOnlySpan<ABGR> pixels);
         public abstract void SetPixels(Vector2i size, ReadOnlySpan<ARGB> pixels);
         public abstract void SetPixels(Vector2i size, ReadOnlySpan<BGRA> pixels);
-
         public abstract void SetPixels(Vector2i size, ReadOnlySpan<RGBA32> pixels);
         public abstract void SetPixels(Vector2i size, ReadOnlySpan<ARGB32> pixels);
     }

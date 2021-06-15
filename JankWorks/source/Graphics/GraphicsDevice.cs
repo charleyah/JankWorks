@@ -31,7 +31,7 @@ namespace JankWorks.Graphics
         public void Deactivate() => this.RenderTarget.Deactivate();
         public override void Display() => this.RenderTarget.Render();
 
-        public abstract Surface CreateSurface(SurfaceSettings settings);
+        public abstract Canvas CreateCanvas(SurfaceSettings settings);
         public abstract VertexBuffer<T> CreateVertexBuffer<T>() where T : unmanaged;
         public abstract VertexLayout CreateVertexLayout();
         public abstract IndexBuffer CreateIndexBuffer();

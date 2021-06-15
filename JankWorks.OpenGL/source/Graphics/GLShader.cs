@@ -26,7 +26,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         {
             var sampler = new Sampler();
             sampler.unit = unit;
-            sampler.texture = texture.textureId;
+            sampler.texture = texture.Id;
             sampler.type = GL_TEXTURE_2D;
 
             var index = this.samplers.FindIndex((s) => s.unit == unit);

@@ -1,7 +1,6 @@
 ﻿using System;
 
 using JankWorks.Core;
-using JankWorks.Drivers;
 
 namespace JankWorks.Graphics
 {
@@ -11,15 +10,22 @@ namespace JankWorks.Graphics
 
         public abstract RGBA ClearColour { get; set; }
 
-        public abstract void Clear();
+        public void Clear() => this.Clear(ClearBitMask.Colour | ClearBitMask.Depth | ClearBitMask.Stencil);
+        public abstract void Clear(ClearBitMask bits);
         public abstract void Display();
-
-        public abstract void CopyToTexture(Texture2D texture);
 
         public abstract void DrawPrimitives(Shader shader, DrawPrimitiveType primitive, int offset, int count);
         public abstract void DrawPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int offset, int count, int instanceCount);
         public abstract void DrawIndexedPrimitives(Shader shader, DrawPrimitiveType primitive, int count);
         public abstract void DrawIndexedPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int count, int instanceCount);
+    }
+
+    [Flags]
+    public enum ClearBitMask
+    {
+        Colour,
+        Depth,
+        Stencil
     }
 
     public enum DrawPrimitiveType

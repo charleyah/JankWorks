@@ -4,7 +4,7 @@ namespace JankWorks.Graphics
 {
     public struct SurfaceSettings
     {
-        public Rectangle Viewport;
+        public Vector2i Size;
         public RGBA ClearColour;
     }
 }

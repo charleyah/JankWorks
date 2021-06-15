@@ -47,7 +47,7 @@ namespace Sample
             var surfaceSettings = new SurfaceSettings()
             {
                 ClearColour = Colour.Black,
-                Viewport = windowSettings.VideoMode.Viewport
+                Size = windowSettings.VideoMode.Viewport.Size
             };
 
             using var window = Window.Create(windowSettings);
