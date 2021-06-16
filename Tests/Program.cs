@@ -12,6 +12,18 @@ namespace Tests
 {
     class Program
     {
+        [StructLayout(LayoutKind.Sequential)]
+        struct TexVertex
+        {
+            public Vector2 Position;
+            public Vector2 TextCoord;
+            public TexVertex(Vector2 position, Vector2 textCoord)
+            {
+                this.Position = position;
+                this.TextCoord = textCoord;
+            }
+        }
+
         static Program()
         {
             DriverConfiguration.Initialise("JankWorks.Glfw", "JankWorks.OpenGL");
@@ -32,6 +44,12 @@ namespace Tests
 
             using var triangle = new Triangle(device);
 
+            using var shader = GetTextureRenderShader(device, out var quad, out var layout, out var indexes);
+
+            using var canvas = device.CreateCanvas(surfacesettings);
+
+            shader.SetUniform("rtexture", canvas.Texture, 0);
+
             window.OnKeyPressed += (keypress) =>
             {
                 if (keypress.Key == Key.Enter)
@@ -42,17 +60,112 @@ namespace Tests
 
             window.Show();
 
+            device.Clear();
+
             while (window.IsOpen)
             {
                 window.ProcessEvents();
+
+
+
+                canvas.Clear();
+                triangle.Draw(canvas);
+                canvas.Display();
+
                 device.Clear();
 
-                triangle.Draw(device);
-                
+                device.DrawIndexedPrimitives(shader, DrawPrimitiveType.Triangles, 6);
+
                 device.Display();
             }
         }
+
+        static Shader GetTextureRenderShader(GraphicsDevice device, out VertexBuffer<TexVertex> quad, out VertexLayout layout, out IndexBuffer indexes)
+        {
+            quad = device.CreateVertexBuffer<TexVertex>();
+            quad.Usage = BufferUsage.Static;
+            TexVertex[] quadData =
+            {
+                new TexVertex(new Vector2(1f,  1f), new Vector2(1f, 1f)),
+                new TexVertex(new Vector2(1f, -1f), new Vector2(1f, 0f)),
+                new TexVertex(new Vector2(-1f, -1f), new Vector2(0f, 0f)),
+                new TexVertex(new Vector2(-1f,  1f), new Vector2(0f, 1f)),
+
+            };
+            quad.Write(quadData);
+
+
+            layout = device.CreateVertexLayout();
+
+            var posAttrib = new VertexAttribute()
+            {
+                Format = VertexAttributeFormat.Vector2f,
+                Index = 0,
+                Offset = 0,
+                Stride = Marshal.SizeOf<TexVertex>(),
+                Usage = VertexAttributeUsage.Position
+            };
+
+            var texAttrib = new VertexAttribute()
+            {
+                Format = VertexAttributeFormat.Vector2f,
+                Index = 1,
+                Offset = Marshal.SizeOf<Vector2>(),
+                Stride = Marshal.SizeOf<TexVertex>(),
+                Usage = VertexAttributeUsage.TextureCoordinate
+            };
+
+            layout.SetAttribute(posAttrib);
+            layout.SetAttribute(texAttrib);
+
+            indexes = device.CreateIndexBuffer();
+            indexes.Usage = BufferUsage.Static;
+
+            uint[] indexValues =
+            {
+                0, 1, 3,
+                1, 2, 3
+            };
+
+            indexes.Write(indexValues);
+
+
+
+            const string VertexSource = @"
+            #version 330 core
+            layout(location = 0) in vec2 position;
+            layout(location = 1) in vec2 texpos;
+        
+            out vec2 texcoord;
+
+            void main()
+            {
+                texcoord = texpos;
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+            ";
+
+            const string FragSource = @"
+            #version 330 core
+
+            in vec2 texcoord;
+            out vec4 fragcolour;
+
+            uniform sampler2D rtexture;
+
+            void main()
+            {
+                fragcolour = texture(rtexture, texcoord);
+            }
+            ";
+
+            var shader = device.CreateShader(ShaderFormat.GLSL, VertexSource, FragSource);
+            shader.SetVertexData(quad, layout, indexes);
+            return shader;
+        }
     }
+
+
 
 
 

@@ -184,5 +184,10 @@ namespace JankWorks.Drivers.OpenGL
             unsafe { glDrawElementsInstanced(primitive.GetGLPrimitive(), count, GL_UNSIGNED_INT, (void*)0, instanceCount); }
             program.UnBind();
         }
+
+        protected override void ApplyDrawState(in DrawState drawState)
+        {
+            if (drawState.DepthTesting) { glEnable(GL_DEPTH_TEST); } else { glDisable(GL_DEPTH_TEST); }
+        }
     }
 }

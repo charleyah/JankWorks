@@ -129,6 +129,11 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             program.UnBind();
         }
 
+        protected override void ApplyDrawState(in DrawState drawState)
+        {
+            if (drawState.DepthTesting) { glEnable(GL_DEPTH_TEST); } else { glDisable(GL_DEPTH_TEST); }
+        }
+
         protected override void Dispose(bool finalising)
         {
             this.texture.Dispose();
