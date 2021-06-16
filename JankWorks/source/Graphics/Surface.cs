@@ -25,7 +25,7 @@ namespace JankWorks.Graphics
 
         public virtual void Clear(ClearBitMask bits, in DrawState drawState)
         {
-            this.ApplyDrawState(this.DefaultDrawState);
+            this.ApplyDrawState(drawState);
             this.Clear(bits);
         }
 
@@ -50,6 +50,12 @@ namespace JankWorks.Graphics
         {
             this.ApplyDrawState(in drawState);
             this.DrawIndexedPrimitives(shader, primitive, count);
+        }
+
+        public virtual void DrawIndexedPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int count, int instanceCount, in DrawState drawState)
+        {
+            this.ApplyDrawState(in drawState);
+            this.DrawIndexedPrimitivesInstanced(shader, primitive, count, instanceCount);
         }
 
         public abstract void DrawPrimitives(Shader shader, DrawPrimitiveType primitive, int offset, int count);
