@@ -13,6 +13,9 @@ using JankWorks.Game.Configuration;
 using JankWorks.Game.Assets;
 using JankWorks.Game.Hosting;
 
+
+using JankWorks.Game.Platform;
+
 namespace JankWorks.Game.Local
 {
     public sealed class Client : Disposable
@@ -232,6 +235,14 @@ namespace JankWorks.Game.Local
                 TimeSpan since = now - lastrun;
                 lag += since;
                 this.Lag = lag;
+
+                if(lag < this.targetFrameRateDelta)
+                {
+                    PlatformApi.Instance.Sleep(this.targetFrameRateDelta - lag);
+                    lastrun = now;
+                    continue;
+                }
+
                 while (lag >= target)
                 {
                     var delta = (lag > target) ? target : lag;
@@ -243,18 +254,9 @@ namespace JankWorks.Game.Local
                 }
 
                 var frame = new Frame(lag.TotalMilliseconds / target.TotalMilliseconds);
-
                 this.Render(state, frame);
-
                 this.FramesPerSecond = Convert.ToSingle(Math.Round(1000 / since.TotalMilliseconds, 0));
 
-                var breakTime = this.targetFrameRateDelta - since;
-
-                if(breakTime > TimeSpan.Zero)
-                {
-                    Thread.Sleep(breakTime);
-                }
-               
                 lastrun = now;
             }
         }
