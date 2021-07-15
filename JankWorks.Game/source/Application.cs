@@ -101,7 +101,6 @@ namespace JankWorks.Game
 
         public static void Run(Application app, Host host, ClientConfgiuration config, string scene, object? initstate)
         {
-            app.RegisterDrivers();
             using var client = new Client(app, config, host);            
             client.Run(scene, host, initstate);
         }
