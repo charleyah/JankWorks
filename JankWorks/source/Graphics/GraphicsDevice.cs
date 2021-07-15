@@ -27,8 +27,13 @@ namespace JankWorks.Graphics
             this.RenderTarget.OnResize += (viewport) => this.Viewport = viewport;
         }
 
-        public void Activate() => this.RenderTarget.Activate();
-        public void Deactivate() => this.RenderTarget.Deactivate();
+        public virtual bool Activate(TimeSpan timeout)
+        {
+            this.RenderTarget.Activate();
+            return true;
+        }
+        public virtual void Activate() => this.RenderTarget.Activate();
+        public virtual void Deactivate() => this.RenderTarget.Deactivate();
         public override void Display() => this.RenderTarget.Render();
 
         public abstract Canvas CreateCanvas(SurfaceSettings settings);

@@ -102,8 +102,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             {
                 this.Bind();
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.X, size.Y, 0, pixelformat, pixeltype, ptr);
-                glGenerateMipmap(GL_TEXTURE_2D);
-
                 this.ApplyStates();
             }
             finally
@@ -152,6 +150,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                     break;
             }
+            glGenerateMipmap(GL_TEXTURE_2D);
         }
 
         protected override void Dispose(bool finalising)

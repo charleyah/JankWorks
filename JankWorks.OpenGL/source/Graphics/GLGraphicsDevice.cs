@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.IO;
+using System.Threading;
 
 
 using JankWorks.Drivers.Graphics;
@@ -66,10 +67,65 @@ namespace JankWorks.Drivers.OpenGL
             return new GraphicsDeviceInfo(name, driver, GraphicsApi.OpenGL, maxSamples, maxTextures);
         }
 
-        public override void Clear(ClearBitMask bits)
+
+        public override bool Activate(TimeSpan timeout)
         {
+            var mutex = typeof(GLGraphicsDevice);
+
+            if (Monitor.IsEntered(mutex))
+            {
+                return true;
+            }
+            else
+            {
+                var entered = Monitor.TryEnter(mutex, timeout);
+
+                if (entered)
+                {
+                    base.Activate();
+                }
+
+                return entered;
+            }
+        }
+
+        public override void Activate()
+        {
+            var mutex = typeof(GLGraphicsDevice);
+            if (Monitor.IsEntered(mutex))
+            {
+                return;
+            }
+            else
+            {
+                Monitor.Enter(mutex);
+                base.Activate();
+            }
+        }
+
+        public override void Deactivate()
+        {
+            var mutex = typeof(GLGraphicsDevice);
+
+            if (Monitor.IsEntered(mutex))
+            {
+                base.Deactivate();
+                Monitor.Exit(mutex);
+            }
+            else
+            {
+                throw new SynchronizationLockException();
+            }
+        }
+
+
+        public override void Clear(ClearBitMask bits)
+        {            
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glClearColor(this.clearColour.X, this.clearColour.Y, this.clearColour.Z, this.clearColour.W);
+
+            var colour = this.clearColour;
+            glClearColor(colour.X, colour.Y, colour.Z, colour.W);
+
             glClear(bits.GetGLClearBits());
         }
         

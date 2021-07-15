@@ -53,15 +53,13 @@ namespace JankWorks.Drivers
             }
         }
 
-        
-
         public static IDisposable Initialise(DriverConfiguration configuration)
         {
             DriverConfiguration.Drivers = configuration;
             return new ScopedConfiguration(configuration);
         }
 
-        public static IDisposable Initialise(params string[] assemblyNames)
+        public static DriverConfiguration Initialise(params string[] assemblyNames)
         {
             foreach(var asmName in assemblyNames)
             {
@@ -96,7 +94,7 @@ namespace JankWorks.Drivers
                 graphicsDriver
             );
             DriverConfiguration.Drivers = config;
-            return new ScopedConfiguration(config);
+            return config;
 
             void SetDriverApi<T>(ref T api, object driver)
             {

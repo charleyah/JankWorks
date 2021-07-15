@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace JankWorks.Audio
 {
-    abstract class AudioDevice
+    public abstract class AudioDevice
     {
+        public static AudioDevice Create() { throw new NotImplementedException(); }
     }
 }

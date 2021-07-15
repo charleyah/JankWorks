@@ -1,0 +1,103 @@
+﻿using System;
+using System.Text;
+using System.Collections.Generic;
+using System.IO;
+
+using JankWorks.Core;
+using JankWorks.Drivers;
+using JankWorks.Game.Assets;
+using JankWorks.Game.Configuration;
+using JankWorks.Game.Local;
+using JankWorks.Game.Hosting;
+
+namespace JankWorks.Game
+{
+    public abstract class Application : Disposable
+    {
+        public const string PerfMetricsEntry = "perfmetrics";
+
+        protected readonly DirectoryInfo DataFolder;
+        protected readonly DirectoryInfo SaveFolder;
+
+        public IReadOnlyDictionary<string, Func<Scene>> Scenes { get; private set; }
+        public DriverConfiguration Drivers { get; private set; }
+
+        public Settings Settings { get; private set; }
+
+        protected Application()
+        {
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + this.Name);
+            this.DataFolder = new DirectoryInfo(path);
+            if(!this.DataFolder.Exists)
+            {
+                this.DataFolder.Create();
+            }
+
+            path = Path.Combine(path + "\\saves");
+            this.SaveFolder = new DirectoryInfo(path);
+
+            if(!this.SaveFolder.Exists)
+            {
+                this.SaveFolder.Create();
+            }
+
+            this.Scenes = this.RegisterScenes();
+
+            this.Drivers = this.RegisterDrivers();
+
+            this.Settings = this.GetApplicationSettings();
+        }
+
+        public abstract string Name { get; }
+
+        protected abstract DriverConfiguration RegisterDrivers();
+        protected abstract IReadOnlyDictionary<string, Func<Scene>> RegisterScenes();
+        public abstract AssetManager RegisterAssetManager();
+        public abstract LoadingScreen? RegisterLoadingScreen();
+
+        public virtual ApplicationParameters ApplicationParameters => ApplicationParameters.Default;
+        public virtual ClientParameters ClientParameters => ClientParameters.Default;
+        public virtual HostParameters HostParameters => HostParameters.Default;
+
+        public virtual Settings GetApplicationSettings()
+        {
+            var path = Path.Combine(this.DataFolder.FullName + "app.ini");
+            return new Settings(new IniSettingsSource(path, Encoding.UTF8));
+        }
+        public virtual Settings GetClientSettings()
+        {
+            var path = Path.Combine(this.DataFolder.FullName + "client.ini");
+            return new Settings(new IniSettingsSource(path, Encoding.UTF8));
+        }
+        public virtual Settings GetHostSettings()
+        {
+            var path = Path.Combine(this.DataFolder.FullName + "host.ini");
+            return new Settings(new IniSettingsSource(path, Encoding.UTF8));
+        }
+    }
+
+    public struct ApplicationParameters
+    {
+        public bool ParseArguments { get; set; }
+        public ArgumentOptions ParseOptions { get; set; }
+        public bool EnableConsole { get; set; }
+        public static ApplicationParameters Default => new ApplicationParameters()
+        {
+            ParseArguments = false,
+            ParseOptions = ArgumentOptions.Parse,
+            EnableConsole = false
+        };
+
+        [Flags]
+        public enum ArgumentOptions
+        {           
+            Parse = 1,
+
+            OverrideAppSettings = 2,
+
+            OverrideClientSettings = 4,
+
+            OverrideHostSettings = 8
+        }
+    }
+}
