@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
+using Thread = System.Threading.Thread;
 using ThreadPool = System.Threading.ThreadPool;
 
 using JankWorks.Core;
@@ -50,6 +51,7 @@ namespace JankWorks.Game.Local
         private volatile ClientState state;
 
         private TimeSpan targetDelta;
+        private TimeSpan targetFrameRateDelta;
 
         private NewSceneRequest newSceneRequest;
 
@@ -67,7 +69,8 @@ namespace JankWorks.Game.Local
 
             var parms = application.ClientParameters;
 
-            this.targetDelta = TimeSpan.FromMilliseconds((1f / parms.UpdateRate) * 1000);
+            this.targetDelta = TimeSpan.FromMilliseconds((1f / parms.UpdateRate) * 1000);          
+            this.targetFrameRateDelta = TimeSpan.FromMilliseconds((1f / config.FrameRate) * 1000);
 
             var winds = new WindowSettings()
             {
@@ -216,7 +219,6 @@ namespace JankWorks.Game.Local
         {
             var timer = new Stopwatch();
             var target = this.targetDelta;
-
             timer.Start();
 
             var lag = TimeSpan.Zero;
@@ -245,6 +247,8 @@ namespace JankWorks.Game.Local
                 this.Render(state, frame);
 
                 this.FramesPerSecond = Convert.ToSingle(Math.Round(1000 / since.TotalMilliseconds, 0));
+
+                Thread.Sleep(this.targetFrameRateDelta - since);
 
                 lastrun = now;
             }
