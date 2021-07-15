@@ -80,7 +80,7 @@ namespace JankWorks.Game.Configuration
                         }
                         else if (currentLine.StartsWith('['))
                         {
-                            currentSection = currentLine.Substring(1, currentLine.LastIndexOf(']'));
+                            currentSection = currentLine.Substring(1, currentLine.LastIndexOf(']') - 1);
                             currentLine = reader.ReadLine();
                             continue;
                         }
