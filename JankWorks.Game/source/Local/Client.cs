@@ -248,8 +248,13 @@ namespace JankWorks.Game.Local
 
                 this.FramesPerSecond = Convert.ToSingle(Math.Round(1000 / since.TotalMilliseconds, 0));
 
-                Thread.Sleep(this.targetFrameRateDelta - since);
+                var breakTime = this.targetFrameRateDelta - since;
 
+                if(breakTime > TimeSpan.Zero)
+                {
+                    Thread.Sleep(breakTime);
+                }
+               
                 lastrun = now;
             }
         }

@@ -115,7 +115,11 @@ namespace JankWorks.Game.Hosting
                 }
                 else
                 {
-                    Thread.Sleep(target - lag);
+                    var breakTime = target - lag;
+                    if(breakTime > TimeSpan.Zero)
+                    {
+                        Thread.Sleep(target - lag);
+                    }
                 }
 
                 lastrun = now;
