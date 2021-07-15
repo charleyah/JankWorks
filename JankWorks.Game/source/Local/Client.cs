@@ -236,14 +236,14 @@ namespace JankWorks.Game.Local
                     this.Update(state, delta);
 
                     lag -= target;
-                    this.UpdatesPerSecond = Convert.ToSingle(Math.Round(delta.TotalMilliseconds / 1000, 0));
+                    this.UpdatesPerSecond = Convert.ToSingle(Math.Round(1000 /delta.TotalMilliseconds, 0));
                 }
 
                 var frame = new Frame(lag.TotalMilliseconds / target.TotalMilliseconds);
 
                 this.Render(state, frame);
 
-                this.FramesPerSecond = Convert.ToSingle(Math.Round(since.TotalMilliseconds / 1000, 0));
+                this.FramesPerSecond = Convert.ToSingle(Math.Round(1000 / since.TotalMilliseconds, 0));
 
                 lastrun = now;
             }

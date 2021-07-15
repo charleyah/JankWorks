@@ -109,7 +109,7 @@ namespace JankWorks.Game.Hosting
                         var delta = (lag > target) ? target : lag;
                         this.scene.Tick(this.tick++, delta);
                         lag -= target;
-                        this.TicksPerSecond = Convert.ToSingle(Math.Round(delta.TotalMilliseconds / 1000, 0));
+                        this.TicksPerSecond = Convert.ToSingle(Math.Round(1000 / delta.TotalMilliseconds, 0));
                     }
                     while (lag >= target);
                 }
