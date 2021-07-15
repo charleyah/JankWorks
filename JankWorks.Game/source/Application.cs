@@ -96,12 +96,12 @@ namespace JankWorks.Game
 
         public static void Run(Application app, Host host, string scene, object? initstate)
         {
-            using var client = new Client(app, ClientConfgiuration.Default, host);
-            client.Run(scene, host, initstate);
+            Application.Run(app, host, ClientConfgiuration.Default, scene, initstate);
         }
 
         public static void Run(Application app, Host host, ClientConfgiuration config, string scene, object? initstate)
         {
+            app.RegisterDrivers();
             using var client = new Client(app, config, host);            
             client.Run(scene, host, initstate);
         }
