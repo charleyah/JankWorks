@@ -28,6 +28,15 @@ namespace JankWorks.Drivers.Glfw.Interface
 
         private bool keyRepeatEnabled;
 
+        private readonly GLFWwindowsizefun windowResizeDelegate;
+        private readonly GLFWwindowfocusfun windowFocusDelegate;
+        private readonly GLFWcursorenterfun cursorEnterDelegate;
+        private readonly GLFWcursorposfun cursorMoveDelegate;
+        private readonly GLFWmousebuttonfun mouseButtonDelegate;
+        private readonly GLFWscrollfun scrollDelegate;
+        private readonly GLFWkeyfun keyDelegate;
+        private readonly GLFWcharfun textDelegate;
+
         public GlfwWindow(WindowSettings settings) : base(settings)
         {
             var glfwMonitor = settings.Monitor as GlfwMonitor ?? throw new NotSupportedException();
@@ -77,6 +86,15 @@ namespace JankWorks.Drivers.Glfw.Interface
                 throw new ApplicationException(errorDesc);
             }
 
+            this.windowResizeDelegate = this.HandleResizeEvent;
+            this.windowFocusDelegate = this.HandleFocusEvent;
+            this.cursorEnterDelegate = this.HandleMouseEnterOrLeaveEvent;
+            this.cursorMoveDelegate = this.HandleMouseMoveEvent;
+            this.mouseButtonDelegate = this.HandleMouseButtonEvent;
+            this.scrollDelegate = this.HandleScrollEvent;
+            this.keyDelegate = this.HandleKeyEvent;
+            this.textDelegate = this.HandleTextEvent;
+
             this.SetupCallbacks();
 
             this.Activate();
@@ -86,14 +104,14 @@ namespace JankWorks.Drivers.Glfw.Interface
 
         private void SetupCallbacks()
         {
-            glfwSetWindowSizeCallback(this.window, this.HandleResizeEvent);
-            glfwSetWindowFocusCallback(this.window, this.HandleFocusEvent);
-            glfwSetCursorEnterCallback(this.window, this.HandleMouseEnterOrLeaveEvent);
-            glfwSetCursorPosCallback(this.window, this.HandleMouseMoveEvent);
-            glfwSetMouseButtonCallback(this.window, this.HandleMouseButtonEvent);
-            glfwSetScrollCallback(this.window, this.HandleScrollEvent);
-            glfwSetKeyCallback(this.window, this.HandleKeyEvent);
-            glfwSetCharCallback(this.window, this.HandleTextEvent);
+            glfwSetWindowSizeCallback(this.window, this.windowResizeDelegate);
+            glfwSetWindowFocusCallback(this.window, this.windowFocusDelegate);
+            glfwSetCursorEnterCallback(this.window, this.cursorEnterDelegate);
+            glfwSetCursorPosCallback(this.window, this.cursorMoveDelegate);
+            glfwSetMouseButtonCallback(this.window, this.mouseButtonDelegate);
+            glfwSetScrollCallback(this.window, this.scrollDelegate);
+            glfwSetKeyCallback(this.window, this.keyDelegate);
+            glfwSetCharCallback(this.window, this.textDelegate);
         }
 
         private void HandleResizeEvent(IntPtr window, int width, int height)
@@ -185,7 +203,11 @@ namespace JankWorks.Drivers.Glfw.Interface
 
         public override void EnableKeyRepeat(bool enable) => this.keyRepeatEnabled = enable;
 
-        public override void Close() => glfwSetWindowShouldClose(this.window, GLFW_TRUE);
+        public override void Close()
+        {
+            this.ClearCallbacks();
+            glfwSetWindowShouldClose(this.window, GLFW_TRUE);
+        }
         public override void Focus() => glfwFocusWindow(this.window);
 
         public override void Hide()
