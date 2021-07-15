@@ -148,6 +148,7 @@ namespace JankWorks.Game.Hosting
                 Scene = scene,
                 InitState = initState
             };
+            this.localClient.Loaded = false;
             this.state = HostState.LoadingScene;
         }
 
@@ -158,6 +159,7 @@ namespace JankWorks.Game.Hosting
                 SceneName = scene,
                 InitState = initState
             };
+            this.localClient.Loaded = false;
             this.state = HostState.LoadingScene;
             this.runner.Start();
         }
