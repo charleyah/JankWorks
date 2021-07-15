@@ -118,6 +118,7 @@ namespace JankWorks.Game.Local
             {
                 throw new NotImplementedException();
             }
+            this.state = ClientState.EndLoadingScene;
         }
 
         private void LoadSceneWithRemoteHost(string scene, RemoteHost host, object? initState)
