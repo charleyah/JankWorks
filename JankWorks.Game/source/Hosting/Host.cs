@@ -48,6 +48,8 @@ namespace JankWorks.Game.Hosting
         protected LocalHost(Application application) : base(application) { }
         public abstract void LoadScene(HostScene scene, object? initState = null);
 
+        public abstract void Start();
+
         public abstract void Start(string scene, object? initState = null);
 
         public abstract void Run(string scene, object? initState = null);              

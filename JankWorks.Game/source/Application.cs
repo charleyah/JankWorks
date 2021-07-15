@@ -51,9 +51,14 @@ namespace JankWorks.Game
         public abstract string Name { get; }
 
         protected abstract DriverConfiguration RegisterDrivers();
+
         protected abstract IReadOnlyDictionary<string, Func<Scene>> RegisterScenes();
+
         public abstract AssetManager RegisterAssetManager();
+
         public abstract LoadingScreen? RegisterLoadingScreen();
+
+
         public virtual ApplicationParameters ApplicationParameters => ApplicationParameters.Default;
         public virtual ClientParameters ClientParameters => ClientParameters.Default;
         public virtual HostParameters HostParameters => HostParameters.Default;
@@ -72,6 +77,33 @@ namespace JankWorks.Game
         {
             var path = Path.Combine(this.DataFolder.FullName + "host.ini");
             return new Settings(new IniSettingsSource(path, Encoding.UTF8));
+        }
+
+
+        public static void Run<App>(string scene, object? initstate) where App : Application, new()
+        {
+            using var app = new App();
+            var host = new OfflineHost(app);
+            host.Start();
+            Application.Run(app, host, scene, initstate);
+        }
+
+        public static void Run<App>(Host host, string scene, object? initstate) where App : Application, new()
+        {
+            using var app = new App();
+            Application.Run(app, host, scene, initstate);
+        }
+
+        public static void Run(Application app, Host host, string scene, object? initstate)
+        {
+            using var client = new Client(app, ClientConfgiuration.Default, host);
+            client.Run(scene, host, initstate);
+        }
+
+        public static void Run(Application app, Host host, ClientConfgiuration config, string scene, object? initstate)
+        {
+            using var client = new Client(app, config, host);            
+            client.Run(scene, host, initstate);
         }
     }
 

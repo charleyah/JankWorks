@@ -152,6 +152,14 @@ namespace JankWorks.Game.Hosting
             this.state = HostState.LoadingScene;
         }
 
+        public override void Start()
+        {
+            this.localClient.Loaded = false;
+            this.localClient.Connected = false;
+            this.state = HostState.Constructed;
+            this.runner.Start();
+        }
+
         public override void Start(string scene, object? initState = null)
         {
             this.newHostSceneRequest = new NewHostSceneRequest()
