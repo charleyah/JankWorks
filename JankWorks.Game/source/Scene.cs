@@ -58,9 +58,9 @@ namespace JankWorks.Game
         }
 
         protected void RegisterHostObject(object obj) => this.hostObjects.Add(obj);
-        
 
-        public abstract void HostInitialise(Host host, AssetManager assets);
+
+        public virtual void HostInitialise(Host host, AssetManager assets) { }
         public virtual void HostInitialised(object? state) => this.BuildHostObjectContainers();
         
         private void BuildHostObjectContainers()
@@ -142,7 +142,7 @@ namespace JankWorks.Game
 
         protected void RegisterClientObject(object obj) => this.clientObjects.Add(obj);
 
-        public abstract void ClientInitialise(Client client, AssetManager assets);
+        public virtual void ClientInitialise(Client client, AssetManager assets) { }
         public virtual void ClientInitialised(object? state) => this.BuildClientObjectContainers();
         
         private void BuildClientObjectContainers()
