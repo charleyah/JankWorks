@@ -306,6 +306,7 @@ namespace JankWorks.Game.Local
                 {
                     try
                     {
+                        this.graphicsDevice.Clear();
                         this.loadingScreen.Render(this.graphicsDevice, frame);
                         this.graphicsDevice.Display();
                         this.fpsCounter.Count();
@@ -318,6 +319,7 @@ namespace JankWorks.Game.Local
             }
             else
             {
+                this.graphicsDevice.Clear();
                 this.scene.Render(this.graphicsDevice, frame);
                 this.graphicsDevice.Display();
                 this.fpsCounter.Count();
