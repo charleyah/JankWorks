@@ -54,7 +54,6 @@ namespace JankWorks.Game
         protected abstract IReadOnlyDictionary<string, Func<Scene>> RegisterScenes();
         public abstract AssetManager RegisterAssetManager();
         public abstract LoadingScreen? RegisterLoadingScreen();
-
         public virtual ApplicationParameters ApplicationParameters => ApplicationParameters.Default;
         public virtual ClientParameters ClientParameters => ClientParameters.Default;
         public virtual HostParameters HostParameters => HostParameters.Default;

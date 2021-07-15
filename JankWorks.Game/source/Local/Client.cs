@@ -300,7 +300,11 @@ namespace JankWorks.Game.Local
                         state = ClientState.RunningScene;
                         this.state = state;
 
-                        this.scene.Initialised();
+                        if(this.host.IsRemote)
+                        {
+                            this.scene.Initialised();
+                        }
+                        
                         this.scene.SubscribeInputs(this.window);
                     }
                    
@@ -362,10 +366,6 @@ namespace JankWorks.Game.Local
 
         EndLoadingScene,
 
-        WaitingOnHost,
-
-        LoadFaliure,
-
-        HostFaliure,
+        WaitingOnHost
     }
 }

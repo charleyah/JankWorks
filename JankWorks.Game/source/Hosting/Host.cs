@@ -3,7 +3,7 @@
 
 using JankWorks.Core;
 using JankWorks.Game.Configuration;
-using JankWorks.Game.Local;
+using JankWorks.Game.Assets;
 
 namespace JankWorks.Game.Hosting
 {   
@@ -30,10 +30,13 @@ namespace JankWorks.Game.Hosting
 
         protected Application Application { get; init; }
 
+        protected AssetManager AssetManager { get; init; }
+
         protected Host(Application application)
         {
             this.Application = application;
             this.Settings = application.Settings;
+            this.AssetManager = application.RegisterAssetManager();
         }
        
         public abstract void Connect();
