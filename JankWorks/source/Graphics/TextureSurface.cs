@@ -2,7 +2,7 @@
 
 namespace JankWorks.Graphics
 {
-    public abstract class Canvas : Surface
+    public abstract class TextureSurface : Surface
     {
         public abstract Texture2D Texture { get; }
     }

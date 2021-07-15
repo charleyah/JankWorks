@@ -9,7 +9,7 @@ using static OpenGL.Functions;
 
 namespace JankWorks.Drivers.OpenGL.Graphics
 {
-    sealed class GLCanvas : Canvas
+    sealed class GLTextureSurface : TextureSurface
     {
         public override RGBA ClearColour
         {
@@ -39,7 +39,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         private GLTexture2D texture;
 
-        public GLCanvas(SurfaceSettings settings)
+        public GLTextureSurface(SurfaceSettings settings)
         {
             unsafe
             {
