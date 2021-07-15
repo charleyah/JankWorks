@@ -18,7 +18,8 @@ namespace JankWorks.Game.Platform
                     PlatformApi.Instance = new Windows.WindowsApi();
                     break;
                 default:
-                    throw new NotImplementedException();
+                    PlatformApi.Instance = new FallbackApi();
+                    break;
             }
         }
 
