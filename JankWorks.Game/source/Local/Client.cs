@@ -298,7 +298,7 @@ namespace JankWorks.Game.Local
 
         private void Render(ClientState state, Frame frame, TimeSpan timeout)
         {
-            this.UpdatesPerSecond = this.upsCounter.Frequency;            
+            this.FramesPerSecond = this.fpsCounter.Frequency;            
 
             if (state > ClientState.BeginLoadingScene)
             {
@@ -308,7 +308,7 @@ namespace JankWorks.Game.Local
                     {
                         this.loadingScreen.Render(this.graphicsDevice, frame);
                         this.graphicsDevice.Display();
-                        this.upsCounter.Count();
+                        this.fpsCounter.Count();
                     }
                     finally
                     {
@@ -320,7 +320,7 @@ namespace JankWorks.Game.Local
             {
                 this.scene.Render(this.graphicsDevice, frame);
                 this.graphicsDevice.Display();
-                this.upsCounter.Count();
+                this.fpsCounter.Count();
             }
         }
 
