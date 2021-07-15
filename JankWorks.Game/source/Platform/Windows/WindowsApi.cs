@@ -3,8 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace JankWorks.Game.Platform.Windows
 {
-
-    public enum MMRESULT : uint
+    internal enum MMRESULT : uint
     {
         MMSYSERR_NOERROR = 0,
         MMSYSERR_ERROR = 1,
