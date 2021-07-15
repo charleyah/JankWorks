@@ -29,6 +29,8 @@ namespace JankWorks.Game.Local
 
         public Settings Settings { get; private set; }
 
+        public ClientConfgiuration Configuration { get; private set; }
+
         public TimeSpan Lag { get; private set; }
 
         public float UpdatesPerSecond { get; private set; }
@@ -53,7 +55,6 @@ namespace JankWorks.Game.Local
 
         private volatile ClientState state;
 
-        private ClientConfgiuration config;
         private ClientParameters parameters;
 
         private NewSceneRequest newSceneRequest;
@@ -75,7 +76,7 @@ namespace JankWorks.Game.Local
 
             var settings = application.GetClientSettings();
             config.Load(settings);
-            this.config = config;
+            this.Configuration = config;
             this.Settings = settings;
 
             var parms = application.ClientParameters;
@@ -228,7 +229,7 @@ namespace JankWorks.Game.Local
         private void Run()
         {
             var updateTime = TimeSpan.FromMilliseconds((1f / this.parameters.UpdateRate) * 1000);
-            var frameTime = TimeSpan.FromMilliseconds((1f / this.config.FrameRate) * 1000);
+            var frameTime = TimeSpan.FromMilliseconds((1f / this.Configuration.FrameRate) * 1000);
 
             var timer = new Stopwatch();
             timer.Start();
