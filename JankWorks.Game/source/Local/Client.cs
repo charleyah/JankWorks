@@ -53,14 +53,21 @@ namespace JankWorks.Game.Local
 
         private volatile ClientState state;
 
-        private TimeSpan targetDelta;
-        private TimeSpan targetFrameRateDelta;
+        private ClientConfgiuration config;
+        private ClientParameters parameters;
 
         private NewSceneRequest newSceneRequest;
+
+        private Counter upsCounter;
+        private Counter fpsCounter;
 
 #pragma warning disable CS8618
         public Client(Application application, ClientConfgiuration config, Host host)
         {
+            var second = TimeSpan.FromSeconds(1);
+            this.upsCounter = new Counter(second);
+            this.fpsCounter = new Counter(second);
+
             this.state = ClientState.Constructed;
             this.application = application;
             this.host = host;
@@ -68,12 +75,12 @@ namespace JankWorks.Game.Local
 
             var settings = application.GetClientSettings();
             config.Load(settings);
+            this.config = config;
             this.Settings = settings;
 
             var parms = application.ClientParameters;
+            this.parameters = parms;
 
-            this.targetDelta = TimeSpan.FromMilliseconds((1f / parms.UpdateRate) * 1000);          
-            this.targetFrameRateDelta = TimeSpan.FromMilliseconds((1f / config.FrameRate) * 1000);
 
             var winds = new WindowSettings()
             {
@@ -220,12 +227,18 @@ namespace JankWorks.Game.Local
         }
         private void Run()
         {
+            var updateTime = TimeSpan.FromMilliseconds((1f / this.parameters.UpdateRate) * 1000);
+            var frameTime = TimeSpan.FromMilliseconds((1f / this.config.FrameRate) * 1000);
+
             var timer = new Stopwatch();
-            var target = this.targetDelta;
             timer.Start();
 
+            var accumulator = TimeSpan.Zero;
             var lag = TimeSpan.Zero;
             var lastrun = timer.Elapsed;
+
+            this.upsCounter.Start();
+            this.fpsCounter.Start();
 
             while (this.window.IsOpen)
             {
@@ -233,29 +246,35 @@ namespace JankWorks.Game.Local
 
                 TimeSpan now = timer.Elapsed;
                 TimeSpan since = now - lastrun;
+                accumulator += since;
                 lag += since;
                 this.Lag = lag;
 
-                if(lag < this.targetFrameRateDelta)
+                if (accumulator >= frameTime)
                 {
-                    PlatformApi.Instance.Sleep(this.targetFrameRateDelta - lag);
-                    lastrun = now;
-                    continue;
-                }
+                    while (lag >= updateTime)
+                    {
+                        var delta = (lag > updateTime) ? updateTime : lag;
 
-                while (lag >= target)
+                        this.Update(state, delta);
+
+                        lag -= updateTime;
+                    }
+
+                    var frame = new Frame(accumulator.TotalMilliseconds / updateTime.TotalMilliseconds);
+                    this.Render(state, frame, updateTime);
+
+                    accumulator -= frameTime;
+                }
+                else
                 {
-                    var delta = (lag > target) ? target : lag;
+                    var remaining = frameTime - accumulator;
 
-                    this.Update(state, delta);
-
-                    lag -= target;
-                    this.UpdatesPerSecond = Convert.ToSingle(Math.Round(1000 /delta.TotalMilliseconds, 0));
+                    if (remaining > TimeSpan.Zero)
+                    {
+                        PlatformApi.Instance.Sleep(remaining);
+                    }
                 }
-
-                var frame = new Frame(lag.TotalMilliseconds / target.TotalMilliseconds);
-                this.Render(state, frame);
-                this.FramesPerSecond = Convert.ToSingle(Math.Round(1000 / since.TotalMilliseconds, 0));
 
                 lastrun = now;
             }
@@ -263,6 +282,9 @@ namespace JankWorks.Game.Local
 
         private void Update(ClientState state, TimeSpan delta)
         {
+            this.UpdatesPerSecond = this.upsCounter.Frequency;
+            this.upsCounter.Count();
+
             this.window.ProcessEvents();
             if (state > ClientState.BeginLoadingScene)
             {
@@ -274,16 +296,19 @@ namespace JankWorks.Game.Local
             }
         }
 
-        private void Render(ClientState state, Frame frame)
+        private void Render(ClientState state, Frame frame, TimeSpan timeout)
         {
+            this.UpdatesPerSecond = this.upsCounter.Frequency;            
+
             if (state > ClientState.BeginLoadingScene)
             {
-                if (this.loadingScreen != null && this.graphicsDevice.Activate(this.targetDelta))
+                if (this.loadingScreen != null && this.graphicsDevice.Activate(timeout))
                 {
                     try
                     {
                         this.loadingScreen.Render(this.graphicsDevice, frame);
                         this.graphicsDevice.Display();
+                        this.upsCounter.Count();
                     }
                     finally
                     {
@@ -295,6 +320,7 @@ namespace JankWorks.Game.Local
             {
                 this.scene.Render(this.graphicsDevice, frame);
                 this.graphicsDevice.Display();
+                this.upsCounter.Count();
             }
         }
 

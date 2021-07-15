@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-
-using System.Threading;
 using System.Threading.Tasks;
+
+using JankWorks.Game.Platform;
 
 namespace JankWorks.Game.Hosting
 {
@@ -21,11 +20,11 @@ namespace JankWorks.Game.Hosting
 
         private volatile HostState state;
 
-        private TimeSpan targetDelta;
-
         private LocalClientState localClient;
 
         private NewHostSceneRequest newHostSceneRequest;
+
+        private HostParameters parameters;
 
         private Task runner;
 
@@ -34,8 +33,7 @@ namespace JankWorks.Game.Hosting
         public OfflineHost(Application application) : base(application)
         {
             var parms = application.HostParameters;
-
-            this.targetDelta = TimeSpan.FromMilliseconds((1f / parms.TickRate) * 1000);
+            this.parameters = parms;
 
             this.runner = new Task(this.Run, TaskCreationOptions.LongRunning);            
         }
@@ -56,7 +54,7 @@ namespace JankWorks.Game.Hosting
         private void Run()
         {
             var timer = new Stopwatch();
-            var target = this.targetDelta;
+            var tickTime = TimeSpan.FromMilliseconds((1f / this.parameters.TickRate) * 1000);
 
             timer.Start();
 
@@ -102,23 +100,23 @@ namespace JankWorks.Game.Hosting
                 lag += since;
                 this.Lag = lag;
 
-                if(lag >= target)
+                if(lag >= tickTime)
                 {
                     do
                     {
-                        var delta = (lag > target) ? target : lag;
+                        var delta = (lag > tickTime) ? tickTime : lag;
                         this.scene.Tick(this.tick++, delta);
-                        lag -= target;
+                        lag -= tickTime;
                         this.TicksPerSecond = Convert.ToSingle(Math.Round(1000 / delta.TotalMilliseconds, 0));
                     }
-                    while (lag >= target);
+                    while (lag >= tickTime);
                 }
                 else
                 {
-                    var breakTime = target - lag;
-                    if(breakTime > TimeSpan.Zero)
+                    var remaining = tickTime - lag;
+                    if(remaining > TimeSpan.Zero)
                     {
-                        Thread.Sleep(target - lag);
+                        PlatformApi.Instance.Sleep(remaining);
                     }
                 }
 
