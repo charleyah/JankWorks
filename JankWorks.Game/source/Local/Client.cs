@@ -207,7 +207,7 @@ namespace JankWorks.Game.Local
                 ls.InitialiseGraphicsResources(this.graphicsDevice, this.assetManager);
                 this.loadingScreen = ls;
             }
-
+            this.window.Show();
             this.ChangeScene(scene, host, initState);
             this.Run();
         }
