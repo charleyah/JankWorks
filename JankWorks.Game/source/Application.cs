@@ -26,14 +26,14 @@ namespace JankWorks.Game
 
         protected Application()
         {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + this.Name);
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), this.Name);
             this.DataFolder = new DirectoryInfo(path);
             if(!this.DataFolder.Exists)
             {
                 this.DataFolder.Create();
             }
 
-            path = Path.Combine(path + "\\saves");
+            path = Path.Combine(path, "saves");
             this.SaveFolder = new DirectoryInfo(path);
 
             if(!this.SaveFolder.Exists)
@@ -65,17 +65,17 @@ namespace JankWorks.Game
 
         public virtual Settings GetApplicationSettings()
         {
-            var path = Path.Combine(this.DataFolder.FullName + "app.ini");
+            var path = Path.Combine(this.DataFolder.FullName, "app.ini");
             return new Settings(new IniSettingsSource(path, Encoding.UTF8));
         }
         public virtual Settings GetClientSettings()
         {
-            var path = Path.Combine(this.DataFolder.FullName + "client.ini");
+            var path = Path.Combine(this.DataFolder.FullName, "client.ini");
             return new Settings(new IniSettingsSource(path, Encoding.UTF8));
         }
         public virtual Settings GetHostSettings()
         {
-            var path = Path.Combine(this.DataFolder.FullName + "host.ini");
+            var path = Path.Combine(this.DataFolder.FullName, "host.ini");
             return new Settings(new IniSettingsSource(path, Encoding.UTF8));
         }
 
