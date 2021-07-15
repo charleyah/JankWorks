@@ -66,17 +66,23 @@ namespace JankWorks.Game
         public virtual Settings GetApplicationSettings()
         {
             var path = Path.Combine(this.DataFolder.FullName, "app.ini");
-            return new Settings(new IniSettingsSource(path, Encoding.UTF8));
+            var settings = new Settings(new IniSettingsSource(path, Encoding.UTF8));
+            settings.Load();
+            return settings;
         }
         public virtual Settings GetClientSettings()
         {
             var path = Path.Combine(this.DataFolder.FullName, "client.ini");
-            return new Settings(new IniSettingsSource(path, Encoding.UTF8));
+            var settings = new Settings(new IniSettingsSource(path, Encoding.UTF8));
+            settings.Load();
+            return settings;
         }
         public virtual Settings GetHostSettings()
         {
             var path = Path.Combine(this.DataFolder.FullName, "host.ini");
-            return new Settings(new IniSettingsSource(path, Encoding.UTF8));
+            var settings = new Settings(new IniSettingsSource(path, Encoding.UTF8));
+            settings.Load();
+            return settings;
         }
 
 
