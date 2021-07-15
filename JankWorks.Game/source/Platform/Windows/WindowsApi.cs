@@ -37,7 +37,7 @@ namespace JankWorks.Game.Platform.Windows
         public uint wPeriodMax;
     }
 
-    internal class WindowsApi : PlatformApi
+    internal sealed class WindowsApi : PlatformApi
     {
         [DllImport("Winmm.dll")]
         private static extern unsafe MMRESULT timeGetDevCaps(TIMECAPS* ptc, uint cbtc);
