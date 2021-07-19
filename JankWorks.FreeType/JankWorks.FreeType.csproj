@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="source\FreeType.Enums.cs" />
+    <Compile Remove="source\Graphics\FreeType.Functions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="runtimes\linux-x64\native\" />
+    <Folder Include="source\Graphics\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="source\Native\FreeType.Enums.cs" />
+    <None Include="source\Native\FreeType.Functions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JankWorks\JankWorks.csproj" />
+  </ItemGroup>
+
+</Project>
