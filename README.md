@@ -4,13 +4,14 @@ JankWorks is a multimedia library and game framework that I currently work on. C
 
 ### Project Layout
 
-| Project          | Description                                                  |
-| ---------------- | ------------------------------------------------------------ |
-| JankWorks        | Multimedia API abstraction that currently covers graphics and windowing. |
-| JankWorks.Game   | Basic framework to build projects with                       |
-| JankWorks.Glfw   | Glfw driver that implements windowing API                    |
-| JankWorks.OpenGL | OpenGL driver that implements graphics API                   |
-| JankWorks.DotNet | .NET driver that currently implements Image loading          |
+| Project            | Description                                                  |
+| ------------------ | ------------------------------------------------------------ |
+| JankWorks          | Multimedia API abstraction that currently covers graphics and windowing. |
+| JankWorks.Game     | Basic framework to build projects with                       |
+| JankWorks.FreeType | FreeType driver that implements font loading                 |
+| JankWorks.Glfw     | Glfw driver that implements window management                |
+| JankWorks.OpenGL   | OpenGL driver that implements graphics API                   |
+| JankWorks.DotNet   | .NET driver that currently implements Image loading          |
 
 ## Lets Draw A Triangle
 
@@ -200,7 +201,7 @@ The window will now close by pressing the enter key.
 
 ### Show Me The Pixels
 
-Its time to finally time to display our triangle.
+Its time to finally display our triangle.
 
 ```csharp
 window.Show();
