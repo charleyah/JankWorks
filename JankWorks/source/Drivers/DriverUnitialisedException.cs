@@ -16,7 +16,8 @@ namespace JankWorks.Drivers
     IMonitorDriver, 
     IWindowDriver, 
     IGraphicsDriver,
-    IImageDriver
+    IImageDriver,
+    IFontDriver
     {
         Monitor[] IMonitorDriver.GetMonitors() => throw this;
         Monitor IMonitorDriver.GetPrimaryMonitor() => throw this;
@@ -26,6 +27,9 @@ namespace JankWorks.Drivers
 
 
         GraphicsDevice IGraphicsDriver.CreateGraphicsDevice(SurfaceSettings settings, IRenderTarget renderTarget) => throw this;
+
+        Font IFontDriver.LoadFontFromStream(Stream stream, FontFormat format) => throw this;
+
         GraphicsApi IGraphicsDriver.GraphicsApi => throw this;
 
         public static readonly DriverUnitialisedException driver = new DriverUnitialisedException();

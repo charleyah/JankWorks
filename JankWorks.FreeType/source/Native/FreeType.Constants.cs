@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
-namespace JankWorks.FreeType.Native
+namespace JankWorks.Drivers.FreeType.Native
 {
     public static class Constants
     {

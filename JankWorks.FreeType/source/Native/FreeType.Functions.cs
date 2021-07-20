@@ -2,12 +2,11 @@
 
 using System;
 using System.Security;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 using JankWorks.Platform;
 
-namespace JankWorks.FreeType.Native
+namespace JankWorks.Drivers.FreeType.Native
 {
     public static class Functions
     {
@@ -65,7 +64,7 @@ namespace JankWorks.FreeType.Native
         public static Delegates.FT_Get_First_Char FT_Get_First_Char;
         public static Delegates.FT_Get_Next_Char FT_Get_Next_Char;
 
-        public static LibraryLoader? loader;
+        public static volatile LibraryLoader? loader;
 
         public static void Init()
         {

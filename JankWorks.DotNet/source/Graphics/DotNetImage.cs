@@ -26,7 +26,7 @@ namespace JankWorks.Drivers.DotNet.Graphics
         public override void CopyTo(Texture2D texture)
         {
             var size = this.Size;
-            var data = this.bitmap.LockBits(new System.Drawing.Rectangle(0, 0, size.X, size.Y), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var data = this.bitmap.LockBits(new System.Drawing.Rectangle(0, 0, size.X, size.Y), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             try
             {

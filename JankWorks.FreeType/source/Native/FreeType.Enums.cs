@@ -1,6 +1,5 @@
-﻿using System;
-
-namespace JankWorks.FreeType.Native
+﻿
+namespace JankWorks.Drivers.FreeType.Native
 {
     public enum FT_Error
     {
@@ -117,6 +116,20 @@ namespace JankWorks.FreeType.Native
         FT_GLYPH_FORMAT_BITMAP = ((uint)'b' << 24) | ((uint)'i' << 16) | ((uint)'t' << 8) | 's',
         FT_GLYPH_FORMAT_OUTLINE = ((uint)'o' << 24) | ((uint)'u' << 16) | ((uint)'t' << 8) | 'l',
         FT_GLYPH_FORMAT_PLOTTER = ((uint)'p' << 24) | ((uint)'l' << 16) | ((uint)'o' << 8) | 't',
+    }
+
+    public enum FT_Pixel_Mode : byte
+    {
+        FT_PIXEL_MODE_NONE = 0,
+        FT_PIXEL_MODE_MONO,
+        FT_PIXEL_MODE_GRAY,
+        FT_PIXEL_MODE_GRAY2,
+        FT_PIXEL_MODE_GRAY4,
+        FT_PIXEL_MODE_LCD,
+        FT_PIXEL_MODE_LCD_V,
+        FT_PIXEL_MODE_BGRA,
+
+        FT_PIXEL_MODE_MAX
     }
 
 }

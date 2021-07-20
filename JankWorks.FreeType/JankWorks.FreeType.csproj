@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <RootNamespace>JankWorks.Drivers.FreeType</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="runtimes\linux-x64\native\" />
-    <Folder Include="source\Graphics\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +30,18 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JankWorks\JankWorks.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="runtimes\linux-x64\native\libfreetype.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="runtimes\osx-x64\native\libfreetype.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="runtimes\win-x64\native\freetype.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

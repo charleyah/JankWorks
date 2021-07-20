@@ -28,7 +28,7 @@ using FT_String = JankWorks.Util.CString;
 
 using FT_Pos = nint;
 
-namespace JankWorks.FreeType.Native
+namespace JankWorks.Drivers.FreeType.Native
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct FT_Library
@@ -203,7 +203,7 @@ namespace JankWorks.FreeType.Native
         public int pitch;
         public byte* buffer;
         public ushort num_grays;
-        public byte pixel_mode;
+        public FT_Pixel_Mode pixel_mode;
         public byte palette_mode;
         public void* palette;
     }

@@ -14,8 +14,9 @@ namespace JankWorks.Drivers
         public readonly IWindowDriver windowApi;
 
         public readonly IImageDriver imageApi;
-
+        public readonly IFontDriver fontApi;
         public readonly IGraphicsDriver graphicsApi;
+
 
         static DriverConfiguration()
         {
@@ -29,13 +30,16 @@ namespace JankWorks.Drivers
             IMonitorDriver monitorDriver = null, 
             IWindowDriver windowDriver = null, 
             IImageDriver imageDriver = null,
+            IFontDriver fontDriver = null,
             IGraphicsDriver graphicsDriver = null
         )
         {
             this.monitorApi = monitorDriver ?? DriverUnitialisedException.driver;
             this.windowApi = windowDriver ?? DriverUnitialisedException.driver;
-            this.graphicsApi = graphicsDriver ?? DriverUnitialisedException.driver;
             this.imageApi = imageDriver ?? DriverUnitialisedException.driver;
+            this.fontApi = fontDriver ?? DriverUnitialisedException.driver;
+            this.graphicsApi = graphicsDriver ?? DriverUnitialisedException.driver;
+            
         }
 
         public void PrintDrivers(TextWriter writer)
@@ -69,6 +73,7 @@ namespace JankWorks.Drivers
             IMonitorDriver monitorDriver = null;
             IWindowDriver windowDriver = null;
             IImageDriver imageDriver = null;
+            IFontDriver fontDriver = null;
             IGraphicsDriver graphicsDriver = null;
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -82,15 +87,17 @@ namespace JankWorks.Drivers
                     SetDriverApi(ref monitorDriver, driverInstance);
                     SetDriverApi(ref windowDriver, driverInstance);
                     SetDriverApi(ref imageDriver, driverInstance);
+                    SetDriverApi(ref fontDriver, driverInstance);
                     SetDriverApi(ref graphicsDriver, driverInstance);
                 }
             }
 
             var config = new DriverConfiguration
             (
-                monitorDriver, 
-                windowDriver, 
-                imageDriver, 
+                monitorDriver,
+                windowDriver,
+                imageDriver,
+                fontDriver,
                 graphicsDriver
             );
             DriverConfiguration.Drivers = config;

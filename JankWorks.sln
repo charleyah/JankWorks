@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Triangle", "Triangle\Triang
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.Game", "JankWorks.Game\JankWorks.Game.csproj", "{1D8E818A-4D69-498B-AA95-978178283A66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JankWorks.FreeType", "JankWorks.FreeType\JankWorks.FreeType.csproj", "{2BDE109B-7938-42E0-81CC-B19BFDC41957}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.FreeType", "JankWorks.FreeType\JankWorks.FreeType.csproj", "{2BDE109B-7938-42E0-81CC-B19BFDC41957}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
