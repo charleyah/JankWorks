@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SurfaceTest\Surface.frag.glsl" />
+    <None Remove="SurfaceTest\Surface.vert.glsl" />
+    <None Remove="SurfaceTest\Triangle.frag.glsl" />
+    <None Remove="SurfaceTest\Triangle.vert.glsl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="SurfaceTest\Surface.frag.glsl" />
+    <EmbeddedResource Include="SurfaceTest\Surface.vert.glsl" />
+    <EmbeddedResource Include="SurfaceTest\Triangle.frag.glsl" />
+    <EmbeddedResource Include="SurfaceTest\Triangle.vert.glsl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JankWorks.DotNet\JankWorks.DotNet.csproj" />
+    <ProjectReference Include="..\JankWorks.FreeType\JankWorks.FreeType.csproj" />
+    <ProjectReference Include="..\JankWorks.Glfw\JankWorks.Glfw.csproj" />
+    <ProjectReference Include="..\JankWorks.OpenGL\JankWorks.OpenGL.csproj" />
+    <ProjectReference Include="..\JankWorks\JankWorks.csproj" />
+  </ItemGroup>
+
+</Project>

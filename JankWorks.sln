@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.Game", "JankWorks
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.FreeType", "JankWorks.FreeType\JankWorks.FreeType.csproj", "{2BDE109B-7938-42E0-81CC-B19BFDC41957}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{06F01A5C-BF69-49F6-B87A-1E42A6A4B381}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{2BDE109B-7938-42E0-81CC-B19BFDC41957}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BDE109B-7938-42E0-81CC-B19BFDC41957}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BDE109B-7938-42E0-81CC-B19BFDC41957}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06F01A5C-BF69-49F6-B87A-1E42A6A4B381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06F01A5C-BF69-49F6-B87A-1E42A6A4B381}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06F01A5C-BF69-49F6-B87A-1E42A6A4B381}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06F01A5C-BF69-49F6-B87A-1E42A6A4B381}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
