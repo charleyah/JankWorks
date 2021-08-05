@@ -10,11 +10,21 @@ namespace JankWorks.Graphics
 
         public abstract RGBA ClearColour { get; set; }
 
-        public DrawState DefaultDrawState { get; set; }
-
-        protected Surface()
+        public DrawState DefaultDrawState 
         {
-            this.DefaultDrawState = DrawState.Default;
+            get => this.defaultDrawState;
+            set
+            {                
+                this.ApplyDrawState(in value);
+                this.defaultDrawState = value;
+            }
+        }
+
+        private DrawState defaultDrawState;
+
+        protected Surface(DrawState defaultDrawState)
+        {
+            this.DefaultDrawState = defaultDrawState;
         }
 
         public virtual void Clear()
@@ -38,24 +48,28 @@ namespace JankWorks.Graphics
         {
             this.ApplyDrawState(in drawState);
             this.DrawPrimitives(shader, primitive, offset, count);
+            this.ApplyDrawState(this.DefaultDrawState);
         }
 
         public virtual void DrawPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int offset, int count, int instanceCount, in DrawState drawState)
         {
             this.ApplyDrawState(in drawState);
             this.DrawPrimitivesInstanced(shader, primitive, offset, count, instanceCount);
+            this.ApplyDrawState(this.DefaultDrawState);
         }
 
         public virtual void DrawIndexedPrimitives(Shader shader, DrawPrimitiveType primitive, int count, in DrawState drawState)
         {
             this.ApplyDrawState(in drawState);
             this.DrawIndexedPrimitives(shader, primitive, count);
+            this.ApplyDrawState(this.DefaultDrawState);
         }
 
         public virtual void DrawIndexedPrimitivesInstanced(Shader shader, DrawPrimitiveType primitive, int count, int instanceCount, in DrawState drawState)
         {
             this.ApplyDrawState(in drawState);
             this.DrawIndexedPrimitivesInstanced(shader, primitive, count, instanceCount);
+            this.ApplyDrawState(this.DefaultDrawState);
         }
 
         public abstract void DrawPrimitives(Shader shader, DrawPrimitiveType primitive, int offset, int count);
@@ -66,11 +80,13 @@ namespace JankWorks.Graphics
 
     public struct DrawState
     {
-        public bool DepthTesting;
+        public DepthTestMode DepthTest;
+        public BlendMode Blend;
 
         public static DrawState Default => new DrawState()
         {
-            DepthTesting = false
+            DepthTest = DepthTestMode.None,
+            Blend = BlendMode.None
         };
     }
 
@@ -91,5 +107,25 @@ namespace JankWorks.Graphics
 
         Triangles,
         TriangleStrip
+    }
+
+    public enum BlendMode
+    {
+        None,
+        Alpha,
+        Additive,
+    }
+
+    public enum DepthTestMode
+    {
+        None,
+        Always,
+        Never,
+        Equal,
+        NotEqual,
+        Less,
+        Greater,
+        LessOrEqual,
+        GreaterOrEqual,
     }
 }

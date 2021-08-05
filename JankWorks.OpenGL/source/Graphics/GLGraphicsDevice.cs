@@ -43,7 +43,7 @@ namespace JankWorks.Drivers.OpenGL
 
         private readonly GraphicsDeviceInfo info;
 
-        public GLGraphicsDevice(SurfaceSettings settings, IRenderTarget renderTarget) : base(renderTarget)
+        public GLGraphicsDevice(SurfaceSettings settings, IRenderTarget renderTarget) : base(renderTarget, DrawState.Default)
         {
             this.Viewport = new Rectangle(new Vector2i(0, 0), settings.Size);
             this.ClearColour = settings.ClearColour;
@@ -241,9 +241,6 @@ namespace JankWorks.Drivers.OpenGL
             program.UnBind();
         }
 
-        protected override void ApplyDrawState(in DrawState drawState)
-        {
-            if (drawState.DepthTesting) { glEnable(GL_DEPTH_TEST); } else { glDisable(GL_DEPTH_TEST); }
-        }
+        protected override void ApplyDrawState(in DrawState drawState) => drawState.Process();
     }
 }

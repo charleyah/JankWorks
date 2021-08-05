@@ -21,7 +21,7 @@ namespace JankWorks.Graphics
 
         protected IRenderTarget RenderTarget { get; private set; }
 
-        protected GraphicsDevice(IRenderTarget renderTarget)
+        protected GraphicsDevice(IRenderTarget renderTarget, DrawState defaultDrawState) : base(defaultDrawState)
         {
             this.RenderTarget = renderTarget;
             this.RenderTarget.OnResize += (viewport) => this.Viewport = viewport;

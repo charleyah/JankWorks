@@ -2,6 +2,7 @@
 using JankWorks.Graphics;
 
 using static OpenGL.Constants;
+using static OpenGL.Functions;
 
 namespace JankWorks.Drivers.OpenGL.Graphics
 {
@@ -112,6 +113,52 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             if (mode.HasFlag(ClearBitMask.Stencil)) { value |= GL_STENCIL_BUFFER_BIT; }
 
             return value;
+        }
+
+        public static void Process(this in DrawState state)
+        {
+            if(state.DepthTest != DepthTestMode.None)
+            {
+                glEnable(GL_DEPTH_TEST);
+
+                var depthMode = state.DepthTest switch
+                {
+                    DepthTestMode.Always => GL_ALWAYS,
+                    DepthTestMode.Never => GL_NEVER,
+                    DepthTestMode.Equal => GL_EQUAL,
+                    DepthTestMode.NotEqual => GL_NOTEQUAL,
+                    DepthTestMode.Greater => GL_GREATER,
+                    DepthTestMode.Less => GL_LESS,
+                    DepthTestMode.GreaterOrEqual => GL_GEQUAL,
+                    DepthTestMode.LessOrEqual => GL_LEQUAL,
+                    _ => throw new NotImplementedException()
+                };
+                glDepthFunc(depthMode);
+            }
+            else
+            {
+                glDisable(GL_DEPTH_TEST);
+            }
+
+            if(state.Blend != BlendMode.None)
+            {
+                glEnable(GL_BLEND);
+
+                switch(state.Blend)
+                {
+                    case BlendMode.Alpha:
+                        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                        break;
+
+                    case BlendMode.Additive:
+                        glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
+                        break;
+                }
+            }
+            else
+            {
+                glDisable(GL_BLEND);
+            }
         }
     }
 }

@@ -39,7 +39,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         private GLTexture2D texture;
 
-        public GLTextureSurface(SurfaceSettings settings)
+        public GLTextureSurface(SurfaceSettings settings) : base(DrawState.Default)
         {
             unsafe
             {
@@ -129,10 +129,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             program.UnBind();
         }
 
-        protected override void ApplyDrawState(in DrawState drawState)
-        {
-            if (drawState.DepthTesting) { glEnable(GL_DEPTH_TEST); } else { glDisable(GL_DEPTH_TEST); }
-        }
+        protected override void ApplyDrawState(in DrawState drawState) => drawState.Process();
 
         protected override void Dispose(bool finalising)
         {
