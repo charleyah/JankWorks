@@ -8,7 +8,7 @@ using JankWorks.Graphics;
 
 namespace Tests.SurfaceTest
 {
-    class TextureSurfaceTest : Test
+    sealed class TextureSurfaceTest : Test
     {
         private VertexBuffer<Vertex2> triangle;
         private VertexLayout triangleLayout;
@@ -77,7 +77,6 @@ namespace Tests.SurfaceTest
                 ClearColour = Colour.Black
             };
             surface = device.CreateTextureSurface(surfacesettings);
-
 
             surfaceQuad = device.CreateVertexBuffer<Vertex2>();
             surfaceQuad.Usage = BufferUsage.Static;
