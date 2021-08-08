@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using JankWorks.Core;
 using JankWorks.Audio;
 using JankWorks.Interface;
 using JankWorks.Graphics;
@@ -171,6 +170,7 @@ namespace JankWorks.Game
             this.inputlisteners = Array.Empty<IInputListener>();
             this.updatables = Array.Empty<IUpdatable>();
             this.asyncUpdatables = Array.Empty<IAsyncUpdatable>();
+            this.clientObjects.Clear();
         }
 
         public virtual void SubscribeInputs(Window window) 
