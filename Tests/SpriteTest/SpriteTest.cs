@@ -98,5 +98,15 @@ namespace Tests.SpriteTest
         {
             device.DrawIndexedPrimitives(this.program, DrawPrimitiveType.Triangles, 6);
         }
+
+        protected override void Dispose(bool finalising)
+        {
+            this.program.Dispose();
+            this.quadIndexes.Dispose();
+            this.quadlayout.Dispose();
+            this.quad.Dispose();
+            this.texture.Dispose();
+            base.Dispose(finalising);
+        }
     }
 }
