@@ -20,7 +20,7 @@ namespace Tests
             var windowsettings = WindowSettings.Default;
             windowsettings.VideoMode = new VideoMode(1024, 768, 32, 60);
             windowsettings.VSync = true;
-            windowsettings.Style = WindowStyle.Windowed;
+            windowsettings.Style = WindowStyle.Windowed;                    
 
             var surfacesettings = new SurfaceSettings()
             {

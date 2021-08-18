@@ -16,11 +16,6 @@ namespace JankWorks.Drivers.DotNet.Graphics
         public DotNetImage(Bitmap bitmap)
         {
             this.bitmap = bitmap;
-
-            if (DriverConfiguration.Drivers.graphicsApi.GraphicsApi == GraphicsApi.OpenGL)
-            {
-                this.bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-            }
         }
 
         public override void CopyTo(Texture2D texture)
