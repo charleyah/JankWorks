@@ -9,53 +9,41 @@ namespace JankWorks.Graphics
     /// Colour represented by 8-bits per channel in order of red, green, blue and alpha
     /// </summary>
     [Serializable]
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct RGBA : IEquatable<RGBA>
     {
-        [FieldOffset(0)] private uint value;
+        public byte R;
+        public byte G;
+        public byte B;
+        public byte A;
 
-        [FieldOffset(0)] public byte R;
-
-        [FieldOffset(1)] public byte G;
-
-        [FieldOffset(2)] public byte B;
-
-        [FieldOffset(3)] public byte A;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static RGBA From(uint value)
+        public RGBA(byte r, byte g, byte b, byte a = 255)
         {
-            RGBA col = default;
-            col.value = value;
-            return col;
+            this.R = r;
+            this.G = g;
+            this.B = b;
+            this.A = a;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static RGBA From(byte r, byte g, byte b, byte a = 255)
+        public unsafe RGBA(uint value)
         {
-            RGBA col = default;
-            col.R = r;
-            col.G = g;
-            col.B = b;
-            col.A = a;
-
-            return col;
+            this = *(RGBA*)&value;
         }
 
         public override bool Equals(object obj) => obj is RGBA other && this == other;
         public bool Equals(RGBA other) => this == other;
-        public override int GetHashCode() => this.value.GetHashCode();
+        public override int GetHashCode() => ((uint)this).GetHashCode();
         public override string ToString() => $"{nameof(RGBA)} {{ R = {this.R}, G = {this.G}, B = {this.B}, A = {this.A} }}";
-        public static bool operator ==(RGBA left, RGBA right) => left.value == right.value;
-        public static bool operator !=(RGBA left, RGBA right) => left.value != right.value;
+        public static unsafe bool operator ==(RGBA left, RGBA right) => *(uint*)&left == *(uint*)&right;
+        public static unsafe bool operator !=(RGBA left, RGBA right) => *(uint*)&left == *(uint*)&right;
 
-        public static implicit operator ARGB(RGBA col) => ARGB.From(col.R, col.G, col.B, col.A);
+        public static implicit operator ARGB(RGBA col) => new ARGB(col.R, col.G, col.B, col.A);
 
-        public static implicit operator BGRA(RGBA col) => BGRA.From(col.R, col.G, col.B, col.A);
+        public static implicit operator BGRA(RGBA col) => new BGRA(col.R, col.G, col.B, col.A);
 
-        public static implicit operator ABGR(RGBA col) => ABGR.From(col.R, col.G, col.B, col.A);
+        public static implicit operator ABGR(RGBA col) => new ABGR(col.R, col.G, col.B, col.A);
 
-        public static explicit operator uint(RGBA col) => col.value;
+        public static unsafe explicit operator uint(RGBA col) => *(uint*)&col;
 
         public static explicit operator Vector4(RGBA col)
         {
@@ -66,7 +54,7 @@ namespace JankWorks.Graphics
         public static explicit operator RGBA(Vector4 vec)
         {
             var veccol = Vector4.Multiply(vec, 255);
-            return RGBA.From(Convert.ToByte(veccol.X), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.Z), Convert.ToByte(veccol.W));
+            return new RGBA(Convert.ToByte(veccol.X), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.Z), Convert.ToByte(veccol.W));
         }
 
         public static explicit operator Vector3(RGBA col)
@@ -78,7 +66,7 @@ namespace JankWorks.Graphics
         public static explicit operator RGBA(Vector3 vec)
         {
             var veccol = Vector3.Multiply(vec, 255);
-            return RGBA.From(Convert.ToByte(veccol.X), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.Z));
+            return new RGBA(Convert.ToByte(veccol.X), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.Z));
         }
     }
 
@@ -87,53 +75,41 @@ namespace JankWorks.Graphics
     /// Colour represented by 8-bits per channel in order of alpha, red, green and blue
     /// </summary>
     [Serializable]
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ARGB : IEquatable<ARGB>
     {
-        [FieldOffset(0)] private uint value;
+        public byte A;
+        public byte R;
+        public byte G;
+        public byte B;
 
-        [FieldOffset(0)] public byte A;
-
-        [FieldOffset(1)] public byte R;
-
-        [FieldOffset(2)] public byte G;
-
-        [FieldOffset(3)] public byte B;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ARGB From(uint value)
+        public ARGB(byte r, byte g, byte b, byte a = 255)
         {
-            ARGB col = default;
-            col.value = value;
-            return col;
+            this.A = a;
+            this.R = r;
+            this.G = g;
+            this.B = b;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ARGB From(byte r, byte g, byte b, byte a = 255)
+        public unsafe ARGB(uint value)
         {
-            ARGB col = default;
-            col.A = a;
-            col.R = r;
-            col.G = g;
-            col.B = b;
-
-            return col;
+            this = *(ARGB*)&value;
         }
-
+      
         public override bool Equals(object obj) => obj is ARGB other && this == other;
         public bool Equals(ARGB other) => this == other;
-        public override int GetHashCode() => this.value.GetHashCode();
+        public override int GetHashCode() => ((uint)this).GetHashCode();
         public override string ToString() => $"{nameof(ARGB)} {{ A = {this.A}, R = {this.R}, G = {this.G}, B = {this.B} }}";
-        public static bool operator ==(ARGB left, ARGB right) => left.value == right.value;
-        public static bool operator !=(ARGB left, ARGB right) => left.value != right.value;
+        public static unsafe bool operator ==(ARGB left, ARGB right) => *(uint*)&left == *(uint*)&right;
+        public static unsafe bool operator !=(ARGB left, ARGB right) => *(uint*)&left == *(uint*)&right;
 
-        public static implicit operator RGBA(ARGB col) => RGBA.From(col.R, col.G, col.B, col.A);
+        public static implicit operator RGBA(ARGB col) => new RGBA(col.R, col.G, col.B, col.A);
 
-        public static implicit operator BGRA(ARGB col) => BGRA.From(col.R, col.G, col.B, col.A);
+        public static implicit operator BGRA(ARGB col) => new BGRA(col.R, col.G, col.B, col.A);
 
-        public static implicit operator ABGR(ARGB col) => ABGR.From(col.R, col.G, col.B, col.A);
+        public static implicit operator ABGR(ARGB col) => new ABGR(col.R, col.G, col.B, col.A);
 
-        public static explicit operator uint(ARGB col) => col.value;
+        public static unsafe explicit operator uint(ARGB col) => *(uint*)&col;
 
         public static explicit operator Vector4(ARGB col)
         {
@@ -144,7 +120,7 @@ namespace JankWorks.Graphics
         public static explicit operator ARGB(Vector4 vec)
         {
             var veccol = Vector4.Multiply(vec, 255);
-            return ARGB.From(Convert.ToByte(veccol.X), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.Z), Convert.ToByte(veccol.W));
+            return new ARGB(Convert.ToByte(veccol.X), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.Z), Convert.ToByte(veccol.W));
         }
 
         public static explicit operator Vector3(ARGB col)
@@ -156,7 +132,7 @@ namespace JankWorks.Graphics
         public static explicit operator ARGB(Vector3 vec)
         {
             var veccol = Vector3.Multiply(vec, 255);
-            return ARGB.From(Convert.ToByte(veccol.X), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.Z));
+            return new ARGB(Convert.ToByte(veccol.X), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.Z));
         }
     }
 
@@ -166,53 +142,41 @@ namespace JankWorks.Graphics
     /// Colour represented by 8-bits per channel in order of blue, green, red and alpha
     /// </summary>
     [Serializable]
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct BGRA : IEquatable<BGRA>
     {
-        [FieldOffset(0)] private uint value;
+        public byte B;
+        public byte G;
+        public byte R;
+        public byte A;
 
-        [FieldOffset(0)] public byte B;
-
-        [FieldOffset(1)] public byte G;
-
-        [FieldOffset(2)] public byte R;
-
-        [FieldOffset(3)] public byte A;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BGRA From(uint value)
-        {
-            BGRA col = default;
-            col.value = value;
-            return col;
+        public BGRA(byte r, byte g, byte b, byte a = 255)
+        {            
+            this.A = a;
+            this.R = r;
+            this.G = g;
+            this.B = b;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BGRA From(byte r, byte g, byte b, byte a = 255)
+        public unsafe BGRA(uint value)
         {
-            BGRA col = default;
-            col.A = a;
-            col.R = r;
-            col.G = g;
-            col.B = b;
-
-            return col;
+            this = *(BGRA*)&value;
         }
 
         public override bool Equals(object obj) => obj is BGRA other && this == other;
         public bool Equals(BGRA other) => this == other;
-        public override int GetHashCode() => this.value.GetHashCode();
+        public override int GetHashCode() => ((uint)this).GetHashCode();
         public override string ToString() => $"{nameof(BGRA)} {{ B = {this.B}, G = {this.G}, R = {this.R}, A = {this.A} }}";
-        public static bool operator ==(BGRA left, BGRA right) => left.value == right.value;
-        public static bool operator !=(BGRA left, BGRA right) => left.value != right.value;
+        public static unsafe bool operator ==(BGRA left, BGRA right) => *(uint*)&left == *(uint*)&right;
+        public static unsafe bool operator !=(BGRA left, BGRA right) => *(uint*)&left == *(uint*)&right;
 
-        public static implicit operator RGBA(BGRA col) => RGBA.From(col.R, col.G, col.B, col.A);
+        public static implicit operator RGBA(BGRA col) => new RGBA(col.R, col.G, col.B, col.A);
 
-        public static implicit operator ARGB(BGRA col) => ARGB.From(col.R, col.G, col.B, col.A);
+        public static implicit operator ARGB(BGRA col) => new ARGB(col.R, col.G, col.B, col.A);
 
-        public static implicit operator ABGR(BGRA col) => ABGR.From(col.R, col.G, col.B, col.A);
+        public static implicit operator ABGR(BGRA col) => new ABGR(col.R, col.G, col.B, col.A);
 
-        public static explicit operator uint(BGRA col) => col.value;
+        public static unsafe explicit operator uint(BGRA col) => *(uint*)&col;
 
         public static explicit operator Vector4(BGRA col)
         {
@@ -223,7 +187,7 @@ namespace JankWorks.Graphics
         public static explicit operator BGRA(Vector4 vec)
         {
             var veccol = Vector4.Multiply(vec, 255);
-            return BGRA.From(Convert.ToByte(veccol.Z), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.X), Convert.ToByte(veccol.W));
+            return new BGRA(Convert.ToByte(veccol.Z), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.X), Convert.ToByte(veccol.W));
         }
 
         public static explicit operator Vector3(BGRA col)
@@ -235,7 +199,7 @@ namespace JankWorks.Graphics
         public static explicit operator BGRA(Vector3 vec)
         {
             var veccol = Vector3.Multiply(vec, 255);
-            return BGRA.From(Convert.ToByte(veccol.Z), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.X));
+            return new BGRA(Convert.ToByte(veccol.Z), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.X));
         }
     }
 
@@ -245,53 +209,41 @@ namespace JankWorks.Graphics
     /// Colour represented by 8-bits per channel in order of alpha, blue, green and red
     /// </summary>
     [Serializable]
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ABGR : IEquatable<ABGR>
     {
-        [FieldOffset(0)] private uint value;
+        public byte A;
+        public byte B;
+        public byte G;
+        public byte R;
 
-        [FieldOffset(0)] public byte A;
-
-        [FieldOffset(1)] public byte B;
-
-        [FieldOffset(2)] public byte G;
-
-        [FieldOffset(3)] public byte R;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ABGR From(uint value)
+        public ABGR(byte r, byte g, byte b, byte a = 255)
         {
-            ABGR col = default;
-            col.value = value;
-            return col;
+            this.A = a;
+            this.R = r;
+            this.G = g;
+            this.B = b;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ABGR From(byte r, byte g, byte b, byte a = 255)
+        public unsafe ABGR(uint value)
         {
-            ABGR col = default;
-            col.A = a;
-            col.R = r;
-            col.G = g;
-            col.B = b;
-
-            return col;
+            this = *(ABGR*)&value;
         }
 
         public override bool Equals(object obj) => obj is ABGR other && this == other;
         public bool Equals(ABGR other) => this == other;
-        public override int GetHashCode() => this.value.GetHashCode();
+        public override int GetHashCode() => ((uint)this).GetHashCode();
         public override string ToString() => $"{nameof(ABGR)} {{ A = {this.A}, B = {this.B}, G = {this.G}, R = {this.R} }}";
-        public static bool operator ==(ABGR left, ABGR right) => left.value == right.value;
-        public static bool operator !=(ABGR left, ABGR right) => left.value != right.value;
+        public static unsafe bool operator ==(ABGR left, ABGR right) => *(uint*)&left == *(uint*)&right;
+        public static unsafe bool operator !=(ABGR left, ABGR right) => *(uint*)&left == *(uint*)&right;
 
-        public static implicit operator RGBA(ABGR col) => RGBA.From(col.R, col.G, col.B, col.A);
+        public static implicit operator RGBA(ABGR col) => new RGBA(col.R, col.G, col.B, col.A);
 
-        public static implicit operator ARGB(ABGR col) => ARGB.From(col.R, col.G, col.B, col.A);
+        public static implicit operator ARGB(ABGR col) => new ARGB(col.R, col.G, col.B, col.A);
 
-        public static implicit operator BGRA(ABGR col) => BGRA.From(col.R, col.G, col.B, col.A);
+        public static implicit operator BGRA(ABGR col) => new BGRA(col.R, col.G, col.B, col.A);
 
-        public static explicit operator uint(ABGR col) => col.value;
+        public static unsafe explicit operator uint(ABGR col) => *(uint*)&col;
 
         public static explicit operator Vector4(ABGR col)
         {
@@ -302,7 +254,7 @@ namespace JankWorks.Graphics
         public static explicit operator ABGR(Vector4 vec)
         {
             var veccol = Vector4.Multiply(vec, 255);
-            return ABGR.From(Convert.ToByte(veccol.W), Convert.ToByte(veccol.Z), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.X));
+            return new ABGR(Convert.ToByte(veccol.W), Convert.ToByte(veccol.Z), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.X));
         }
 
         public static explicit operator Vector3(ABGR col)
@@ -314,7 +266,7 @@ namespace JankWorks.Graphics
         public static explicit operator ABGR(Vector3 vec)
         {
             var veccol = Vector3.Multiply(vec, 255);
-            return ABGR.From(Convert.ToByte(veccol.Z), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.X));
+            return new ABGR(Convert.ToByte(veccol.Z), Convert.ToByte(veccol.Y), Convert.ToByte(veccol.X));
         }
     }
 
@@ -368,59 +320,43 @@ namespace JankWorks.Graphics
             }
         }
 
-
-        [FieldOffset(0)] private uint value;
         [FieldOffset(0)] private RGBA big;
         [FieldOffset(0)] private ABGR little;
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static RGBA32 From(uint value)
+        public unsafe RGBA32(byte r, byte g, byte b, byte a = 255)
         {
-            RGBA32 col = default;
-            col.value = value;
-            return col;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static RGBA32 From(byte r, byte g, byte b, byte a = 255)
-        {
-            RGBA32 col = default;
-
-            if(BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian)
             {
-                col.little.A = a;
-                col.little.R = r;
-                col.little.G = g;
-                col.little.B = b;
+                var abgr = new ABGR(r, g, b, a);
+                this = *(RGBA32*)&abgr;
             }
             else
             {
-                col.big.A = a;
-                col.big.R = r;
-                col.big.G = g;
-                col.big.B = b;
+                var rgba = new RGBA(r, g, b, a);
+                this = *(RGBA32*)&rgba;
             }
-            
-
-            return col;
         }
 
+        public unsafe RGBA32(uint value)
+        {
+            this = *(RGBA32*)&value;
+        }
+       
         public override bool Equals(object obj) => obj is RGBA32 other && this == other;
         public bool Equals(RGBA32 other) => this == other;
-        public override int GetHashCode() => this.value.GetHashCode();
+        public override int GetHashCode() => ((uint)this).GetHashCode();
         public override string ToString() => $"{nameof(RGBA32)} {{ R = {this.R}, G = {this.G}, B = {this.B}, A = {this.A} }}";
-        public static bool operator ==(RGBA32 left, RGBA32 right) => left.value == right.value;
-        public static bool operator !=(RGBA32 left, RGBA32 right) => left.value != right.value;
+        public static unsafe bool operator ==(RGBA32 left, RGBA32 right) => *(uint*)&left == *(uint*)&right;
+        public static unsafe bool operator !=(RGBA32 left, RGBA32 right) => *(uint*)&left == *(uint*)&right;
 
         public static implicit operator RGBA(RGBA32 col) => BitConverter.IsLittleEndian ? col.little : col.big;
         public static implicit operator ABGR(RGBA32 col) => BitConverter.IsLittleEndian ? col.little : col.big;
 
-        public static implicit operator RGBA32(RGBA col) => BitConverter.IsLittleEndian ? RGBA32.From(col.R, col.G, col.B, col.A) : RGBA32.From((uint)col);
-        public static implicit operator RGBA32(ABGR col) => BitConverter.IsLittleEndian ? RGBA32.From((uint)col) : RGBA32.From(col.R, col.G, col.B, col.A);
+        public static implicit operator RGBA32(RGBA col) => BitConverter.IsLittleEndian ? new RGBA32(col.R, col.G, col.B, col.A) : new RGBA32((uint)col);
+        public static implicit operator RGBA32(ABGR col) => BitConverter.IsLittleEndian ? new RGBA32((uint)col) : new RGBA32(col.R, col.G, col.B, col.A);
 
 
-        public static explicit operator uint(RGBA32 col) => col.value;
+        public static unsafe explicit operator uint(RGBA32 col) => *(uint*)&col;
     }
 
 
@@ -472,74 +408,58 @@ namespace JankWorks.Graphics
             }
         }
 
-
-        [FieldOffset(0)] private uint value;
         [FieldOffset(0)] private ARGB big;
         [FieldOffset(0)] private BGRA little;
 
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ARGB32 From(uint value)
+        public unsafe ARGB32(uint value)
         {
-            ARGB32 col = default;
-            col.value = value;
-            return col;
+            this = *(ARGB32*)&value;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ARGB32 From(byte r, byte g, byte b, byte a = 255)
+        public unsafe ARGB32(byte r, byte g, byte b, byte a = 255)
         {
-            ARGB32 col = default;
-
             if (BitConverter.IsLittleEndian)
             {
-                col.little.A = a;
-                col.little.R = r;
-                col.little.G = g;
-                col.little.B = b;
+                var bgra = new BGRA(r, g, b, a);
+                this = *(ARGB32*)&bgra;
             }
             else
             {
-                col.big.A = a;
-                col.big.R = r;
-                col.big.G = g;
-                col.big.B = b;
+                var argb = new ARGB(r, g, b, a);
+                this = *(ARGB32*)&argb;
             }
-
-
-            return col;
         }
 
         public override bool Equals(object obj) => obj is ARGB32 other && this == other;
         public bool Equals(ARGB32 other) => this == other;
-        public override int GetHashCode() => this.value.GetHashCode();
+        public override int GetHashCode() => ((uint)this).GetHashCode();
         public override string ToString() => $"{nameof(ARGB32)} {{ A = {this.A}, R ={this.R}, G = {this.G}, B = {this.B} }}";
-        public static bool operator ==(ARGB32 left, ARGB32 right) => left.value == right.value;
-        public static bool operator !=(ARGB32 left, ARGB32 right) => left.value != right.value;
+        public static unsafe bool operator ==(ARGB32 left, ARGB32 right) => *(uint*)&left == *(uint*)&right;
+        public static unsafe bool operator !=(ARGB32 left, ARGB32 right) => *(uint*)&left != *(uint*)&right;
 
         public static implicit operator ARGB(ARGB32 col) => BitConverter.IsLittleEndian ? col.little : col.big;
         public static implicit operator BGRA(ARGB32 col) => BitConverter.IsLittleEndian ? col.little : col.big;
 
-        public static implicit operator ARGB32(ARGB col) => BitConverter.IsLittleEndian ? ARGB32.From(col.R, col.G, col.B, col.A) : ARGB32.From((uint)col);
-        public static implicit operator ARGB32(BGRA col) => BitConverter.IsLittleEndian ? ARGB32.From((uint)col) : ARGB32.From(col.R, col.G, col.B, col.A);
+        public static implicit operator ARGB32(ARGB col) => BitConverter.IsLittleEndian ? new ARGB32(col.R, col.G, col.B, col.A) : new ARGB32((uint)col);
+        public static implicit operator ARGB32(BGRA col) => BitConverter.IsLittleEndian ? new ARGB32((uint)col) : new ARGB32(col.R, col.G, col.B, col.A);
 
-        public static explicit operator uint(ARGB32 col) => col.value;
+        public static unsafe explicit operator uint(ARGB32 col) => *(uint*)&col;
     }
 
     public static class Colour
     {
-        public static readonly RGBA Transparent = RGBA.From(0, 0, 0, 0);
-        public static readonly RGBA Black = RGBA.From(0, 0, 0);
-        public static readonly RGBA White = RGBA.From(255, 255, 255);
+        public static readonly RGBA Transparent = new RGBA(0, 0, 0, 0);
+        public static readonly RGBA Black = new RGBA(0, 0, 0);
+        public static readonly RGBA White = new RGBA(255, 255, 255);
 
-        public static readonly RGBA Red = RGBA.From(255, 0, 0);
-        public static readonly RGBA Green = RGBA.From(0, 255, 0);
-        public static readonly RGBA Blue = RGBA.From(0, 0, 255);
+        public static readonly RGBA Red = new RGBA(255, 0, 0);
+        public static readonly RGBA Green = new RGBA(0, 255, 0);
+        public static readonly RGBA Blue = new RGBA(0, 0, 255);
 
-        public static readonly RGBA Yellow = RGBA.From(255, 255, 0);
-        public static readonly RGBA Pink = RGBA.From(255, 0, 255);
-        public static readonly RGBA Cyan = RGBA.From(0, 255, 255);
-        public static RGBA From(byte r, byte g, byte b, byte a = byte.MaxValue) => RGBA.From(r, g, b, a);
+        public static readonly RGBA Yellow = new RGBA(255, 255, 0);
+        public static readonly RGBA Pink = new RGBA(255, 0, 255);
+        public static readonly RGBA Cyan = new RGBA(0, 255, 255);
 
         public static RGBA Blend(RGBA source, RGBA additive, float amount)
         {
