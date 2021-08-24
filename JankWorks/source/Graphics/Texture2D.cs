@@ -11,6 +11,15 @@ namespace JankWorks.Graphics
         public TextureWrap Wrap { get; set; }
         public TextureFilter Filter { get; set; }
 
+        public Vector2i Size { get; protected set; }
+        public PixelFormat Format { get; protected set; }
+
+        protected Texture2D(Vector2i size, PixelFormat format)
+        {
+            this.Size = size;
+            this.Format = format;
+        }
+
         public abstract void SetPixels(Vector2i size, ReadOnlySpan<byte> pixels, PixelFormat format);
         public abstract void SetPixels(Vector2i size, ReadOnlySpan<RGBA> pixels);
         public abstract void SetPixels(Vector2i size, ReadOnlySpan<ABGR> pixels);
@@ -30,8 +39,9 @@ namespace JankWorks.Graphics
 
     public enum PixelFormat
     {
-        GrayScale8,
-        RGB24,
+        GrayScale,
+        RGB,
+        RGBA
     }
         
 

@@ -78,8 +78,8 @@ namespace JankWorks.Drivers.FreeType.Graphics
 
                 var format = bitmap.pixel_mode switch
                 {
-                    FT_Pixel_Mode.FT_PIXEL_MODE_GRAY => PixelFormat.GrayScale8,
-                    FT_Pixel_Mode.FT_PIXEL_MODE_LCD => PixelFormat.RGB24,
+                    FT_Pixel_Mode.FT_PIXEL_MODE_GRAY => PixelFormat.GrayScale,
+                    FT_Pixel_Mode.FT_PIXEL_MODE_LCD => PixelFormat.RGB,
                     _ => throw new NotSupportedException()
                 };
 

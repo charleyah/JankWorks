@@ -46,9 +46,7 @@ namespace JankWorks.Graphics
         public abstract Shader CreateShader(ShaderFormat format, ReadOnlySpan<byte> vertex, ReadOnlySpan<byte> fragment, ReadOnlySpan<byte> geometry = default);
         public abstract Shader CreateShader(ShaderFormat format, string vertex, string fragment, string geometry = null);
 
-        public abstract Texture2D CreateTexture2D();
-
-        public abstract Texture2D[] CreateTexture2Ds(int count);
+        public abstract Texture2D CreateTexture2D(Vector2i size, PixelFormat format);
 
         public static GraphicsDevice Create(SurfaceSettings settings, IRenderTarget renderTarget)
         {

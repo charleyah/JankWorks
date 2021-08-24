@@ -177,20 +177,7 @@ namespace JankWorks.Drivers.OpenGL
             return new GLShader(program);
         }
 
-        public override Texture2D CreateTexture2D() => new GLTexture2D();
-
-        public override Texture2D[] CreateTexture2Ds(int count)
-        {
-            var ids = new uint[count];
-            unsafe
-            {
-                fixed(uint* idsptr = ids)
-                {
-                    glGenTextures(count, idsptr);
-                }
-            }
-            return (from id in ids select new GLTexture2D(id)).ToArray();
-        }
+        public override Texture2D CreateTexture2D(Vector2i size, PixelFormat format) => new GLTexture2D(size, format);
 
         public override TextureSurface CreateTextureSurface(SurfaceSettings settings) => new GLTextureSurface(settings);
 

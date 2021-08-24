@@ -19,7 +19,7 @@ namespace JankWorks.Graphics
         {
             using var image = Image.Load(stream, format);
 
-            var texture = device.CreateTexture2D();
+            var texture = device.CreateTexture2D(image.Size, PixelFormat.RGBA);
             texture.Filter = filter;
             texture.Wrap = warp;
 

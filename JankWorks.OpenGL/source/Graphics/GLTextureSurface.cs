@@ -54,10 +54,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
             glBindFramebuffer(GL_FRAMEBUFFER, this.fbo);
 
-            this.texture = new GLTexture2D();
-            this.texture.Filter = TextureFilter.Nearest;
-            this.texture.Wrap = TextureWrap.Clamp;
-            this.texture.SetPixels(settings.Size, ReadOnlySpan<RGBA>.Empty);
+            this.texture = new GLTexture2D(settings.Size, PixelFormat.RGBA, TextureWrap.Clamp, TextureFilter.Nearest);
 
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this.texture.Id, 0);
 

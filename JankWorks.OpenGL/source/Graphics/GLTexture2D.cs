@@ -11,14 +11,27 @@ namespace JankWorks.Drivers.OpenGL.Graphics
     {
         internal uint Id;
 
-        public GLTexture2D()
+        public GLTexture2D(Vector2i size, PixelFormat format, TextureWrap warp, TextureFilter filter) : base(size, format)
+        {
+            this.Wrap = warp;
+            this.Filter = filter;
+
+            uint texid = 0;
+            unsafe { glGenTextures(1, &texid); }
+            this.Id = texid;
+
+            this.SetPixels(this.Size, ReadOnlySpan<byte>.Empty, this.Format);
+        }
+
+        public GLTexture2D(Vector2i size, PixelFormat format) : base(size, format)
         {
             uint texid = 0;
             unsafe { glGenTextures(1, &texid); }
             this.Id = texid;
+            this.SetPixels(this.Size, ReadOnlySpan<byte>.Empty, this.Format);
         }
 
-        public GLTexture2D(uint id)
+        public GLTexture2D(uint id, Vector2i size, PixelFormat format) : base(size, format)
         {
             this.Id = id;
         }
@@ -32,14 +45,14 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         {
             switch(format)
             {
-                case PixelFormat.RGB24:
+                case PixelFormat.RGB:
 
                     unsafe
                     {
                         this.Bind();
                         fixed (byte* ptr = pixels)
                         {
-                            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.X, size.Y, 0, GL_RGB, GL_UNSIGNED_BYTE, (IntPtr)ptr);
+                            glTexImage2D(GL_TEXTURE_2D, 0, this.GLSourceFormat, size.X, size.Y, 0, GL_RGB, GL_UNSIGNED_BYTE, (IntPtr)ptr);
                         }
                         this.ApplyStates();
                         this.UnBind();
@@ -47,7 +60,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
                     return;
 
-                case PixelFormat.GrayScale8:
+                case PixelFormat.GrayScale:
 
                     unsafe
                     {
@@ -56,11 +69,26 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
                         fixed (byte* ptr = pixels)
                         {
-                            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, size.X, size.Y, 0, GL_RED, GL_UNSIGNED_BYTE, (IntPtr)ptr);
+                            glTexImage2D(GL_TEXTURE_2D, 0, this.GLSourceFormat, size.X, size.Y, 0, GL_RED, GL_UNSIGNED_BYTE, (IntPtr)ptr);
                         }
                         this.ApplyStates();
                         this.UnBind();
                         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+                    }
+
+                    return;
+
+                case PixelFormat.RGBA:
+
+                    unsafe
+                    {
+                        this.Bind();
+                        fixed (byte* ptr = pixels)
+                        {
+                            glTexImage2D(GL_TEXTURE_2D, 0, this.GLSourceFormat, size.X, size.Y, 0, GL_RGBA, GL_UNSIGNED_BYTE, (IntPtr)ptr);
+                        }
+                        this.ApplyStates();
+                        this.UnBind();
                     }
 
                     return;
@@ -71,7 +99,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         {
             switch (format)
             {
-                case PixelFormat.RGB24:
+                case PixelFormat.RGB:
 
                     unsafe
                     {
@@ -86,7 +114,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
                     return;
 
-                case PixelFormat.GrayScale8:
+                case PixelFormat.GrayScale:
 
                     unsafe
                     {
@@ -254,7 +282,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             try
             {
                 this.Bind();
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.X, size.Y, 0, pixelformat, pixeltype, ptr);              
+                glTexImage2D(GL_TEXTURE_2D, 0, this.GLSourceFormat, size.X, size.Y, 0, pixelformat, pixeltype, ptr); ;
+                this.Size = size;
                 this.ApplyStates();
             }
             finally
@@ -277,6 +306,14 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
         }
 
+        private int GLSourceFormat => this.Format switch
+        {
+            PixelFormat.GrayScale => GL_RED,
+            PixelFormat.RGB => GL_RGB,
+            PixelFormat.RGBA => GL_RGBA,
+            _ => throw new NotImplementedException()
+        };
+              
         internal void ApplyStates()
         {
             switch (this.Wrap)
