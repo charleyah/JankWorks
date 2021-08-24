@@ -43,6 +43,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void SetPixels(Vector2i size, ReadOnlySpan<byte> pixels, PixelFormat format)
         {
+            this.Size = size;
             switch(format)
             {
                 case PixelFormat.RGB:
