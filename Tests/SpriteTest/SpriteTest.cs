@@ -64,25 +64,29 @@ namespace Tests.SpriteTest
             this.quadlayout.SetAttribute(texAttrib);
 
 
-            this.quad = device.CreateVertexBuffer<Vertex2>();
 
+            this.quad = device.CreateVertexBuffer<Vertex2>();
             Vertex2[] quadData =
             {
-                new Vertex2(new Vector2(1f,  1f), Colour.White, new Vector2(1f, 1f)),
+                new Vertex2(new Vector2(0f,  0f), Colour.White, new Vector2(0f, 0f)),
                 new Vertex2(new Vector2(1f, 0f), Colour.White, new Vector2(1f, 0f)),
-                new Vertex2(new Vector2(0f, 0f), Colour.White, new Vector2(0f, 0f)),
-                new Vertex2(new Vector2(0f,  1f), Colour.White, new Vector2(0f, 1f)),
+                new Vertex2(new Vector2(0f, 1f), Colour.White, new Vector2(0f, 1f)),
+                new Vertex2(new Vector2(1f,  1f), Colour.White, new Vector2(1f, 1f)),
 
             };
             this.quad.Write(quadData);
 
+
+
             this.quadIndexes = device.CreateIndexBuffer();
             uint[] indexValues =
             {
-                0, 1, 3,
-                1, 2, 3
+                0, 1, 2,
+                2, 3, 1
             };
             this.quadIndexes.Write(indexValues);
+
+
 
             this.program = device.CreateShader(ShaderFormat.GLSL, GetEmbeddedStream("SpriteTest.vert.glsl"), GetEmbeddedStream("SpriteTest.frag.glsl"));
 
