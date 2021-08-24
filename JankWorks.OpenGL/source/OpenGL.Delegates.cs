@@ -1352,8 +1352,8 @@ namespace OpenGL {
         public delegate void glGetnPolygonStippleARB(int bufSize, byte* pattern);
         public delegate void glGetnSeparableFilter(int target, int format, int type, int rowBufSize, IntPtr row, int columnBufSize, IntPtr column, IntPtr span);
         public delegate void glGetnSeparableFilterARB(int target, int format, int type, int rowBufSize, IntPtr row, int columnBufSize, IntPtr column, IntPtr span);
-        public delegate void glGetnTexImage(int target, int level, int format, int type, int bufSize, IntPtr pixels);
-        public delegate void glGetnTexImageARB(int target, int level, int format, int type, int bufSize, IntPtr img);
+        public delegate void glGetnTexImage(int target, int level, int format, int type, uint bufSize, IntPtr pixels);
+        public delegate void glGetnTexImageARB(int target, int level, int format, int type, uint bufSize, IntPtr img);
         public delegate void glGetnUniformdv(uint program, int location, int bufSize, double* _params);
         public delegate void glGetnUniformdvARB(uint program, int location, int bufSize, double* _params);
         public delegate void glGetnUniformfv(uint program, int location, int bufSize, float* _params);

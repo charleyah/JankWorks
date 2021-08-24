@@ -13,7 +13,13 @@ namespace JankWorks.Graphics
 
         public abstract void CopyTo(Texture2D texture);
 
+        public abstract void WriteFrom(Texture2D texture);
+
+        public abstract void Save(Stream stream, ImageFormat format);
+
         public static Image Load(Stream stream, ImageFormat format) => DriverConfiguration.Drivers.imageApi.LoadFromStream(stream, format);
+
+        public static Image Create(Vector2i size, ImageFormat format) => DriverConfiguration.Drivers.imageApi.Create(size, format);
 
         public static Texture2D LoadTexture(GraphicsDevice device, Stream stream, ImageFormat format, TextureFilter filter = TextureFilter.Linear, TextureWrap warp = TextureWrap.Clamp)
         {

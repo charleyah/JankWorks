@@ -11,6 +11,14 @@ namespace JankWorks.Drivers.OpenGL.Graphics
     {
         internal uint Id;
 
+        private int GLSourceFormat => this.Format switch
+        {
+            PixelFormat.GrayScale => GL_RED,
+            PixelFormat.RGB => GL_RGB,
+            PixelFormat.RGBA => GL_RGBA,
+            _ => throw new NotImplementedException()
+        };
+
         public GLTexture2D(Vector2i size, PixelFormat format, TextureWrap warp, TextureFilter filter) : base(size, format)
         {
             this.Wrap = warp;
@@ -134,6 +142,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                     return;
             }
         }
+
 
         public override void SetPixels(Vector2i size, ReadOnlySpan<RGBA> pixels)
         {
@@ -278,6 +287,126 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
 
 
+        public override void CopyTo(Span<byte> pixels, PixelFormat format)
+        {
+            switch(format)
+            {
+                case PixelFormat.GrayScale:
+
+
+                    this.Bind();
+                    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+                    unsafe
+                    {
+                        fixed (byte* ptr = pixels)
+                        {
+                            glGetnTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, (uint)pixels.Length, (IntPtr)ptr);
+                        }
+                    }
+                                            
+                    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+                    this.UnBind();                                        
+                    return;
+
+                case PixelFormat.RGB:
+
+                    unsafe
+                    {
+                        fixed (byte* ptr = pixels)
+                        {
+                            this.CopyTo((IntPtr)ptr, (uint)pixels.Length, GL_RGB, GL_UNSIGNED_BYTE);
+                        }
+                    }
+
+                    return;
+
+                case PixelFormat.RGBA:
+
+                    unsafe
+                    {
+                        fixed (byte* ptr = pixels)
+                        {
+                            this.CopyTo((IntPtr)ptr, (uint)pixels.Length, GL_RGBA, GL_UNSIGNED_BYTE);
+                        }
+                    }
+
+                    return;
+            }
+        }
+
+        public override void CopyTo(Span<RGBA> pixels)
+        {            
+            unsafe
+            {
+                fixed (RGBA* ptr = pixels)
+                {
+                    this.CopyTo((IntPtr)ptr, (uint)(pixels.Length * sizeof(RGBA)), GL_RGBA, GL_UNSIGNED_BYTE);
+                }
+            }
+        }
+
+        public override void CopyTo(Span<ABGR> pixels)
+        {
+            unsafe
+            {
+
+                fixed (ABGR* ptr = pixels)
+                {
+                    var pixeltype = BitConverter.IsLittleEndian ? GL_UNSIGNED_INT_8_8_8_8 : GL_UNSIGNED_INT_8_8_8_8_REV;
+                    this.CopyTo((IntPtr)ptr, (uint)(pixels.Length * sizeof(ABGR)), GL_RGBA, pixeltype);
+                }
+            }
+        }
+
+        public override void CopyTo(Span<ARGB> pixels)
+        {
+            unsafe
+            {
+
+                fixed (ARGB* ptr = pixels)
+                {
+                    var pixeltype = BitConverter.IsLittleEndian ? GL_UNSIGNED_INT_8_8_8_8 : GL_UNSIGNED_INT_8_8_8_8_REV;
+                    this.CopyTo((IntPtr)ptr, (uint)(pixels.Length * sizeof(ARGB)), GL_BGRA, pixeltype);
+                }
+            }
+        }
+
+        public override void CopyTo(Span<BGRA> pixels)
+        {
+            unsafe
+            {
+                fixed (BGRA* ptr = pixels)
+                {
+                    this.CopyTo((IntPtr)ptr, (uint)(pixels.Length * sizeof(BGRA)), GL_BGRA, GL_UNSIGNED_BYTE);
+                }
+            }
+        }
+
+        public override void CopyTo(Span<RGBA32> pixels)
+        {
+            unsafe
+            {
+                fixed (RGBA32* ptr = pixels)
+                {
+                    this.CopyTo((IntPtr)ptr, (uint)(pixels.Length * sizeof(RGBA32)), GL_RGBA, GL_UNSIGNED_INT_8_8_8_8);
+                }
+            }
+        }
+
+        public override void CopyTo(Span<ARGB32> pixels)
+        {
+            unsafe
+            {
+                fixed (ARGB32* ptr = pixels)
+                {
+                    this.CopyTo((IntPtr)ptr, (uint)(pixels.Length * sizeof(ARGB32)), GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV);
+                }
+            }
+        }
+
+
+
         private void SetPixels(IntPtr ptr, Vector2i size, int pixelformat, int pixeltype)
         {
             try
@@ -307,14 +436,20 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
         }
 
-        private int GLSourceFormat => this.Format switch
+        private void CopyTo(IntPtr ptr, uint buffersize, int pixelformat, int pixeltype)
         {
-            PixelFormat.GrayScale => GL_RED,
-            PixelFormat.RGB => GL_RGB,
-            PixelFormat.RGBA => GL_RGBA,
-            _ => throw new NotImplementedException()
-        };
-              
+            try
+            {
+                this.Bind();
+                glGetnTexImage(GL_TEXTURE_2D, 0, pixelformat, pixeltype, buffersize, ptr);
+            }
+            finally
+            {
+                this.UnBind();
+            }
+        }
+
+
         internal void ApplyStates()
         {
             switch (this.Wrap)

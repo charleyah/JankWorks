@@ -35,6 +35,14 @@ namespace JankWorks.Graphics
         public abstract void SetPixels(Vector2i size, Vector2i position, ReadOnlySpan<BGRA> pixels);
         public abstract void SetPixels(Vector2i size, Vector2i position, ReadOnlySpan<RGBA32> pixels);
         public abstract void SetPixels(Vector2i size, Vector2i position, ReadOnlySpan<ARGB32> pixels);
+
+        public abstract void CopyTo(Span<byte> pixels, PixelFormat format);
+        public abstract void CopyTo(Span<RGBA> pixels);
+        public abstract void CopyTo(Span<ABGR> pixels);
+        public abstract void CopyTo(Span<ARGB> pixels);
+        public abstract void CopyTo(Span<BGRA> pixels);
+        public abstract void CopyTo(Span<RGBA32> pixels);
+        public abstract void CopyTo(Span<ARGB32> pixels);
     }
 
     public enum PixelFormat

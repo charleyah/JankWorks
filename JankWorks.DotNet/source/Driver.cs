@@ -13,9 +13,8 @@ namespace JankWorks.Drivers.DotNet
 {
     public class Driver : IImageDriver
     {
-        public JankWorks.Graphics.Image LoadFromStream(Stream stream, ImageFormat format)
-        {
-            return new DotNetImage(new Bitmap(stream));
-        }
+        public JankWorks.Graphics.Image Create(Vector2i size, ImageFormat format) => new DotNetImage(new Bitmap(size.X, size.Y, System.Drawing.Imaging.PixelFormat.Format32bppArgb));       
+
+        public JankWorks.Graphics.Image LoadFromStream(Stream stream, ImageFormat format) => new DotNetImage(new Bitmap(stream));        
     }
 }
