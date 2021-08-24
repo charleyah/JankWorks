@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
+using JankWorks.Drivers.Graphics;
 using JankWorks.Graphics;
 
 namespace JankWorks.Drivers.DotNet.Graphics
@@ -57,12 +58,16 @@ namespace JankWorks.Drivers.DotNet.Graphics
                 {
                     var pixels = new Span<ARGB32>(data.Scan0.ToPointer(), size.X * size.Y);
                     texture.CopyTo(pixels);
-                }
-                
+                }                                
             }
             finally
             {
                 this.bitmap.UnlockBits(data);
+            }
+
+            if (DriverConfiguration.Drivers.graphicsApi.GraphicsApi == GraphicsApi.OpenGL)
+            {
+                bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
             }
         }
 
