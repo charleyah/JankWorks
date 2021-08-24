@@ -283,7 +283,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             try
             {
                 this.Bind();
-                glTexImage2D(GL_TEXTURE_2D, 0, this.GLSourceFormat, size.X, size.Y, 0, pixelformat, pixeltype, ptr); ;
+                glTexImage2D(GL_TEXTURE_2D, 0, this.GLSourceFormat, size.X, size.Y, 0, pixelformat, pixeltype, ptr);
                 this.Size = size;
                 this.ApplyStates();
             }
