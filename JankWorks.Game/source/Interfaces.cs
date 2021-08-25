@@ -73,6 +73,13 @@ namespace JankWorks.Game
         void Render(Surface surface, Frame frame);
     }
 
+    public interface IAsyncRenderable : IGraphicsResource
+    {
+        void BeginRender(Surface surface, Frame frame);
+
+        void EndRender(Surface surface, Frame frame);
+    }
+
     public readonly struct Frame : IEquatable<Frame>
     {
         public static readonly Frame Complete = new Frame(1d);

@@ -121,6 +121,8 @@ namespace JankWorks.Game
 
         private IRenderable[] renderables;
 
+        private IAsyncRenderable[] asyncRenderables;
+
         private IDrawable[] drawables;
 
         protected Scene() : base()
@@ -136,6 +138,7 @@ namespace JankWorks.Game
             this.asyncUpdatables = Array.Empty<IAsyncUpdatable>();
 
             this.renderables = Array.Empty<IRenderable>();
+            this.asyncRenderables = Array.Empty<IAsyncRenderable>();
             this.drawables = Array.Empty<IDrawable>();
         }
 
@@ -156,6 +159,7 @@ namespace JankWorks.Game
             this.asyncUpdatables = (from obj in this.clientObjects where obj is IAsyncUpdatable select (IAsyncUpdatable)obj).ToArray();
 
             this.renderables = (from obj in this.clientObjects where obj is IRenderable select (IRenderable)obj).ToArray();
+            this.asyncRenderables = (from obj in this.clientObjects where obj is IAsyncRenderable select (IAsyncRenderable)obj).ToArray();
             this.drawables = (from obj in this.clientObjects where obj is IDrawable select (IDrawable)obj).ToArray();
         }
 
@@ -194,6 +198,7 @@ namespace JankWorks.Game
             Array.ForEach(this.graphicsResources, (gr) => gr.DisposeGraphicsResources(device));
             this.graphicsResources = Array.Empty<IGraphicsResource>();
             this.renderables = Array.Empty<IRenderable>();
+            this.asyncRenderables = Array.Empty<IAsyncRenderable>();
             this.drawables = Array.Empty<IDrawable>();
         }
 
@@ -224,9 +229,19 @@ namespace JankWorks.Game
 
         public virtual void Render(Surface surface, Frame frame) 
         {
+            for(int index = 0; index < this.asyncRenderables.Length; index++)
+            {
+                this.asyncRenderables[index].BeginRender(surface, frame);
+            }
+
             for (int index = 0; index < this.renderables.Length; index++)
             {
                 this.renderables[index].Render(surface, frame);
+            }
+
+            for (int index = 0; index < this.asyncRenderables.Length; index++)
+            {
+                this.asyncRenderables[index].EndRender(surface, frame);
             }
         }
 
