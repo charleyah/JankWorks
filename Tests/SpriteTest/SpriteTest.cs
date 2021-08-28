@@ -40,7 +40,7 @@ namespace Tests.SpriteTest
             this.model = Matrix4x4.CreateScale(new Vector3(spriteSize, 0)) * Matrix4x4.CreateTranslation(new Vector3(spritePosition - (this.spriteSize * this.spritePositionOrigin), 0));
 
 
-            this.texture = Image.LoadTexture(device, GetEmbeddedStream("SpriteTest.punchy_512.png"), ImageFormat.PNG);
+            this.texture = device.CreateTexture2D(GetEmbeddedStream("SpriteTest.punchy_512.png"), ImageFormat.PNG);
 
             this.quadlayout = device.CreateVertexLayout();
             var positionAttrib = new VertexAttribute()

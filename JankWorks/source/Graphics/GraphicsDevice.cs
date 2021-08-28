@@ -48,6 +48,17 @@ namespace JankWorks.Graphics
 
         public abstract Texture2D CreateTexture2D(Vector2i size, PixelFormat format);
 
+        public virtual Texture2D CreateTexture2D(Stream stream, ImageFormat format, TextureFilter filter = TextureFilter.Linear, TextureWrap wrap = TextureWrap.Clamp)
+        {
+            using var image = Image.Load(stream, format);
+
+            var tex = this.CreateTexture2D(image.Size, PixelFormat.RGBA);
+            tex.Filter = filter;
+            tex.Wrap = wrap;
+            image.CopyTo(tex);
+            return tex;
+        }
+
         public static GraphicsDevice Create(SurfaceSettings settings, IRenderTarget renderTarget)
         {
             return DriverConfiguration.Drivers.graphicsApi.CreateGraphicsDevice(settings, renderTarget);
