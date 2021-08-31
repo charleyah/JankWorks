@@ -21,10 +21,12 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         }
 
         public override void CopyTo(Span<T> data) => this.buffer.CopyTo(GL_ARRAY_BUFFER, data);
-
+        
         public override T[] Read() => this.buffer.Read(GL_ARRAY_BUFFER);
 
         public override void Write(ReadOnlySpan<T> data) => this.buffer.Write(GL_ARRAY_BUFFER, this.Usage, data);
+
+        public override void Update(ReadOnlySpan<T> data, int offset) => this.buffer.Update(GL_ARRAY_BUFFER, this.Usage, data, offset);
 
         protected override void Dispose(bool finalising)
         {

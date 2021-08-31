@@ -8,6 +8,7 @@ namespace JankWorks.Graphics
         public abstract int ElementCount { get; }
         public abstract BufferUsage Usage { get; set; }
         public abstract void Write(ReadOnlySpan<uint> data);
+        public abstract void Update(ReadOnlySpan<uint> data, int offset);
         public abstract void CopyTo(Span<uint> data);
         public abstract uint[] Read();
     }

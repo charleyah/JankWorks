@@ -46,6 +46,33 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
         }
 
+        public void Update(int target, BufferUsage usage, ReadOnlySpan<T> data, int offset)
+        {
+            var sliceUpperBound = offset + data.Length;
+
+            if(offset < 0 || sliceUpperBound > this.ElementCount)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            try
+            {
+                glBindBuffer(target, this.BufferId);
+
+                unsafe
+                {
+                    fixed (T* ptr = data)
+                    {
+                        glBufferSubData(target, (uint)(sizeof(T) * offset), (uint)(sizeof(T) * data.Length), ptr);
+                    }
+                }
+            }
+            finally
+            {
+                glBindBuffer(target, 0);
+            }
+        }
+
         public void CopyTo(int target, Span<T> destination)
         {
             if (this.ElementCount == 0)

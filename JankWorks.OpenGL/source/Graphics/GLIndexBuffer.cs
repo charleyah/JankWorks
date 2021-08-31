@@ -8,7 +8,7 @@ using static OpenGL.Constants;
 
 namespace JankWorks.Drivers.OpenGL.Graphics
 {
-    class GLIndexBuffer : IndexBuffer
+    sealed class GLIndexBuffer : IndexBuffer
     {
         internal uint Id => this.buffer.BufferId;
         public override int ElementCount => this.buffer.ElementCount;
@@ -26,6 +26,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         public override uint[] Read() => this.buffer.Read(GL_ELEMENT_ARRAY_BUFFER);
 
         public override void Write(ReadOnlySpan<uint> data) => this.buffer.Write(GL_ELEMENT_ARRAY_BUFFER, this.Usage, data);
+
+        public override void Update(ReadOnlySpan<uint> data, int offset) => this.buffer.Update(GL_ELEMENT_ARRAY_BUFFER, this.Usage, data, offset);
 
         protected override void Dispose(bool finalising)
         {

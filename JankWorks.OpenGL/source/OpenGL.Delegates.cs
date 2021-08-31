@@ -200,7 +200,7 @@ namespace OpenGL {
         public delegate void glBufferStorageEXT(int target, uint size, void* data, uint flags);
         public delegate void glBufferStorageExternalEXT(int target, uint offset, uint size, IntPtr clientBuffer, uint flags);
         public delegate void glBufferStorageMemEXT(int target, uint size, uint memory, ulong offset);
-        public delegate void glBufferSubData(int target, uint offset, uint size, IntPtr data);
+        public delegate void glBufferSubData(int target, uint offset, uint size, void* data);
         public delegate void glBufferSubDataARB(int target, IntPtr offset, uint size, IntPtr data);
         public delegate void glCallCommandListNV(uint list);
         public delegate void glCallList(uint list);
