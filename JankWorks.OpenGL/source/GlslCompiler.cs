@@ -1,9 +1,9 @@
 ﻿using System;
-
 using System.Text;
 using System.IO;
 
 using JankWorks.Graphics;
+using JankWorks.Util;
 
 using static OpenGL.Constants;
 using static OpenGL.Functions;
@@ -12,6 +12,8 @@ namespace JankWorks.Drivers.OpenGL
 {
     public static class GlslCompiler
     {
+        private const int ErrorBufferSize = 512;
+
         public static uint CompileShader(Stream source, int type)
         {
             if(source == null)
@@ -22,7 +24,7 @@ namespace JankWorks.Drivers.OpenGL
             {
                 unsafe
                 {
-                    ReadOnlySpan<byte> span = default;
+                    ReadOnlySpan<byte> span;
 
                     checked
                     {
@@ -37,7 +39,7 @@ namespace JankWorks.Drivers.OpenGL
             }
             else
             {
-                int sourceLength = 0;
+                int sourceLength;
                 checked
                 {
                     sourceLength = (int)source.Length;
@@ -56,32 +58,30 @@ namespace JankWorks.Drivers.OpenGL
 
             unsafe
             {
+                byte** dataptr = stackalloc byte*[1];
+                int length = source.Length;
+
                 fixed (byte* data = source)
-                {
-                    byte** dataptr = stackalloc byte*[1];
-                    int* lengths = stackalloc int[1];
-                    dataptr[0] = data;
-                    lengths[0] = source.Length;
-
-                    glShaderSource(shaderId, 1, dataptr, lengths);
+                {                    
+                    dataptr[0] = data;                                         
+                    glShaderSource(shaderId, 1, dataptr, &length);
                 }
-
+                
                 glCompileShader(shaderId);
                 int success = 0;
                 glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
 
                 if (success == GL_FALSE)
-                {
-                    const int bufferSize = 512;
-
-                    Span<byte> info = stackalloc byte[bufferSize];
-
+                {  
+                    var info = new byte[ErrorBufferSize];
+                    var errorLength = 0;
                     fixed (byte* infobuffer = info)
                     {
-                        glGetShaderInfoLog(shaderId, bufferSize, null, infobuffer);
+                        glGetShaderInfoLog(shaderId, ErrorBufferSize, null, infobuffer);
+                        errorLength = new CString(infobuffer).Length;                        
                     }
 
-                    throw new InvalidShaderException(Encoding.UTF8.GetString(info));
+                    throw new InvalidShaderException(Encoding.UTF8.GetString(info, 0, errorLength));
                 }
             }
 
@@ -111,16 +111,16 @@ namespace JankWorks.Drivers.OpenGL
 
                 if (success == GL_FALSE)
                 {
-                    const int bufferSize = 512;
-
-                    Span<byte> info = stackalloc byte[bufferSize];
+                    var info = new byte[ErrorBufferSize];
+                    var errorLength = 0;
 
                     fixed (byte* infobuffer = info)
                     {
-                        glGetProgramInfoLog(programId, bufferSize, null, infobuffer);
+                        glGetProgramInfoLog(programId, ErrorBufferSize, null, infobuffer);
+                        errorLength = new CString(infobuffer).Length;
                     }
 
-                    throw new InvalidShaderException(Encoding.UTF8.GetString(info));
+                    throw new InvalidShaderException(Encoding.UTF8.GetString(info, 0, errorLength));
                 }
             }
 
