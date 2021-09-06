@@ -18,8 +18,8 @@ namespace JankWorks.Platform.Windows
             var win32path = Path.Combine(basepath, "runtimes", "win-x86", "native", name);
 
             if (File.Exists(winpath)) { return new NetCoreLibraryLoader(winpath); }
-            else if (File.Exists(win64path)) { return new NetCoreLibraryLoader(win64path); }
-            else if (File.Exists(win32path)) { return new NetCoreLibraryLoader(win32path); }
+            else if (Environment.Is64BitProcess == true && File.Exists(win64path)) { return new NetCoreLibraryLoader(win64path); }
+            else if (Environment.Is64BitProcess == false && File.Exists(win32path)) { return new NetCoreLibraryLoader(win32path); }
             else { return new NetCoreLibraryLoader(name); }
         }
     }
