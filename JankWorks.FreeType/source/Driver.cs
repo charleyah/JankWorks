@@ -6,10 +6,11 @@ using JankWorks.Graphics;
 
 using JankWorks.Drivers;
 using JankWorks.Drivers.Graphics;
+
 using JankWorks.Drivers.FreeType.Graphics;
+using JankWorks.Drivers.FreeType.Native;
 
 using static JankWorks.Drivers.FreeType.Native.Functions;
-using JankWorks.Drivers.FreeType.Native;
 
 [assembly: JankWorksDriver(typeof(JankWorks.Drivers.FreeType.Driver))]
 
@@ -49,7 +50,12 @@ namespace JankWorks.Drivers.FreeType
                 }
                 else
                 {
-                    memoryStream = new MemoryStream();
+                    int sourceLength;
+                    checked
+                    {
+                        sourceLength = (int)stream.Length;
+                    }
+                    memoryStream = new MemoryStream(sourceLength);
                     stream.CopyTo(memoryStream);
                 }
 
