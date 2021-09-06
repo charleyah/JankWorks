@@ -14,13 +14,32 @@ namespace JankWorks.Util
         {
             get
             {
-                var length = 0;
+                // a terrible implementation for a terrible strlen 
                 unsafe
                 {
-                    // so dumb
-                    while (chars[length] != 0) { length++; }                    
+                    if (this.IsNullPointer)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        byte* cursor = chars;
+                        while (*cursor != 0)
+                        {
+                            cursor++;
+                        }
+                        return (int)(cursor - chars);
+
+                    }                            
                 }
-                return length;
+            }
+        }
+
+        public bool IsNullPointer
+        {
+            get
+            {
+                unsafe { return (int)this.chars == 0; }
             }
         }
 
@@ -32,16 +51,41 @@ namespace JankWorks.Util
         
 
         public override string ToString() => this.ToString(CString.DefaultEncoding);
-        public unsafe string ToString(Encoding encoding) => encoding.GetString(this.chars, this.Length);
+        public unsafe string ToString(Encoding encoding)
+        { 
+            if(this.IsNullPointer)
+            {
+                return null;
+            }
+            else
+            {
+               return encoding.GetString(this.chars, this.Length);
+            }            
+        }
 
         
         public int GetCharCount() => this.GetCharCount(CString.DefaultEncoding);
-        public unsafe int GetCharCount(Encoding encoding) => encoding.GetCharCount(this.chars, this.Length);
+        public unsafe int GetCharCount(Encoding encoding)
+        {
+            if(this.IsNullPointer)
+            {
+                return 0;
+            }
+            else
+            {
+               return encoding.GetCharCount(this.chars, this.Length);
+            }           
+        }
 
 
         public void Set(ReadOnlySpan<char> chars) => this.Set(chars, CString.DefaultEncoding);
         public void Set(ReadOnlySpan<char> chars, Encoding encoding)
         {
+            if (this.IsNullPointer)
+            {
+                throw new NullReferenceException();
+            }
+
             var byteCount = encoding.GetByteCount(chars);
 
             if (byteCount <= this.Length)
