@@ -33,19 +33,25 @@ namespace JankWorks.Drivers.OpenGL
                     return CompileShader(span, type);
                 }
             }
-            else if (source is MemoryStream memoryStream)
-            {
-                return CompileShader(memoryStream.GetBuffer(), type);
-            }
             else
             {
-                int sourceLength;
-                checked
+                MemoryStream ms;
+
+                if(source is MemoryStream memoryStream)
                 {
-                    sourceLength = (int)source.Length;
+                    ms = memoryStream;
                 }
-                var ms = new MemoryStream(sourceLength);
-                source.CopyTo(ms);
+                else
+                {
+                    int sourceLength;
+                    checked
+                    {
+                        sourceLength = (int)source.Length;
+                    }
+                    ms = new MemoryStream(sourceLength);
+                    source.CopyTo(ms);
+                }
+
                 return CompileShader(ms.GetBuffer(), type);
             }
         }
