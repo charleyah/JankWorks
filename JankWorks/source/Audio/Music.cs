@@ -4,9 +4,9 @@ namespace JankWorks.Audio
 {
     public abstract class Music : Sound, IPlayable
     {
-        public float Volume { get; set; }
+        public virtual float Volume { get; set; }
 
-        public bool Loop { get; set; }
+        public virtual bool Loop { get; set; }
 
         public abstract PlayState State { get; }
 
