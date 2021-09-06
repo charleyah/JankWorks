@@ -101,7 +101,7 @@ namespace JankWorks.Game.Local
 
             this.window = Window.Create(winds);
             this.graphicsDevice = GraphicsDevice.Create(surfs, this.window);
-            this.audioDevice = AudioDevice.Create();
+            this.audioDevice = AudioDevice.GetDefault();
         }
 #pragma warning restore CS8618
 

@@ -4,10 +4,11 @@ using System.IO;
 
 using JankWorks.Drivers.Interface;
 using JankWorks.Drivers.Graphics;
+using JankWorks.Drivers.Audio;
 
 using JankWorks.Interface;
 using JankWorks.Graphics;
-
+using JankWorks.Audio;
 
 namespace JankWorks.Drivers
 {
@@ -17,7 +18,8 @@ namespace JankWorks.Drivers
     IWindowDriver, 
     IGraphicsDriver,
     IImageDriver,
-    IFontDriver
+    IFontDriver,
+    IAudioDriver
     {
         Monitor[] IMonitorDriver.GetMonitors() => throw this;
 
@@ -38,7 +40,9 @@ namespace JankWorks.Drivers
         GraphicsApi IGraphicsDriver.GraphicsApi => throw this;
 
         Font IFontDriver.LoadFontFromStream(Stream stream, FontFormat format) => throw this;
-       
+
+        AudioDevice IAudioDriver.GetDefaultAudioDevice() => throw this;
+
         public static readonly DriverUnitialisedException driver = new DriverUnitialisedException();
     }
 }

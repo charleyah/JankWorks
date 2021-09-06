@@ -4,6 +4,7 @@ using System.Reflection;
 
 using JankWorks.Drivers.Interface;
 using JankWorks.Drivers.Graphics;
+using JankWorks.Drivers.Audio;
 
 
 namespace JankWorks.Drivers
@@ -17,6 +18,7 @@ namespace JankWorks.Drivers
         public readonly IFontDriver fontApi;
         public readonly IGraphicsDriver graphicsApi;
 
+        public readonly IAudioDriver audioApi;
 
         static DriverConfiguration()
         {
@@ -31,7 +33,8 @@ namespace JankWorks.Drivers
             IWindowDriver windowDriver = null, 
             IImageDriver imageDriver = null,
             IFontDriver fontDriver = null,
-            IGraphicsDriver graphicsDriver = null
+            IGraphicsDriver graphicsDriver = null,
+            IAudioDriver audioDriver = null
         )
         {
             this.monitorApi = monitorDriver ?? DriverUnitialisedException.driver;
@@ -39,7 +42,7 @@ namespace JankWorks.Drivers
             this.imageApi = imageDriver ?? DriverUnitialisedException.driver;
             this.fontApi = fontDriver ?? DriverUnitialisedException.driver;
             this.graphicsApi = graphicsDriver ?? DriverUnitialisedException.driver;
-            
+            this.audioApi = audioDriver ?? DriverUnitialisedException.driver;
         }
 
         public void PrintDrivers(TextWriter writer)
@@ -48,6 +51,8 @@ namespace JankWorks.Drivers
             PrintDriver(this.windowApi, writer);
             PrintDriver(this.imageApi, writer);
             PrintDriver(this.graphicsApi, writer);
+            PrintDriver(this.fontApi, writer);
+            PrintDriver(this.audioApi, writer);
 
             void PrintDriver<T>(T driver, TextWriter writer) where T : IDriver
             {
@@ -75,6 +80,7 @@ namespace JankWorks.Drivers
             IImageDriver imageDriver = null;
             IFontDriver fontDriver = null;
             IGraphicsDriver graphicsDriver = null;
+            IAudioDriver audioDriver = null;
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -89,6 +95,7 @@ namespace JankWorks.Drivers
                     SetDriverApi(ref imageDriver, driverInstance);
                     SetDriverApi(ref fontDriver, driverInstance);
                     SetDriverApi(ref graphicsDriver, driverInstance);
+                    SetDriverApi(ref audioDriver, driverInstance);
                 }
             }
 
@@ -98,7 +105,8 @@ namespace JankWorks.Drivers
                 windowDriver,
                 imageDriver,
                 fontDriver,
-                graphicsDriver
+                graphicsDriver,
+                audioDriver
             );
             DriverConfiguration.Drivers = config;
             return config;
@@ -120,7 +128,10 @@ namespace JankWorks.Drivers
         {
             MaybeDispose(drivers.monitorApi);
             MaybeDispose(drivers.windowApi);
-            MaybeDispose(drivers.graphicsApi);            
+            MaybeDispose(drivers.graphicsApi);
+            MaybeDispose(drivers.imageApi);
+            MaybeDispose(drivers.fontApi);
+            MaybeDispose(drivers.audioApi);
 
             void MaybeDispose(IDriver driver)
             {
