@@ -12,14 +12,13 @@ namespace JankWorks.Audio
 
         public virtual Vector3 Position { get; set; }
 
-        public PlayState State { get; protected set; }
+        public abstract PlayState State { get; }
 
         protected Emitter(Sound sound, float volume, Vector3 position)
         {
             this.Sound = sound;
             this.Volume = volume;
-            this.Position = position;
-            this.State = PlayState.Stopped;            
+            this.Position = position;           
         }
        
         public abstract void Play();

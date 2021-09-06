@@ -15,7 +15,7 @@ namespace JankWorks.Audio
 
     public enum PlayState
     {
-        Stopped,
+        Stopped = 0,
         Playing,
         Paused
     }

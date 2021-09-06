@@ -8,7 +8,7 @@ namespace JankWorks.Audio
 
         public bool Loop { get; set; }
 
-        public PlayState State { get; protected set; }
+        public abstract PlayState State { get; }
 
         public abstract void Play();
 
