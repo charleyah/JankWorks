@@ -8,7 +8,7 @@ using JankWorks.Drivers;
 
 namespace JankWorks.Interface
 {
-    public abstract class Window : Disposable, IRenderTarget
+    public abstract class Window : Disposable, IRenderTarget, IInputManager
     {
         public abstract bool IsOpen { get; }
         public abstract IntPtr NativeHandle { get; }

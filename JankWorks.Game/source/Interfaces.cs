@@ -19,9 +19,9 @@ namespace JankWorks.Game
     }
     public interface IInputListener
     {
-        void SubscribeInputs(Window window);
+        void SubscribeInputs(IInputManager inputManager);
 
-        void UnsubscribeInputs(Window window);
+        void UnsubscribeInputs(IInputManager inputManager);
     }
 
     public interface ITickable

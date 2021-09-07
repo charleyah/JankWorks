@@ -177,18 +177,18 @@ namespace JankWorks.Game
             this.clientObjects.Clear();
         }
 
-        public virtual void SubscribeInputs(Window window) 
+        public virtual void SubscribeInputs(IInputManager inputManager) 
         {
             for (int index = 0; index < this.inputlisteners.Length; index++)
             {
-                this.inputlisteners[index].SubscribeInputs(window);
+                this.inputlisteners[index].SubscribeInputs(inputManager);
             }
         }
-        public virtual void UnsubscribeInputs(Window window) 
+        public virtual void UnsubscribeInputs(IInputManager inputManager) 
         {
             for (int index = 0; index < this.inputlisteners.Length; index++)
             {
-                this.inputlisteners[index].UnsubscribeInputs(window);
+                this.inputlisteners[index].UnsubscribeInputs(inputManager);
             }
         }
 
