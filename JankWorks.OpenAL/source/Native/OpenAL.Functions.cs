@@ -86,7 +86,7 @@ namespace JankWorks.Drivers.OpenAL.Native
             public unsafe delegate void alGetSourcefv(uint source, ALSource3f parm, float* values);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            public delegate void alGetSourcei(uint source, ALSourcei parm, ref int value);
+            public delegate void alGetSourcei(uint source, ALGetSourcei parm, ref int value);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
             public delegate void alSourcePlay(uint source);

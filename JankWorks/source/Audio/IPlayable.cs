@@ -11,6 +11,8 @@ namespace JankWorks.Audio
         void Stop();
 
         void Pause();
+
+        void Resume();
     }
 
     public enum PlayState

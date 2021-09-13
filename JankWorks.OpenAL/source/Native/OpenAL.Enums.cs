@@ -78,19 +78,6 @@ namespace JankWorks.Drivers.OpenAL.Native
         Direction = 0x1005,
     }
 
-    public enum ALSourceb : int
-    {
-        SourceRelative = 0x202,
-
-        Looping = 0x1007,
-
-        EfxDirectFilterGainHighFrequencyAuto = 0x2000A,
-
-        EfxAuxiliarySendFilterGainAuto = 0x2000B,
-
-        EfxAuxiliarySendFilterGainHighFrequencyAuto = 0x2000C,
-    }
-
     public enum ALSourcei : int
     {
         ByteOffset = 0x1026,
@@ -101,7 +88,17 @@ namespace JankWorks.Drivers.OpenAL.Native
 
         SourceType = 0x1027,
 
+        SourceRelative = 0x202,
+
+        Looping = 0x1007,
+
         EfxDirectFilter = 0x20005,
+
+        EfxDirectFilterGainHighFrequencyAuto = 0x2000A,
+
+        EfxAuxiliarySendFilterGainAuto = 0x2000B,
+
+        EfxAuxiliarySendFilterGainHighFrequencyAuto = 0x2000C,
     }
 
     public enum ALSource3i : int
@@ -128,6 +125,10 @@ namespace JankWorks.Drivers.OpenAL.Native
         BuffersProcessed = 0x1016,
 
         SourceType = 0x1027,
+
+        SourceRelative = 0x202,
+
+        Looping = 0x1007,
     }
 
     public enum ALSourceState : int

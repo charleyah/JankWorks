@@ -10,21 +10,20 @@ namespace JankWorks.Audio
 
         public virtual float Volume { get; set; }
 
-        public virtual Vector3 Position { get; set; }
+        public virtual Vector3? Position { get; set; }
+
+        public virtual Vector3 Velocity { get; set; }
+
+        public virtual bool Loop { get; set; }
 
         public abstract PlayState State { get; }
-
-        protected Emitter(Sound sound, float volume, Vector3 position)
-        {
-            this.Sound = sound;
-            this.Volume = volume;
-            this.Position = position;           
-        }
        
         public abstract void Play();
 
         public abstract void Stop();
 
         public abstract void Pause();
+
+        public abstract void Resume();
     }
 }

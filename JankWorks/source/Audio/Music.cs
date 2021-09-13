@@ -16,6 +16,8 @@ namespace JankWorks.Audio
 
         public abstract void Pause();
 
+        public abstract void Resume();
+
         public abstract void ChangeTrack(Stream stream, AudioFormat format);
     }
 }
