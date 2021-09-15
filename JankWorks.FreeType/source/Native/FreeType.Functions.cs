@@ -84,15 +84,13 @@ namespace JankWorks.Drivers.FreeType.Native
         {
             var env = SystemEnvironment.Current;
 
-            var libname = env.OS switch
+            var loader = env.OS switch
             {
-                SystemPlatform.Windows => "freetype.dll",
-                SystemPlatform.MacOS => "libfreetype.dylib",
-                SystemPlatform.Linux => "libfreetype.so",
+                SystemPlatform.Windows => env.LoadLibrary("freetype.dll"),
+                SystemPlatform.MacOS => env.LoadLibrary("libfreetype.dylib"),
+                SystemPlatform.Linux => env.LoadLibrary("libfreetype.so"),
                 _ => throw new NotSupportedException()
             };
-
-            var loader = env.LoadLibrary(libname);
 
             Functions.FT_Init_FreeType = LoadFunction<Delegates.FT_Init_FreeType>(loader);
             Functions.FT_Done_FreeType = LoadFunction<Delegates.FT_Done_FreeType>(loader);

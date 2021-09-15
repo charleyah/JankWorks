@@ -24,8 +24,10 @@ namespace Tests.SurfaceTest
         private IndexBuffer surfaceIndexes;
         private Shader surfaceProgram;
 
+#if Include_Sound
         private Sound sound;
         private Emitter speaker;
+
 
         private void OnKey(KeyEvent e)
         {
@@ -55,12 +57,15 @@ namespace Tests.SurfaceTest
             this.speaker.Position = new Vector3(vec, 0);
             Console.WriteLine(vec);
         }
+#endif
 
         public override void Setup(GraphicsDevice graphics, AudioDevice audio, Window window)
         {
             this.SetupTriangle(graphics);
             this.SetupSurface(graphics);
 
+#if Include_Sound
+            
             audio.Position = new Vector3(512, 384, 0);
             audio.Orientation = new Orientation()
             {
@@ -83,6 +88,7 @@ namespace Tests.SurfaceTest
             this.speaker.Play();
             window.OnKeyReleased += this.OnKey;
             window.OnMouseMoved += this.OnMouseMoved;
+#endif
         }
 
         private void SetupTriangle(GraphicsDevice graphics)
@@ -199,11 +205,13 @@ namespace Tests.SurfaceTest
 
         public override void Dispose(GraphicsDevice device, AudioDevice audio, Window window)
         {
+#if Include_Sound
             window.OnKeyReleased -= this.OnKey;
             window.OnMouseMoved -= this.OnMouseMoved;
             audio.Position = Vector3.Zero;
             speaker.Dispose();
             sound.Dispose();
+#endif
             surface.Dispose();
             surfaceProgram.Dispose();
             surfaceIndexes.Dispose();

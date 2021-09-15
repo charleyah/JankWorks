@@ -3785,16 +3785,16 @@ namespace JankWorks.Drivers.Glfw
 
         static Api()
         {
-            string libname = SystemEnvironment.Current.OS switch
+            var env = SystemEnvironment.Current;
+
+            Api.loader = env.OS switch
             {
-                SystemPlatform.Windows => "glfw3.dll",
-                SystemPlatform.Linux => "libglfw.so",
-                SystemPlatform.MacOS => "libglfw.3.dylib",
+                SystemPlatform.Windows => env.LoadLibrary("glfw3.dll"),
+                SystemPlatform.Linux => env.LoadLibrary("libglfw.so"),
+                SystemPlatform.MacOS => env.LoadLibrary("libglfw.3.dylib"),
 
                 _ => throw new NotSupportedException()
             };
-
-            Api.loader = SystemEnvironment.Current.LoadLibrary(libname);
         }
     }
 }

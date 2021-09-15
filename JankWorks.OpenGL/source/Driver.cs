@@ -20,16 +20,14 @@ namespace JankWorks.Drivers.OpenGL
 
         public Driver()
         {
-            var system = SystemEnvironment.Current;
+            var env = SystemEnvironment.Current;
 
-            var libname = system.OS switch
+            this.loader = env.OS switch
             {
-                SystemPlatform.Windows => "opengl32.dll",
-                SystemPlatform.Linux => "libGL.so",
+                SystemPlatform.Windows => env.LoadLibrary("opengl32.dll"),
+                SystemPlatform.Linux => env.LoadLibrary("libGL.so"),
                 _ => throw new NotImplementedException()
             };
-
-            this.loader = SystemEnvironment.Current.LoadLibrary(libname);
         }
 
         public GraphicsDevice CreateGraphicsDevice(SurfaceSettings settings, IRenderTarget renderTarget)
