@@ -59,8 +59,17 @@ namespace JankWorks.Game
         protected void RegisterHostObject(object obj) => this.hostObjects.Add(obj);
 
 
-        public virtual void HostInitialise(Host host, AssetManager assets) { }
-        public virtual void HostInitialised(object? state) => this.BuildHostObjectContainers();
+        public virtual void HostInitialise(Host host, AssetManager assets)
+        { 
+            this.BuildHostObjectContainers();
+
+            for (int index = 0; index < this.resources.Length; index++)
+            {
+                this.resources[index].InitialiseResources(assets);
+            }
+        }
+
+        public virtual void HostInitialised(object? state) { }
         
         private void BuildHostObjectContainers()
         {
@@ -144,8 +153,16 @@ namespace JankWorks.Game
 
         protected void RegisterClientObject(object obj) => this.clientObjects.Add(obj);
 
-        public virtual void ClientInitialise(Client client, AssetManager assets) { }
-        public virtual void ClientInitialised(object? state) => this.BuildClientObjectContainers();
+        public virtual void ClientInitialise(Client client, AssetManager assets)
+        { 
+            this.BuildClientObjectContainers();
+
+            for (int index = 0; index < this.resources.Length; index++)
+            {
+                this.resources[index].InitialiseResources(assets);
+            }
+        }
+        public virtual void ClientInitialised(object? state) { }
         
         private void BuildClientObjectContainers()
         {
@@ -192,7 +209,14 @@ namespace JankWorks.Game
             }
         }
 
-        public virtual void InitialiseGraphicsResources(GraphicsDevice device, AssetManager assets) { }
+        public virtual void InitialiseGraphicsResources(GraphicsDevice device, AssetManager assets) 
+        {
+            for (int index = 0; index < this.graphicsResources.Length; index++)
+            {
+                this.graphicsResources[index].InitialiseGraphicsResources(device, assets);
+            }
+        }
+
         public virtual void DisposeGraphicsResources(GraphicsDevice device) 
         {
             Array.ForEach(this.graphicsResources, (gr) => gr.DisposeGraphicsResources(device));
@@ -202,7 +226,14 @@ namespace JankWorks.Game
             this.drawables = Array.Empty<IDrawable>();
         }
 
-        public virtual void InitialiseSoundResources(AudioDevice device, AssetManager assets) { }
+        public virtual void InitialiseSoundResources(AudioDevice device, AssetManager assets) 
+        {
+            for (int index = 0; index < this.soundResources.Length; index++)
+            {
+                this.soundResources[index].InitialiseSoundResources(device, assets);
+            }
+        }
+
         public virtual void DisposeSoundResources(AudioDevice device) 
         {
             Array.ForEach(this.soundResources, (sr) => sr.DisposeSoundResources(device));
