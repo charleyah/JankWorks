@@ -158,6 +158,15 @@ namespace JankWorks.Drivers.Glfw.Interface
                     case GLFW_KEY_PAGE_DOWN:
                         return Key.PageDown;
 
+                    case GLFW_KEY_UP:
+                        return Key.Up;
+                    case GLFW_KEY_DOWN:
+                        return Key.Down;
+                    case GLFW_KEY_LEFT:
+                        return Key.Left;
+                    case GLFW_KEY_RIGHT:
+                        return Key.Right;
+
                     case GLFW_KEY_BACKSLASH:
                         return Key.Backslash;
                     case GLFW_KEY_SLASH:
