@@ -24,11 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="source\Native\FreeType.Enums.cs" />
-    <None Include="source\Native\FreeType.Functions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\JankWorks\JankWorks.csproj" />
   </ItemGroup>
 
