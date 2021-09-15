@@ -33,22 +33,25 @@ namespace JankWorks.Drivers.OpenAL.Native
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
             public delegate ALError alGetError();
 
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
+            public delegate void alDistanceModel(ALDistanceModel model);
+
 
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
             public delegate void alListenerf(ALListenerf parm, float value);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            public delegate void alListener3f(ALListener3f parm, Vector3 value);
+            public delegate void alListener3f(ALListener3f parm, float x, float y, float z);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
             public unsafe delegate void alListenerfv(ALListenerfv parm, float* values);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            public delegate void alGetListenerf(ALListenerf parm, ref float value);
+            public unsafe delegate void alGetListenerf(ALListenerf parm, float* value);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            public delegate void alGetListener3f(ALListener3f parm, ref Vector3 value);
+            public unsafe delegate void alGetListener3f(ALListener3f parm, float* x, float* y, float* z);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
             public unsafe delegate void alGetListenerfv(ALListenerfv parm, float* values);
@@ -68,7 +71,7 @@ namespace JankWorks.Drivers.OpenAL.Native
             public delegate void alSourcef(uint source, ALSourcef parm, float value);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            public delegate void alSource3f(uint source, ALSource3f parm, Vector3 value);
+            public delegate void alSource3f(uint source, ALSource3f parm, float x, float y, float z);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
             public unsafe delegate void alSourcefv(uint source, ALSource3f parm, float* values);
@@ -77,16 +80,16 @@ namespace JankWorks.Drivers.OpenAL.Native
             public delegate void alSourcei(uint source, ALSourcei parm, int value);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            public delegate void alGetSourcef(uint source, ALSourcef parm, ref float value);
+            public unsafe delegate void alGetSourcef(uint source, ALSourcef parm, float* value);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            public delegate void alGetSource3f(uint source, ALSource3f parm, ref Vector3 value);
+            public unsafe delegate void alGetSource3f(uint source, ALSource3f parm, float* x, float* y, float* z);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
             public unsafe delegate void alGetSourcefv(uint source, ALSource3f parm, float* values);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            public delegate void alGetSourcei(uint source, ALGetSourcei parm, ref int value);
+            public unsafe delegate void alGetSourcei(uint source, ALGetSourcei parm, int* value);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
             public delegate void alSourcePlay(uint source);
@@ -126,7 +129,7 @@ namespace JankWorks.Drivers.OpenAL.Native
             public unsafe delegate void alBufferData(uint buffer, ALFormat format, void* data, int size, int freq);
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-            public delegate void alGetBufferi(uint buffer, ALBufferi parm, ref int value);
+            public unsafe delegate void alGetBufferi(uint buffer, ALBufferi parm, int* value);
 
         }
 
@@ -139,6 +142,7 @@ namespace JankWorks.Drivers.OpenAL.Native
         public static Delegates.alcDestroyContext alcDestroyContext;
 
         public static Delegates.alGetError alGetError;
+        public static Delegates.alDistanceModel alDistanceModel;
 
         public static Delegates.alListenerf alListenerf;
         public static Delegates.alListener3f alListener3f;
@@ -195,16 +199,14 @@ namespace JankWorks.Drivers.OpenAL.Native
         {
             var env = SystemEnvironment.Current;
 
-            var libname = env.OS switch
+            var loader = env.OS switch
             {
-                SystemPlatform.Windows => "openal32.dll",
-                SystemPlatform.MacOS => "/System/Library/Frameworks/OpenAL.framework/OpenAL",
-                SystemPlatform.Linux => "libopenal.so.1",
+                SystemPlatform.Windows => env.LoadLibrary("soft_oal.dll", "openal32.dll"),
+                SystemPlatform.MacOS => env.LoadLibrary("/System/Library/Frameworks/OpenAL.framework/OpenAL"),
+                SystemPlatform.Linux => env.LoadLibrary("libopenal.so.1"),
                 _ => throw new NotSupportedException()
             };
-
-            var loader = env.LoadLibrary(libname);
-
+               
             Functions.alcOpenDevice = LoadFunction<Delegates.alcOpenDevice>(loader);
             Functions.alcCloseDevice = LoadFunction<Delegates.alcCloseDevice>(loader);
 
@@ -214,6 +216,7 @@ namespace JankWorks.Drivers.OpenAL.Native
             Functions.alcDestroyContext = LoadFunction<Delegates.alcDestroyContext>(loader);
 
             Functions.alGetError = LoadFunction<Delegates.alGetError>(loader);
+            Functions.alDistanceModel = LoadFunction<Delegates.alDistanceModel>(loader);
 
             Functions.alListenerf = LoadFunction<Delegates.alListenerf>(loader);
             Functions.alListener3f = LoadFunction<Delegates.alListener3f>(loader);

@@ -23,7 +23,7 @@ namespace JankWorks.Platform
         public abstract SystemPlatform OS { get; }
         public abstract string Description { get; }
 
-        public abstract LibraryLoader LoadLibrary(string name);
+        public abstract LibraryLoader LoadLibrary(params string[] names);
     }
 
     public enum SystemPlatform

@@ -4,6 +4,7 @@ using System.Linq;
 
 using JankWorks.Drivers;
 using JankWorks.Graphics;
+using JankWorks.Audio;
 using JankWorks.Interface;
 
 
@@ -15,7 +16,7 @@ namespace Tests
     {
         static void Main(string[] args)
         {
-            DriverConfiguration.Initialise("JankWorks.Glfw", "JankWorks.OpenGL", "JankWorks.FreeType", "JankWorks.DotNet");
+            DriverConfiguration.Initialise("JankWorks.Glfw", "JankWorks.OpenGL", "JankWorks.FreeType", "JankWorks.DotNet", "JankWorks.OpenAL");
 
             var windowsettings = WindowSettings.Default;
             windowsettings.VideoMode = new VideoMode(1024, 768, 32, 60);
@@ -29,7 +30,8 @@ namespace Tests
             };
 
             using var window = Window.Create(windowsettings);
-            using var device = GraphicsDevice.Create(surfacesettings, window);
+            using var graphics = GraphicsDevice.Create(surfacesettings, window);
+            using var audio = AudioDevice.GetDefault();
 
 
             var tests = Runner.GetTestClasses().GetEnumerator();
@@ -39,7 +41,7 @@ namespace Tests
             if (testsRemaining)
             {
                 test = (Test)Activator.CreateInstance(tests.Current);
-                test.Setup(device);
+                test.Setup(graphics, audio, window);
             }
 
             window.OnKeyReleased += (ke) =>
@@ -54,9 +56,9 @@ namespace Tests
 
                     if (testsRemaining)
                     {
-                        test?.Dispose();
+                        test?.Dispose(graphics, audio, window);
                         test = (Test)Activator.CreateInstance(tests.Current);
-                        test.Setup(device);
+                        test.Setup(graphics, audio, window);
                     }
                 }
             };
@@ -67,11 +69,11 @@ namespace Tests
             {
                 window.ProcessEvents();
 
-                device.Clear();
+                graphics.Clear();
 
-                test?.Draw(device);
+                test?.Draw(graphics);
 
-                device.Display();
+                graphics.Display();
             }
 
             window.Hide();

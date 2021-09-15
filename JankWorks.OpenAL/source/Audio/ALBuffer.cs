@@ -56,11 +56,11 @@ namespace JankWorks.Drivers.OpenAL.Audio
             {
                 if (samples >= 16)
                 {
-                    return channels > 0 ? ALFormat.Stereo16 : ALFormat.Mono16;
+                    return channels > 1 ? ALFormat.Stereo16 : ALFormat.Mono16;
                 }
                 else
                 {
-                    return channels > 0 ? ALFormat.Stereo8 : ALFormat.Mono8;
+                    return channels > 1 ? ALFormat.Stereo8 : ALFormat.Mono8;
                 }
             }
         }

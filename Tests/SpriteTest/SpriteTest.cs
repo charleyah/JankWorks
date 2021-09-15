@@ -1,7 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using System.Numerics;
-using JankWorks.Graphics;
 
+using JankWorks.Audio;
+using JankWorks.Graphics;
+using JankWorks.Interface;
 
 #pragma warning disable CS8618
 
@@ -25,9 +27,9 @@ namespace Tests.SpriteTest
         private Vector2 spritePositionOrigin;
         private Vector2 spritePosition; 
 
-        public override void Setup(GraphicsDevice device)
+        public override void Setup(GraphicsDevice graphics, AudioDevice audio, Window window)
         {
-            var viewport = device.Viewport;
+            var viewport = graphics.Viewport;
 
             this.spriteSize = new Vector2(256);
             this.spritePositionOrigin = new Vector2(0.5f);
@@ -40,9 +42,9 @@ namespace Tests.SpriteTest
             this.model = Matrix4x4.CreateScale(new Vector3(spriteSize, 0)) * Matrix4x4.CreateTranslation(new Vector3(spritePosition - (this.spriteSize * this.spritePositionOrigin), 0));
 
 
-            this.texture = device.CreateTexture2D(GetEmbeddedStream("SpriteTest.punchy_512.png"), ImageFormat.PNG);
+            this.texture = graphics.CreateTexture2D(GetEmbeddedStream("SpriteTest.punchy_512.png"), ImageFormat.PNG);
 
-            this.quadlayout = device.CreateVertexLayout();
+            this.quadlayout = graphics.CreateVertexLayout();
             var positionAttrib = new VertexAttribute()
             {
                 Format = VertexAttributeFormat.Vector2f,
@@ -65,7 +67,7 @@ namespace Tests.SpriteTest
 
 
 
-            this.quad = device.CreateVertexBuffer<Vertex2>();
+            this.quad = graphics.CreateVertexBuffer<Vertex2>();
             Vertex2[] quadData =
             {
                 new Vertex2(new Vector2(0f,  0f), Colour.White, new Vector2(0f, 0f)),
@@ -78,7 +80,7 @@ namespace Tests.SpriteTest
 
 
 
-            this.quadIndexes = device.CreateIndexBuffer();
+            this.quadIndexes = graphics.CreateIndexBuffer();
             uint[] indexValues =
             {
                 0, 1, 2,
@@ -88,7 +90,7 @@ namespace Tests.SpriteTest
 
 
 
-            this.program = device.CreateShader(ShaderFormat.GLSL, GetEmbeddedStream("SpriteTest.vert.glsl"), GetEmbeddedStream("SpriteTest.frag.glsl"));
+            this.program = graphics.CreateShader(ShaderFormat.GLSL, GetEmbeddedStream("SpriteTest.vert.glsl"), GetEmbeddedStream("SpriteTest.frag.glsl"));
 
             this.program.SetVertexData(this.quad, this.quadlayout, this.quadIndexes);
 
@@ -103,14 +105,13 @@ namespace Tests.SpriteTest
             device.DrawIndexedPrimitives(this.program, DrawPrimitiveType.Triangles, 6);
         }
 
-        protected override void Dispose(bool finalising)
+        public override void Dispose(GraphicsDevice device, AudioDevice audio, Window window)
         {
             this.program.Dispose();
             this.quadIndexes.Dispose();
             this.quadlayout.Dispose();
             this.quad.Dispose();
             this.texture.Dispose();
-            base.Dispose(finalising);
         }
     }
 }

@@ -6,13 +6,13 @@ namespace JankWorks.Audio
 {
     public abstract class Listener : Disposable
     {
-        public virtual float Volume { get; set; }
+        public abstract float Volume { get; set; }
 
-        public virtual Vector3 Position { get; set; }
+        public abstract Vector3 Position { get; set; }
 
-        public virtual Vector3 Velocity { get; set; }
+        public abstract Vector3 Velocity { get; set; }
 
-        public virtual Orientation Orientation { get; set; }        
+        public abstract Orientation Orientation { get; set; }        
     }
 
     public struct Orientation

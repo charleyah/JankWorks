@@ -12,67 +12,147 @@ namespace JankWorks.Drivers.OpenAL.Audio
     {
         public override float Volume 
         { 
-            get => base.Volume;
+            get
+            {
+                unsafe
+                {
+                    float value = default;
+                    alGetSourcef(this.handle, ALSourcef.Gain, &value);
+                    return value;
+                }
+                
+            }
             set
             {
-                alSourcef(this.handle, ALSourcef.Gain, value);
-                base.Volume = value;
+                alSourcef(this.handle, ALSourcef.Gain, value);                
             }
         }
 
         public override bool Loop 
         { 
-            get => base.Loop; 
+            get
+            {
+                unsafe
+                {
+                    int value = default;
+                    alGetSourcei(this.handle, ALGetSourcei.Looping, &value);
+                    return value == 1;
+                }
+                
+            }
             set
             {
-                alSourcei(this.handle, ALSourcei.Looping, value ? 1 : 0);
-                base.Loop = value;
+                alSourcei(this.handle, ALSourcei.Looping, value ? 1 : 0);                
             }
         }
 
         public override Vector3? Position
         {
-            get => base.Position;
+            get => this.position;
             set
             {
-                var oldval = base.Position;
-
-                if(value is Vector3 pos)
-                {
-                    if (oldval is null) 
-                    { 
-                        alSourcei(this.handle, ALSourcei.SourceRelative, 0); 
-                    }
-
-                    alSource3f(this.handle, ALSource3f.Position, pos);
-                }
-                else
+                if(value is null)
                 {
                     alSourcei(this.handle, ALSourcei.SourceRelative, 1);
-
-                    var zero = new Vector3(0);
-                    alSource3f(this.handle, ALSource3f.Position, zero);
-                    alSource3f(this.handle, ALSource3f.Velocity, zero);
-                    base.Velocity = zero;
+                    alSource3f(this.handle, ALSource3f.Position, 0, 0, 0);
                 }
-            
-                base.Position = value;
+                else if(value is Vector3 pos)
+                {
+                    alSourcei(this.handle, ALSourcei.SourceRelative, 0);
+                    alSource3f(this.handle, ALSource3f.Position, pos.X, pos.Y, pos.Z);
+                }
+                this.position = value;
+            }
+        }
+
+        public override Vector3 Direction 
+        { 
+            get
+            {
+                unsafe
+                {
+                    Vector3 value = default;
+                    alGetSource3f(this.handle, ALSource3f.Direction, &value.X, &value.Y, &value.Z);
+                    return value;
+                }                
+            }
+            set
+            {
+                alSource3f(this.handle, ALSource3f.Direction, value.X, value.Y, value.Z);                
             }
         }
 
         public override Vector3 Velocity 
         {
-            get => base.Velocity;
+            get
+            {
+                unsafe
+                {
+                    Vector3 value = default;
+                    alGetSource3f(this.handle, ALSource3f.Velocity, &value.X, &value.Y, &value.Z);
+                    return value;
+                }                
+            }
             set
             {
-                alSource3f(this.handle, ALSource3f.Velocity, value);
-                base.Velocity = value;
+                alSource3f(this.handle, ALSource3f.Velocity, value.X, value.Y, value.Z);                
+            }
+        }
+
+        public override float MinDistance
+        { 
+            get
+            {
+                unsafe
+                {
+                    float value = default;
+                    alGetSourcef(this.handle, ALSourcef.ReferenceDistance, &value);
+                    return value;
+                }                
+            }
+            set
+            {
+                alSourcef(this.handle, ALSourcef.ReferenceDistance, value);                
+            }
+        }
+
+        public override float MaxDistance
+        {
+            get
+            {
+                unsafe
+                {
+                    float value = default;
+                    alGetSourcef(this.handle, ALSourcef.MaxDistance, &value);
+                    return value;
+                }                
+            }
+            set
+            {
+                alSourcef(this.handle, ALSourcef.MaxDistance, value);                
+            }
+        }
+
+        public override float DistanceScale
+        { 
+            get
+            {
+                unsafe
+                {
+                    float value = default;
+                    alGetSourcef(this.handle, ALSourcef.RolloffFactor, &value);
+                    return value;
+                }                
+            }
+            set
+            {
+                alSourcef(this.handle, ALSourcef.RolloffFactor, value);                
             }
         }
 
         public override Sound Sound 
         { 
-            get => base.Sound; 
+            get => this.sound; 
             set
             {
                 int soundHandle = 0;
@@ -80,11 +160,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
                 if(value is ALSound alsound)
                 {
                     soundHandle = (int)alsound.buffer.handle;
-                }
-                else if (value is ALMusic almusic)
-                {
-                    soundHandle = (int)almusic.buffer.handle;
-                }
+                }                
                 else
                 {
                     throw new NotSupportedException();
@@ -103,15 +179,16 @@ namespace JankWorks.Drivers.OpenAL.Audio
                     throw new AudioException($"ALEmitter Sound {error}");
                 }
 
-                base.Sound = value;
+                this.sound = value;
             }
         }
-
         private readonly uint handle;
+        private Vector3? position;
+        private Sound sound;
+        
+        public ALEmitter(Sound sound) : this(sound, null) { }
 
-        public ALEmitter(Sound sound) : this(sound, 1f, false, null, new Vector3(0)) { }
-
-        public ALEmitter(Sound sound, float volume, bool loop, Vector3? position, Vector3 velocity)
+        public ALEmitter(Sound sound, Vector3? position)
         {
             uint handle = 0;
 
@@ -129,11 +206,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
             this.handle = handle;
             this.Sound = sound;
-
-            this.Volume = volume;
-            this.Loop = loop;
             this.Position = position;
-            this.Velocity = velocity;
         }
 
         public override PlayState State
@@ -142,8 +215,11 @@ namespace JankWorks.Drivers.OpenAL.Audio
             {
                 int state = (int)ALSourceState.Initial;
 
-                alGetSourcei(this.handle, ALGetSourcei.SourceState, ref state);
-
+                unsafe
+                {
+                    alGetSourcei(this.handle, ALGetSourcei.SourceState, &state);
+                }
+                
                 return (ALSourceState)state switch
                 {
                     ALSourceState.Initial => PlayState.Stopped,

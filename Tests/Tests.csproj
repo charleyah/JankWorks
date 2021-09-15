@@ -30,6 +30,7 @@
     <ProjectReference Include="..\JankWorks.DotNet\JankWorks.DotNet.csproj" />
     <ProjectReference Include="..\JankWorks.FreeType\JankWorks.FreeType.csproj" />
     <ProjectReference Include="..\JankWorks.Glfw\JankWorks.Glfw.csproj" />
+    <ProjectReference Include="..\JankWorks.OpenAL\JankWorks.OpenAL.csproj" />
     <ProjectReference Include="..\JankWorks.OpenGL\JankWorks.OpenGL.csproj" />
     <ProjectReference Include="..\JankWorks\JankWorks.csproj" />
   </ItemGroup>

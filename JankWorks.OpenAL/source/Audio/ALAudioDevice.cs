@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.IO;
 using System.Numerics;
 
@@ -31,59 +32,88 @@ namespace JankWorks.Drivers.OpenAL.Audio
                 }
             }
 
+            alcMakeContextCurrent(this.context);
+            alDistanceModel(ALDistanceModel.LinearDistanceClamped);
+
             this.Volume = 1f;
-            this.Position = new Vector3(0);
-            this.Velocity = new Vector3(0);
+            this.Position = Vector3.Zero;
+            this.Velocity = Vector3.Zero;
             this.Orientation = new Orientation()
             {
                 Direction = Vector3.UnitZ,
                 Up = Vector3.UnitY
             };
-
-            alcMakeContextCurrent(this.context);
         }
 
         public override float Volume 
         { 
-            get => base.Volume;
+            get
+            {
+                unsafe
+                {
+                    float value = default;
+                    alGetListenerf(ALListenerf.Gain, &value);
+                    return value;
+                }
+                
+            }
             set
             {
                 alListenerf(ALListenerf.Gain, value);
-                base.Volume = value;
             }
         }
 
         public override Vector3 Position 
         {
-            get => base.Position; 
+            get
+            {                
+                unsafe
+                {
+                    Vector3 value = default;
+                    alGetListener3f(ALListener3f.Position, &value.X, &value.Y, &value.Z);
+                    return value;                        
+                }
+            }
             set
             {
-                alListener3f(ALListener3f.Position, value);
-                base.Position = value;
+                alListener3f(ALListener3f.Position, value.X, value.Y, value.Z);
             }
         }
 
         public override Vector3 Velocity 
         { 
-            get => base.Velocity; 
+            get
+            {
+                unsafe
+                {
+                    Vector3 value = default;
+                    alGetListener3f(ALListener3f.Velocity, &value.X, &value.Y, &value.Z);
+                    return value;
+                }
+            }
             set
             {
-                alListener3f(ALListener3f.Velocity, value);
-                base.Velocity = value;
+                alListener3f(ALListener3f.Velocity, value.X, value.Y, value.Z);                
             }
         }
 
         public override Orientation Orientation 
         { 
-            get => base.Orientation; 
+            get
+            {
+                unsafe
+                {
+                    Orientation value = default;
+                    alGetListenerfv(ALListenerfv.Orientation, (float*)&value);
+                    return value;
+                }
+            }
             set
             {                
                 unsafe
                 {
                     alListenerfv(ALListenerfv.Orientation, (float*)&value);
                 }
-                
-                base.Orientation = value;
             }
         }
 
@@ -96,17 +126,57 @@ namespace JankWorks.Drivers.OpenAL.Audio
             return sound;
         }
 
-        public override Music LoadMusic(Stream stream, AudioFormat format)
-        {
-            throw new NotImplementedException();
-        }
-
         public override Sound LoadSound(Stream stream, AudioFormat format)
         {
-            throw new NotImplementedException();
+            if(format == AudioFormat.Wav)
+            {
+                var sound = new ALSound();
+                ALAudioDevice.LoadWav(stream, sound.buffer);
+                return sound;
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
 
+        internal static void LoadWav(Stream stream, ALBuffer buffer)
+        {
+            var header = WavHeader.Read(stream);
 
+            if (header.AudioFormat != 1)
+            {
+                throw new NotSupportedException("ALAudioDevice only supports 16-bit pcm wav format");
+            }
+
+            int dataLength = (int)header.SubChunk2Size;
+
+            if(stream is UnmanagedMemoryStream ums)
+            {
+                ReadOnlySpan<byte> umsData;
+                unsafe
+                {
+                    umsData = new ReadOnlySpan<byte>(ums.PositionPointer, dataLength);
+                }
+                buffer.Write(umsData, (short)header.NumChannels, (short)header.BitsPerSample, (int)header.SampleRate);
+            }
+            else
+            {
+                MemoryStream ms;
+
+                if(stream is MemoryStream sms)
+                {
+                    ms = sms;
+                }
+                else
+                {
+                    ms = new MemoryStream(dataLength);
+                    stream.Read(ms.GetBuffer(), 0, dataLength);
+                }
+
+                buffer.Write(ms.GetBuffer(), (short)header.NumChannels, (short)header.BitsPerSample, (int)header.SampleRate);
+            }            
+        }
 
         protected override void Dispose(bool finalising)
         {
@@ -114,6 +184,81 @@ namespace JankWorks.Drivers.OpenAL.Audio
             alcCloseDevice(this.device);
 
             base.Dispose(finalising);
+        }
+    }
+
+
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    unsafe struct RiffHeader
+    {
+        public const int IDSize = 4;
+
+        public fixed byte ChunkId[RiffHeader.IDSize];
+        public uint ChunkSize;
+        public fixed byte Format[RiffHeader.IDSize];
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    unsafe struct WavHeader
+    {
+        public RiffHeader RiffHeader;
+        public fixed byte SubChunk1ID[RiffHeader.IDSize];
+        public uint SubChunk1Size;
+        public ushort AudioFormat;
+        public ushort NumChannels;
+        public uint SampleRate;
+        public uint ByteRate;
+        public ushort BlockAlign;
+        public ushort BitsPerSample;
+        public fixed byte SubChunk2ID[RiffHeader.IDSize];
+        public uint SubChunk2Size;
+
+        public static WavHeader Read(Stream stream)
+        {
+            var header = default(WavHeader);
+
+            unsafe
+            {
+                var hspan = new Span<byte>(&header, sizeof(WavHeader));
+                stream.Read(hspan);
+
+                Span<byte> expectedId = stackalloc byte[RiffHeader.IDSize];
+
+                Span<byte> actualId = new Span<byte>(header.RiffHeader.ChunkId, RiffHeader.IDSize);
+                WriteRiff(expectedId);
+                if (!expectedId.SequenceEqual(actualId))
+                {
+                    throw new InvalidDataException("Invalid RIFF header");
+                }
+
+                actualId = new Span<byte>(header.RiffHeader.Format, RiffHeader.IDSize);
+                WriteWave(expectedId);
+                if (!expectedId.SequenceEqual(actualId))
+                {
+                    throw new InvalidDataException("Invalid WAVE header");
+                }
+            }
+
+            return header;
+
+            void WriteRiff(Span<byte> data)
+            {
+                // RIFF in Ascii
+                data[0] = 82;
+                data[1] = 73;
+                data[2] = 70;
+                data[3] = 70;
+            }
+
+            void WriteWave(Span<byte> data)
+            {
+                // WAVE in Ascii
+                data[0] = 87;
+                data[1] = 65;
+                data[2] = 86;
+                data[3] = 69;
+            }
         }
     }
 }

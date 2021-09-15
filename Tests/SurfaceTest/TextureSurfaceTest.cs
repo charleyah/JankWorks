@@ -1,8 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Numerics;
 
+using JankWorks.Audio;
 using JankWorks.Graphics;
+using JankWorks.Interface;
 
 #pragma warning disable CS8618
 
@@ -21,15 +24,70 @@ namespace Tests.SurfaceTest
         private IndexBuffer surfaceIndexes;
         private Shader surfaceProgram;
 
-        public override void Setup(GraphicsDevice device)
+        private Sound sound;
+        private Emitter speaker;
+
+        private void OnKey(KeyEvent e)
         {
-            this.SetupTriangle(device);
-            this.SetupSurface(device);
+            switch (e.Key)
+            {               
+                case Key.E:
+                    if(this.speaker.State == PlayState.Paused)
+                    {
+                        this.speaker.Resume();
+                    }
+                    else if(this.speaker.State == PlayState.Playing)
+                    {
+                        this.speaker.Pause();
+                    }                   
+                    break;
+                case Key.W:
+                    this.speaker.Play();
+                    break;
+                case Key.Q:
+                    this.speaker.Stop();
+                    break;
+            }
         }
 
-        private void SetupTriangle(GraphicsDevice device)
+        private void OnMouseMoved(Vector2 vec)
         {
-            triangle = device.CreateVertexBuffer<Vertex2>();
+            this.speaker.Position = new Vector3(vec, 0);
+            Console.WriteLine(vec);
+        }
+
+        public override void Setup(GraphicsDevice graphics, AudioDevice audio, Window window)
+        {
+            this.SetupTriangle(graphics);
+            this.SetupSurface(graphics);
+
+            audio.Position = new Vector3(512, 384, 0);
+            audio.Orientation = new Orientation()
+            {
+                Direction = Vector3.UnitZ,
+                Up = -Vector3.UnitY
+            };
+
+            var soundpath = "Money.wav";
+            using var soundfile = new FileStream(soundpath, FileMode.Open, FileAccess.Read);
+            this.sound = audio.LoadSound(soundfile, AudioFormat.Wav);
+            this.speaker = audio.CreateEmitter(this.sound);
+
+            var dis = this.speaker.Direction;
+
+            this.speaker.MinDistance = 100f;
+            this.speaker.DistanceScale = 1f;
+            this.speaker.MaxDistance = 300f;
+
+
+            this.speaker.Play();
+            window.OnKeyReleased += this.OnKey;
+            window.OnMouseMoved += this.OnMouseMoved;
+        }
+
+        private void SetupTriangle(GraphicsDevice graphics)
+        {
+            triangle = graphics.CreateVertexBuffer<Vertex2>();
             triangle.Usage = BufferUsage.Static;
 
             Vertex2[] vertices =
@@ -42,7 +100,7 @@ namespace Tests.SurfaceTest
             triangle.Write(vertices);
 
 
-            triangleLayout = device.CreateVertexLayout();
+            triangleLayout = graphics.CreateVertexLayout();
 
             var positionAttrib = new VertexAttribute()
             {
@@ -65,7 +123,7 @@ namespace Tests.SurfaceTest
             triangleLayout.SetAttribute(positionAttrib);
             triangleLayout.SetAttribute(colourAttrib);
 
-            triangleProgram = device.CreateShader(ShaderFormat.GLSL, this.GetEmbeddedStream("SurfaceTest.Triangle.vert.glsl"), this.GetEmbeddedStream("SurfaceTest.Triangle.frag.glsl"));
+            triangleProgram = graphics.CreateShader(ShaderFormat.GLSL, this.GetEmbeddedStream("SurfaceTest.Triangle.vert.glsl"), this.GetEmbeddedStream("SurfaceTest.Triangle.frag.glsl"));
             triangleProgram.SetVertexData(triangle, triangleLayout);
         }
 
@@ -139,8 +197,13 @@ namespace Tests.SurfaceTest
             device.DrawIndexedPrimitives(this.surfaceProgram, DrawPrimitiveType.Triangles, 6);
         }
 
-        protected override void Dispose(bool finalising)
+        public override void Dispose(GraphicsDevice device, AudioDevice audio, Window window)
         {
+            window.OnKeyReleased -= this.OnKey;
+            window.OnMouseMoved -= this.OnMouseMoved;
+            audio.Position = Vector3.Zero;
+            speaker.Dispose();
+            sound.Dispose();
             surface.Dispose();
             surfaceProgram.Dispose();
             surfaceIndexes.Dispose();
@@ -150,7 +213,6 @@ namespace Tests.SurfaceTest
             triangleProgram.Dispose();
             triangleLayout.Dispose();
             triangle.Dispose();
-            base.Dispose(finalising);
         }
     }
 }
