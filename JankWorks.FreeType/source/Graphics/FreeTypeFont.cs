@@ -116,10 +116,18 @@ namespace JankWorks.Drivers.FreeType.Graphics
 
             public bool MoveNext()
             {
-                if(!readFirst)
-                {
-                    var ch = FT_Get_First_Char(this.font.face, ref glyphIndex);
+                ulong ch;
 
+                if (!readFirst)
+                {                    
+                    unsafe
+                    {
+                        fixed (uint* gip = &this.glyphIndex)
+                        {
+                            ch = FT_Get_First_Char(this.font.face, gip);
+                        }
+                    }
+                            
                     var foundGlyph = glyphIndex != 0;
 
                     if (foundGlyph)
@@ -131,7 +139,14 @@ namespace JankWorks.Drivers.FreeType.Graphics
                 }
                 else
                 {
-                    var ch = FT_Get_Next_Char(this.font.face, glyph.Value, ref glyphIndex);
+                    unsafe
+                    {
+                        fixed(uint* gip = &this.glyphIndex)
+                        {
+                            ch = FT_Get_Next_Char(this.font.face, glyph.Value, gip);
+                        }                        
+                    }
+                    
 
                     var foundGlyph = glyphIndex != 0;
 

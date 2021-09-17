@@ -23,8 +23,13 @@ namespace JankWorks.Drivers.FreeType
         public Driver()
         {
             Functions.Init();
-
-            FT_Init_FreeType(out this.library);
+            FT_Library lib = default;
+            unsafe
+            {
+                FT_Init_FreeType(&lib);
+            }
+            this.library = lib;
+            
         }
         public Font LoadFontFromStream(Stream stream, FontFormat format)
         {
@@ -36,7 +41,7 @@ namespace JankWorks.Drivers.FreeType
             {
                 unsafe
                 {
-                    error = FT_New_Memory_Face(this.library, (IntPtr)ums.PositionPointer, (int)ums.Length, 0, out face);
+                    error = FT_New_Memory_Face(this.library, (IntPtr)ums.PositionPointer, (int)ums.Length, 0, &face);
                 }
                 source = ums;
             }
@@ -63,7 +68,7 @@ namespace JankWorks.Drivers.FreeType
                 {
                     fixed (byte* ptr = memoryStream.GetBuffer())
                     {
-                        error = FT_New_Memory_Face(this.library, (IntPtr)ptr, (int)memoryStream.Length, 0, out face);
+                        error = FT_New_Memory_Face(this.library, (IntPtr)ptr, (int)memoryStream.Length, 0, &face);
                     }
                 }
                 source = memoryStream;
