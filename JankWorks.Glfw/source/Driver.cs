@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 using JankWorks.Core;
 
@@ -11,7 +10,8 @@ using JankWorks.Interface;
 
 using JankWorks.Drivers.Glfw.Interface;
 
-using static JankWorks.Drivers.Glfw.Api;
+using JankWorks.Drivers.Glfw.Native;
+using static JankWorks.Drivers.Glfw.Native.Functions;
 
 
 [assembly: JankWorksDriver(typeof(JankWorks.Drivers.Glfw.Driver))]
@@ -22,11 +22,10 @@ namespace JankWorks.Drivers.Glfw
     {
         public Driver()
         {
+            Functions.Init();
             glfwInit();
             glfwSetErrorCallback(new GLFWerrorfun((ec, des) => Console.Out.WriteLine(des)));
         }
-
-        public string Name => typeof(Driver).FullName;
 
         public Window CreateWindow(WindowSettings settings, IGraphicsDriver graphicDriver)
         {
@@ -40,7 +39,22 @@ namespace JankWorks.Drivers.Glfw
             }
         }
 
-        public Monitor[] GetMonitors() => (from IntPtr monitorHandle in glfwGetMonitors() select new GlfwMonitor(monitorHandle)).ToArray();
+        public Monitor[] GetMonitors()
+        {
+            unsafe
+            {
+                nint* ptr = (nint*)glfwGetMonitors(out var count).ToPointer();
+
+                var monitors = new GlfwMonitor[count];
+                for (int index = 0; index < count; index++)
+                {
+                    monitors[index] = new GlfwMonitor((IntPtr)ptr);
+                    ptr++;
+                }
+
+                return monitors;
+            }
+        }
         
         public Monitor GetPrimaryMonitor() => new GlfwMonitor(glfwGetPrimaryMonitor());        
 
@@ -48,6 +62,7 @@ namespace JankWorks.Drivers.Glfw
         {
             glfwSetErrorCallback(null);
             glfwTerminate();
+            Functions.loader.Dispose();
             base.Dispose(finalising);
         }
     }

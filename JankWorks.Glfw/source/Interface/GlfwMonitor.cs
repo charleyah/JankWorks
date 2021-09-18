@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Text;
 
 using JankWorks.Util;
 using JankWorks.Interface;
 
-using static JankWorks.Drivers.Glfw.Api;
+using JankWorks.Drivers.Glfw.Native;
+using static JankWorks.Drivers.Glfw.Native.Functions;
 
 namespace JankWorks.Drivers.Glfw.Interface
 {
@@ -22,12 +22,16 @@ namespace JankWorks.Drivers.Glfw.Interface
         {
             get
             {
-                var mode = glfwGetVideoMode(this.Handle);
-
-                checked
+                unsafe
                 {
-                    return new VideoMode((uint)mode.width, (uint)mode.height, (uint)mode.redBits * 4, (uint)mode.refreshRate);
+                    GLFWvidmode* mode = glfwGetVideoMode(this.Handle);
+
+                    checked
+                    {
+                        return new VideoMode((uint)mode->width, (uint)mode->height, (uint)mode->redBits * 4, (uint)mode->refreshRate);
+                    }
                 }
+                
             }
         }
             
@@ -36,19 +40,22 @@ namespace JankWorks.Drivers.Glfw.Interface
         {
             get
             {
-                var modes = glfwGetVideoModes(this.Handle);
-
-                var vmodes = new VideoMode[modes.Length];
-
-                for (int i = 0; i < vmodes.Length; i++)
+                unsafe
                 {
-                    var mode = modes[i];
-                    checked
+                    ReadOnlySpan<GLFWvidmode> modes = new ReadOnlySpan<GLFWvidmode>(glfwGetVideoModes(this.Handle, out var count), count);
+
+                    var vmodes = new VideoMode[modes.Length];
+
+                    for (int i = 0; i < vmodes.Length; i++)
                     {
-                        vmodes[i] = new VideoMode((uint)mode.width, (uint)mode.height, (uint)mode.redBits * 4, (uint)mode.refreshRate);
+                        var mode = modes[i];
+                        checked
+                        {
+                            vmodes[i] = new VideoMode((uint)mode.width, (uint)mode.height, (uint)mode.redBits * 4, (uint)mode.refreshRate);
+                        }
                     }
-                }
-                return vmodes;
+                    return vmodes;
+                }            
             }
         }
     }

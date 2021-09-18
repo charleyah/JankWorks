@@ -1,7 +1,8 @@
 ﻿using System;
+
 using JankWorks.Interface;
 
-using static JankWorks.Drivers.Glfw.Api;
+using static JankWorks.Drivers.Glfw.Native.Constants;
 
 namespace JankWorks.Drivers.Glfw.Interface
 {

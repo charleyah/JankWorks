@@ -5,8 +5,11 @@ using System.Numerics;
 using JankWorks.Util;
 using JankWorks.Graphics;
 using JankWorks.Interface;
+using JankWorks.Platform;
 
-using static JankWorks.Drivers.Glfw.Api;
+using JankWorks.Drivers.Glfw.Native;
+using static JankWorks.Drivers.Glfw.Native.Constants;
+using static JankWorks.Drivers.Glfw.Native.Functions;
 
 namespace JankWorks.Drivers.Glfw.Interface
 {
@@ -16,7 +19,14 @@ namespace JankWorks.Drivers.Glfw.Interface
         { 
             get
             {
-                return glfwGetNativeWindow(this.window);
+                switch (SystemEnvironment.Current.OS)
+                {
+                    case SystemPlatform.Windows: return glfwGetWin32Window(this.window);
+                    case SystemPlatform.Linux: return glfwGetX11Window(this.window);
+                    case SystemPlatform.MacOS: return glfwGetCocoaWindow(this.window);
+
+                    default: throw new PlatformNotSupportedException();
+                }
             }
         }
 
@@ -75,7 +85,15 @@ namespace JankWorks.Drivers.Glfw.Interface
 
                 glfwWindowHint(GLFW_REFRESH_RATE, (int)mode.RefreshRate);
 
-                this.window = glfwCreateWindow((int)mode.Width, (int)mode.Height, settings.Title, settings.Style == WindowStyle.FullScreen ? glfwMonitor.Handle : IntPtr.Zero, IntPtr.Zero);
+                var titleutf8 = Encoding.UTF8.GetBytes(settings.Title);
+
+                unsafe
+                {
+                    fixed(byte* titleptr = titleutf8)
+                    {
+                        this.window = glfwCreateWindow((int)mode.Width, (int)mode.Height, titleptr, settings.Style == WindowStyle.FullScreen ? glfwMonitor.Handle : IntPtr.Zero, IntPtr.Zero);
+                    }
+                }                
             }
 
             if (this.window == IntPtr.Zero)
