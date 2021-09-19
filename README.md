@@ -1,17 +1,16 @@
 # JankWorks
 
-JankWorks is a multimedia library and game framework that I currently work on. Currently incomplete in early development so  windowing and graphics are currently usable but not completed and there is no audio yet and the framework is still in early stages.
+JankWorks is a low level multimedia wrapper and framework suitable for game and game engine development. Currently in-development and not ready for use.
 
-### Project Layout
-
-| Project            | Description                                                  |
-| ------------------ | ------------------------------------------------------------ |
-| JankWorks          | Multimedia API abstraction that currently covers graphics and windowing. |
-| JankWorks.Game     | Basic framework to build projects with                       |
-| JankWorks.FreeType | FreeType driver that implements font loading                 |
-| JankWorks.Glfw     | Glfw driver that implements window management                |
-| JankWorks.OpenGL   | OpenGL driver that implements graphics API                   |
-| JankWorks.DotNet   | .NET driver that currently implements Image loading          |
+| Project            | Description                                   |
+| ------------------ | --------------------------------------------- |
+| JankWorks          | Multimedia API abstraction                    |
+| JankWorks.Game     | Game framework API                            |
+| JankWorks.FreeType | FreeType driver that implements font loading  |
+| JankWorks.Glfw     | Glfw driver that implements window management |
+| JankWorks.OpenGL   | OpenGL driver that implements graphics API    |
+| JankWorks.OpenAL   | OpenAL driver that implements audio API       |
+| JankWorks.DotNet   | .NET driver that implements Image loading     |
 
 ## Lets Draw A Triangle
 
