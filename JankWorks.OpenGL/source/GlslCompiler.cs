@@ -5,8 +5,8 @@ using System.IO;
 using JankWorks.Graphics;
 using JankWorks.Util;
 
-using static OpenGL.Constants;
-using static OpenGL.Functions;
+using static JankWorks.Drivers.OpenGL.Native.Constants;
+using static JankWorks.Drivers.OpenGL.Native.Functions;
 
 namespace JankWorks.Drivers.OpenGL
 {

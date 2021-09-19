@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Numerics;
 
 using JankWorks.Graphics;
 
-using static OpenGL.Constants;
-using static OpenGL.Functions;
+using static JankWorks.Drivers.OpenGL.Native.Functions;
+using static JankWorks.Drivers.OpenGL.Native.Constants;
 
 namespace JankWorks.Drivers.OpenGL.Graphics
 {
@@ -82,7 +83,17 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         private int GetUniformLocation(string name)
         {
             glUseProgram(this.ProgramId);
-            var loc = glGetUniformLocation(this.ProgramId, name);
+
+            var utfName = Encoding.UTF8.GetBytes(name);
+            var loc = -1;
+            unsafe
+            {
+                fixed(byte* namePtr = utfName)
+                {
+                    loc = glGetUniformLocation(this.ProgramId, namePtr);
+                }
+            }
+            //var loc = glGetUniformLocation(this.ProgramId, name);
 
             if (loc == -1)
             {

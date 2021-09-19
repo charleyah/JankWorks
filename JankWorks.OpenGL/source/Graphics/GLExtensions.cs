@@ -1,8 +1,9 @@
 ﻿using System;
+
 using JankWorks.Graphics;
 
-using static OpenGL.Constants;
-using static OpenGL.Functions;
+using static JankWorks.Drivers.OpenGL.Native.Functions;
+using static JankWorks.Drivers.OpenGL.Native.Constants;
 
 namespace JankWorks.Drivers.OpenGL.Graphics
 {

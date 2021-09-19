@@ -12,8 +12,8 @@ using JankWorks.Drivers.OpenGL.Graphics;
 using JankWorks.Graphics;
 using JankWorks.Util;
 
-using static OpenGL.Constants;
-using static OpenGL.Functions;
+using static JankWorks.Drivers.OpenGL.Native.Functions;
+using static JankWorks.Drivers.OpenGL.Native.Constants;
 
 namespace JankWorks.Drivers.OpenGL
 {

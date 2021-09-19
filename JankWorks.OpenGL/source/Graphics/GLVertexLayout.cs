@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using JankWorks.Graphics;
 
-using static OpenGL.Functions;
+using static JankWorks.Drivers.OpenGL.Native.Functions;
 
 namespace JankWorks.Drivers.OpenGL.Graphics
 {

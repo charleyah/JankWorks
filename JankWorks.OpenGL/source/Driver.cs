@@ -8,6 +8,8 @@ using JankWorks.Drivers.Graphics;
 
 using JankWorks.Graphics;
 
+using JankWorks.Drivers.OpenGL.Native;
+
 [assembly: JankWorksDriver(typeof(JankWorks.Drivers.OpenGL.Driver))]
 
 namespace JankWorks.Drivers.OpenGL
@@ -16,33 +18,18 @@ namespace JankWorks.Drivers.OpenGL
     {
         public GraphicsApi GraphicsApi => GraphicsApi.OpenGL;
 
-        private LibraryLoader loader;
-
-        public Driver()
-        {
-            var env = SystemEnvironment.Current;
-
-            this.loader = env.OS switch
-            {
-                SystemPlatform.Windows => env.LoadLibrary("opengl32.dll"),
-                SystemPlatform.Linux => env.LoadLibrary("libGL.so"),
-                _ => throw new NotImplementedException()
-            };
-        }
-
         public GraphicsDevice CreateGraphicsDevice(SurfaceSettings settings, IRenderTarget renderTarget)
         {
             renderTarget.Activate();
-            global::OpenGL.Loader.Init(this.loader);
+            Functions.Init();            
             return new GLGraphicsDevice(settings, renderTarget);
         }
         
-
         public bool IsShaderFormatSupported(ShaderFormat format) => format == ShaderFormat.GLSL;
 
         protected override void Dispose(bool finalising)
         {
-            this.loader.Dispose();
+            Functions.loader.Dispose();
             base.Dispose(finalising);
         }
     }

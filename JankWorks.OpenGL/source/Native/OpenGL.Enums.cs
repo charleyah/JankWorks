@@ -1,36 +1,13 @@
-/**
+﻿// Sourced from https://github.com/tstavrianos/OpenGL
 
-https://github.com/tstavrianos/OpenGL
+using System;
 
-MIT License
-
-Copyright (c) 2018 Theo
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-*/
-
-
-
-namespace OpenGL {
-    public static class Enums {
-        public enum AttribMask: uint {
+namespace JankWorks.Drivers.OpenGL.Native
+{
+    public static class Enums
+    {
+        public enum AttribMask : uint
+        {
             CurrentBit = 0x00000001,
             PointBit = 0x00000002,
             LineBit = 0x00000004,
@@ -58,9 +35,10 @@ namespace OpenGL {
             // Guaranteed to mark all attribute groups at once
             AllAttribBits = 0xFFFFFFFF,
         }
-        
+
         // GL_MAP_{COHERENT,PERSISTENT,READ,WRITE}_{BIT,BIT_EXT} also lie in this namespace
-        public enum BufferStorageMask: uint {
+        public enum BufferStorageMask : uint
+        {
             DynamicStorageBit = 0x0100,
             DynamicStorageBitExt = 0x0100,
             ClientStorageBit = 0x0200,
@@ -70,21 +48,24 @@ namespace OpenGL {
             PerGpuStorageBitNv = 0x0800,
             ExternalStorageBitNvx = 0x2000,
         }
-        
+
         // GL_{DEPTH,ACCUM,STENCIL,COLOR}_BUFFER_BIT also lie in this namespace
-        public enum ClearBufferMask: uint {
+        public enum ClearBufferMask : uint
+        {
             // Collides with AttribMask bit GL_HINT_BIT. OK since this token is for OpenGL ES 2, which doesn't have attribute groups.
             CoverageBufferBitNv = 0x00008000,
         }
-        
-        public enum ClientAttribMask: uint {
+
+        public enum ClientAttribMask : uint
+        {
             ClientPixelStoreBit = 0x00000001,
             ClientVertexArrayBit = 0x00000002,
             ClientAllAttribBits = 0xFFFFFFFF,
         }
-        
+
         // Should be shared with WGL/GLX, but aren't since the FORWARD_COMPATIBLE and DEBUG values are swapped vs. WGL/GLX.
-        public enum ContextFlagMask: uint {
+        public enum ContextFlagMask : uint
+        {
             ContextFlagForwardCompatibleBit = 0x00000001,
             ContextFlagDebugBit = 0x00000002,
             ContextFlagDebugBitKhr = 0x00000002,
@@ -94,13 +75,15 @@ namespace OpenGL {
             ContextFlagNoErrorBitKhr = 0x00000008,
             ContextFlagProtectedContentBitExt = 0x00000010,
         }
-        
-        public enum ContextProfileMask: uint {
+
+        public enum ContextProfileMask : uint
+        {
             ContextCoreProfileBit = 0x00000001,
             ContextCompatibilityProfileBit = 0x00000002,
         }
-        
-        public enum MapBufferAccessMask: uint {
+
+        public enum MapBufferAccessMask : uint
+        {
             MapReadBit = 0x0001,
             MapReadBitExt = 0x0001,
             MapWriteBit = 0x0002,
@@ -118,8 +101,9 @@ namespace OpenGL {
             MapCoherentBit = 0x0080,
             MapCoherentBitExt = 0x0080,
         }
-        
-        public enum MemoryBarrierMask: uint {
+
+        public enum MemoryBarrierMask : uint
+        {
             VertexAttribArrayBarrierBit = 0x00000001,
             VertexAttribArrayBarrierBitExt = 0x00000001,
             ElementArrayBarrierBit = 0x00000002,
@@ -152,21 +136,24 @@ namespace OpenGL {
             AllBarrierBits = 0xFFFFFFFF,
             AllBarrierBitsExt = 0xFFFFFFFF,
         }
-        
-        public enum OcclusionQueryEventMaskAMD: uint {
+
+        public enum OcclusionQueryEventMaskAMD : uint
+        {
             QueryDepthPassEventBitAmd = 0x00000001,
             QueryDepthFailEventBitAmd = 0x00000002,
             QueryStencilFailEventBitAmd = 0x00000004,
             QueryDepthBoundsFailEventBitAmd = 0x00000008,
             QueryAllEventBitsAmd = 0xFFFFFFFF,
         }
-        
-        public enum SyncObjectMask: uint {
+
+        public enum SyncObjectMask : uint
+        {
             SyncFlushCommandsBit = 0x00000001,
             SyncFlushCommandsBitApple = 0x00000001,
         }
-        
-        public enum UseProgramStageMask: uint {
+
+        public enum UseProgramStageMask : uint
+        {
             VertexShaderBit = 0x00000001,
             VertexShaderBitExt = 0x00000001,
             FragmentShaderBit = 0x00000002,
@@ -186,18 +173,21 @@ namespace OpenGL {
             AllShaderBits = 0xFFFFFFFF,
             AllShaderBitsExt = 0xFFFFFFFF,
         }
-        
-        public enum TextureStorageMaskAMD: uint {
+
+        public enum TextureStorageMaskAMD : uint
+        {
             TextureStorageSparseBitAmd = 0x00000001,
         }
-        
-        public enum FragmentShaderDestMaskATI: uint {
+
+        public enum FragmentShaderDestMaskATI : uint
+        {
             RedBitAti = 0x00000001,
             GreenBitAti = 0x00000002,
             BlueBitAti = 0x00000004,
         }
-        
-        public enum FragmentShaderDestModMaskATI: uint {
+
+        public enum FragmentShaderDestModMaskATI : uint
+        {
             _2xBitAti = 0x00000001,
             _4xBitAti = 0x00000002,
             _8xBitAti = 0x00000004,
@@ -206,14 +196,16 @@ namespace OpenGL {
             EighthBitAti = 0x00000020,
             SaturateBitAti = 0x00000040,
         }
-        
-        public enum FragmentShaderColorModMaskATI: uint {
+
+        public enum FragmentShaderColorModMaskATI : uint
+        {
             CompBitAti = 0x00000002,
             NegateBitAti = 0x00000004,
             BiasBitAti = 0x00000008,
         }
-        
-        public enum TraceMaskMESA: uint {
+
+        public enum TraceMaskMESA : uint
+        {
             TraceOperationsBitMesa = 0x0001,
             TracePrimitivesBitMesa = 0x0002,
             TraceArraysBitMesa = 0x0004,
@@ -222,8 +214,9 @@ namespace OpenGL {
             TraceErrorsBitMesa = 0x0020,
             TraceAllBitsMesa = 0xFFFF,
         }
-        
-        public enum PathRenderingMaskNV: uint {
+
+        public enum PathRenderingMaskNV : uint
+        {
             BoldBitNv = 0x01,
             ItalicBitNv = 0x02,
             GlyphWidthBitNv = 0x01,
@@ -250,13 +243,15 @@ namespace OpenGL {
             FontHasKerningBitNv = 0x10000000,
             FontNumGlyphIndicesBitNv = 0x20000000,
         }
-        
-        public enum PerformanceQueryCapsMaskINTEL: uint {
+
+        public enum PerformanceQueryCapsMaskINTEL : uint
+        {
             PerfquerySingleContextIntel = 0x00000000,
             PerfqueryGlobalContextIntel = 0x00000001,
         }
-        
-        public enum VertexHintsMaskPGI: uint {
+
+        public enum VertexHintsMaskPGI : uint
+        {
             Vertex23BitPgi = 0x00000004,
             Vertex4BitPgi = 0x00000008,
             Color3BitPgi = 0x00010000,
@@ -276,8 +271,9 @@ namespace OpenGL {
             Texcoord3BitPgi = 0x40000000,
             Texcoord4BitPgi = 0x80000000,
         }
-        
-        public enum BufferBitQCOM: uint {
+
+        public enum BufferBitQCOM : uint
+        {
             ColorBufferBit0Qcom = 0x00000001,
             ColorBufferBit1Qcom = 0x00000002,
             ColorBufferBit2Qcom = 0x00000004,
@@ -311,20 +307,23 @@ namespace OpenGL {
             MultisampleBufferBit6Qcom = 0x40000000,
             MultisampleBufferBit7Qcom = 0x80000000,
         }
-        
-        public enum FoveationConfigBitQCOM: uint {
+
+        public enum FoveationConfigBitQCOM : uint
+        {
             FoveationEnableBitQcom = 0x00000001,
             FoveationScaledBinMethodBitQcom = 0x00000002,
             FoveationSubsampledLayoutMethodBitQcom = 0x00000004,
         }
-        
-        public enum FfdMaskSGIX: uint {
+
+        public enum FfdMaskSGIX : uint
+        {
             TextureDeformationBitSgix = 0x00000001,
             GeometryDeformationBitSgix = 0x00000002,
         }
-        
+
         // For NV_command_list.
-        public enum CommandOpcodesNV {
+        public enum CommandOpcodesNV
+        {
             TerminateSequenceCommandNv = 0x0000,
             NopCommandNv = 0x0001,
             DrawElementsCommandNv = 0x0002,
@@ -345,15 +344,17 @@ namespace OpenGL {
             ScissorCommandNv = 0x0011,
             FrontFaceCommandNv = 0x0012,
         }
-        
+
         // Texture memory layouts for INTEL_map_texture
-        public enum MapTextureFormatINTEL {
+        public enum MapTextureFormatINTEL
+        {
             LayoutDefaultIntel = 0,
             LayoutLinearIntel = 1,
             LayoutLinearCpuCachedIntel = 2,
         }
-        
-        public enum PathRenderingTokenNV {
+
+        public enum PathRenderingTokenNV
+        {
             ClosePathNv = 0x00,
             MoveToNv = 0x02,
             RelativeMoveToNv = 0x03,
@@ -401,23 +402,26 @@ namespace OpenGL {
             ArcToNv = 0xFE,
             RelativeArcToNv = 0xFF,
         }
-        
+
         // For NV_transform_feedback. No clue why small negative values are used
-        public enum TransformFeedbackTokenNV {
+        public enum TransformFeedbackTokenNV
+        {
             NextBufferNv = -2,
             SkipComponents4Nv = -3,
             SkipComponents3Nv = -4,
             SkipComponents2Nv = -5,
             SkipComponents1Nv = -6,
         }
-        
-        public enum TriangleListSUN {
+
+        public enum TriangleListSUN
+        {
             RestartSun = 0x0001,
             ReplaceMiddleSun = 0x0002,
             ReplaceOldestSun = 0x0003,
         }
-        
-        public enum RegisterCombinerPname {
+
+        public enum RegisterCombinerPname
+        {
             Combine = 0x8570,
             CombineArb = 0x8570,
             CombineExt = 0x8570,
@@ -494,20 +498,23 @@ namespace OpenGL {
             Operand2AlphaExt = 0x859A,
             Operand3AlphaNv = 0x859B,
         }
-        
-        public enum ShaderType {
+
+        public enum ShaderType
+        {
             FragmentShader = 0x8B30,
             FragmentShaderArb = 0x8B30,
             VertexShader = 0x8B31,
             VertexShaderArb = 0x8B31,
         }
-        
-        public enum ContainerType {
+
+        public enum ContainerType
+        {
             ProgramObjectArb = 0x8B40,
             ProgramObjectExt = 0x8B40,
         }
-        
-        public enum AttributeType {
+
+        public enum AttributeType
+        {
             FloatVec2 = 0x8B50,
             FloatVec2Arb = 0x8B50,
             FloatVec3 = 0x8B51,
