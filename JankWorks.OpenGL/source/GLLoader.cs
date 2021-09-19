@@ -8,8 +8,8 @@ namespace JankWorks.Drivers.OpenGL
     {
         private LibraryLoader osloader;
         private Encoder utfencoder;
-
         private delegate* unmanaged<byte*, IntPtr> wglGetProcAddress;
+
         public GLLoader(LibraryLoader osloader)
         {
             this.osloader = osloader;
