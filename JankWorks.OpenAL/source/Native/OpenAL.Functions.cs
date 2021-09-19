@@ -60,7 +60,7 @@ namespace JankWorks.Drivers.OpenAL.Native
                 SystemPlatform.Linux => env.LoadLibrary("libopenal.so.1"),
                 _ => throw new NotSupportedException()
             };
-            
+
             Functions.alcOpenDevicePtr = (delegate* unmanaged[Cdecl]<CString, IntPtr>)Functions.LoadFunction("alcOpenDevice");
             Functions.alcCloseDevicePtr = (delegate* unmanaged[Cdecl]<IntPtr, bool>)Functions.LoadFunction("alcCloseDevice");
             Functions.alcCreateContextPtr = (delegate* unmanaged[Cdecl]<IntPtr, int*, IntPtr>)Functions.LoadFunction("alcCreateContext");
@@ -102,7 +102,7 @@ namespace JankWorks.Drivers.OpenAL.Native
         }
 
         private static void* LoadFunction(string name) => Functions.loader.LoadFunction(name).ToPointer();
-        
+
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
