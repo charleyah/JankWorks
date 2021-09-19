@@ -27,17 +27,17 @@ namespace JankWorks.Drivers.FreeType.Native
 
 		public static void Init()
 		{
-            var env = SystemEnvironment.Current;
+			var env = SystemEnvironment.Current;
 
-            Functions.loader = env.OS switch
-            {
-                SystemPlatform.Windows => env.LoadLibrary("freetype.dll"),
-                SystemPlatform.MacOS => env.LoadLibrary("libfreetype.dylib"),
-                SystemPlatform.Linux => env.LoadLibrary("libfreetype.so"),
-                _ => throw new NotSupportedException()
-            };
+			Functions.loader = env.OS switch
+			{
+				SystemPlatform.Windows => env.LoadLibrary("freetype.dll"),
+				SystemPlatform.MacOS => env.LoadLibrary("libfreetype.dylib"),
+				SystemPlatform.Linux => env.LoadLibrary("libfreetype.so"),
+				_ => throw new NotSupportedException()
+			};
 
-            Functions.FT_Init_FreeTypePtr = (delegate* unmanaged[Cdecl]<FT_Library*, FT_Error>)Functions.LoadFunction("FT_Init_FreeType");
+			Functions.FT_Init_FreeTypePtr = (delegate* unmanaged[Cdecl]<FT_Library*, FT_Error>)Functions.LoadFunction("FT_Init_FreeType");
 			Functions.FT_Done_FreeTypePtr = (delegate* unmanaged[Cdecl]<FT_Library, FT_Error>)Functions.LoadFunction("FT_Done_FreeType");
 			Functions.FT_New_FacePtr = (delegate* unmanaged[Cdecl]<FT_Library, CString, int, FT_Face*, FT_Error>)Functions.LoadFunction("FT_New_Face");
 			Functions.FT_New_Memory_FacePtr = (delegate* unmanaged[Cdecl]<FT_Library, IntPtr, int, int, FT_Face*, FT_Error>)Functions.LoadFunction("FT_New_Memory_Face");
