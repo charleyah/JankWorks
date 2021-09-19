@@ -12,6 +12,8 @@ JankWorks is a low level multimedia wrapper and framework suitable for game and 
 | JankWorks.OpenAL   | OpenAL driver that implements audio API       |
 | JankWorks.DotNet   | .NET driver that implements Image loading     |
 
+JankWorks is built with C# 9.0 and only supports .NET 5 onwards.
+
 ## Lets Draw A Triangle
 
 Just like the first tutorials for using any low level graphics API like DirectX, OpenGL or Vulkan... lets draw a triangle.
