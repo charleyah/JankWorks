@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Numerics;
 
+using JankWorks.Core;
 
 namespace JankWorks.Graphics
 {
-    public abstract class TextRenderer
+    public abstract class TextRenderer : Disposable
     {
         public Camera Camera { get; set; }
 
