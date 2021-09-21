@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Text;
 
 using JankWorks.Core;
 
@@ -24,7 +25,14 @@ namespace JankWorks.Graphics
             this.Draw(text, position, Vector2.Zero, colour);
         }
 
+        public virtual void Draw(StringBuilder text, Vector2 position, RGBA colour)
+        {
+            this.Draw(text, position, Vector2.Zero, colour);
+        }
+
         public abstract void Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, RGBA colour);
+
+        public abstract void Draw(StringBuilder text, Vector2 position, Vector2 origin, RGBA colour);
 
         public abstract void EndDraw(Surface surface);
 
