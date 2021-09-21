@@ -25,5 +25,7 @@ namespace JankWorks.Audio
             this.Direction = direction;
             this.Up = up;
         }
+
+        public static Orientation Ortho => new Orientation(Vector3.UnitZ, -Vector3.UnitY);
     }
 }

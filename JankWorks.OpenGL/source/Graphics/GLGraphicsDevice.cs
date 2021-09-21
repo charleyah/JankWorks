@@ -181,6 +181,10 @@ namespace JankWorks.Drivers.OpenGL
 
         public override TextureSurface CreateTextureSurface(SurfaceSettings settings) => new GLTextureSurface(settings);
 
+        public override SpriteRenderer CreateSpriteRenderer(Camera camera, SpriteRenderer.DrawOrder drawOrder) => throw new NotImplementedException();        
+
+        public override TextRenderer CreateTextRenderer(Camera camera, Font font) => throw new NotImplementedException();
+        
         public override VertexBuffer<T> CreateVertexBuffer<T>() => new GLVertexBuffer<T>();
 
         public override VertexLayout CreateVertexLayout() => new GLVertexLayout();
@@ -228,6 +232,6 @@ namespace JankWorks.Drivers.OpenGL
             program.UnBind();
         }
 
-        protected override void ApplyDrawState(in DrawState drawState) => drawState.Process();
+        protected override void ApplyDrawState(in DrawState drawState) => drawState.Process();    
     }
 }

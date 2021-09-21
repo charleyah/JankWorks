@@ -33,18 +33,29 @@ namespace JankWorks.Graphics
             return true;
         }
         public virtual void Activate() => this.RenderTarget.Activate();
+
         public virtual void Deactivate() => this.RenderTarget.Deactivate();
+
         public override void Display() => this.RenderTarget.Render();
 
+
         public abstract TextureSurface CreateTextureSurface(SurfaceSettings settings);
+
         public abstract VertexBuffer<T> CreateVertexBuffer<T>() where T : unmanaged;
+
         public abstract VertexLayout CreateVertexLayout();
+
         public abstract IndexBuffer CreateIndexBuffer();
        
-        public abstract bool IsShaderFormatSupported(ShaderFormat format);        
+
+        public abstract bool IsShaderFormatSupported(ShaderFormat format);       
+        
         public abstract Shader CreateShader(ShaderFormat format, Stream vertex, Stream fragment, Stream geometry = null);
+
         public abstract Shader CreateShader(ShaderFormat format, ReadOnlySpan<byte> vertex, ReadOnlySpan<byte> fragment, ReadOnlySpan<byte> geometry = default);
+
         public abstract Shader CreateShader(ShaderFormat format, string vertex, string fragment, string geometry = null);
+
 
         public abstract Texture2D CreateTexture2D(Vector2i size, PixelFormat format);
 
@@ -58,6 +69,14 @@ namespace JankWorks.Graphics
             image.CopyTo(tex);
             return tex;
         }
+
+
+        public virtual SpriteRenderer CreateSpriteRenderer(Camera camera) => this.CreateSpriteRenderer(camera, SpriteRenderer.DrawOrder.Sequential);
+
+        public abstract SpriteRenderer CreateSpriteRenderer(Camera camera, SpriteRenderer.DrawOrder drawOrder);
+
+        public abstract TextRenderer CreateTextRenderer(Camera camera, Font font);
+
 
         public static GraphicsDevice Create(SurfaceSettings settings, IRenderTarget renderTarget)
         {

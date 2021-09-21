@@ -44,5 +44,9 @@ namespace JankWorks.Graphics
         public bool Equals(Bounds other) => this == other;
         public static bool operator ==(Bounds a, Bounds b) => a.Position == b.Position && a.Size == b.Position;
         public static bool operator !=(Bounds a, Bounds b) => a.Position != b.Position || a.Size != b.Position;
+
+
+        public static Bounds Zero = new Bounds(Vector2.Zero, Vector2.Zero);
+        public static Bounds One => new Bounds(Vector2.Zero, Vector2.One);
     }
 }
