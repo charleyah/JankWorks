@@ -190,6 +190,35 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
 
+        internal void SetVertexData<T>(GLBuffer<T> buffer, VertexLayout layout) where T : unmanaged
+        {
+            var vao = (GLVertexLayout)layout;
+
+            this.Vao = vao.Id;
+
+            this.Bind();
+            glBindBuffer(GL_ARRAY_BUFFER, buffer.BufferId);
+            vao.ApplyAttributes();
+            this.UnBind();
+
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+
+        internal void SetVertexData<T>(GLBuffer<T> buffer, VertexLayout layout, GLBuffer<uint> indexes) where T : unmanaged
+        {
+            var vao = (GLVertexLayout)layout;
+
+            this.Vao = vao.Id;
+
+            this.Bind();
+            glBindBuffer(GL_ARRAY_BUFFER, buffer.BufferId);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexes.BufferId);
+            vao.ApplyAttributes();
+            this.UnBind();
+
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        }
         protected override void Dispose(bool finalising)
         {
             this.ClearUniformTextures();

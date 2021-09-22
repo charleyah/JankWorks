@@ -181,7 +181,7 @@ namespace JankWorks.Drivers.OpenGL
 
         public override TextureSurface CreateTextureSurface(SurfaceSettings settings) => new GLTextureSurface(settings);
 
-        public override SpriteRenderer CreateSpriteRenderer(Camera camera, SpriteRenderer.DrawOrder drawOrder) => throw new NotImplementedException();        
+        public override SpriteRenderer CreateSpriteRenderer(Camera camera, SpriteRenderer.DrawOrder drawOrder) => new GLSpriteRenderer(this, camera, drawOrder);
 
         public override TextRenderer CreateTextRenderer(Camera camera, Font font) => throw new NotImplementedException();
         
@@ -218,7 +218,8 @@ namespace JankWorks.Drivers.OpenGL
             var program = (GLShader)shader;
             program.Bind();
             program.BindTextures();
-            unsafe { glDrawElements(primitive.GetGLPrimitive(), count, GL_UNSIGNED_INT, (void*)0); }
+            unsafe { glDrawElements(primitive.GetGLPrimitive(), count, GL_UNSIGNED_INT, (void*)0); }            
+
             program.UnBind();
         }
 
