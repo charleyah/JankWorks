@@ -59,7 +59,7 @@ namespace Tests.RendererTest
             this.spriteRenderer.BeginDraw();
 
             this.spriteRenderer.Draw(this.smiley, (Vector2)this.viewportSize / 2, new Vector2(200), new Vector2(0.5f), 0, Colour.Red, Bounds.One);
-            this.spriteRenderer.Draw(this.smiley, this.mousePos, new Vector2(100), new Vector2(0.5f), 0, Colour.White, this.cursorTextureMap);
+            this.spriteRenderer.Draw(this.smiley, this.mousePos, new Vector2(100), new Vector2(0.5f), 180f, Colour.White, this.cursorTextureMap);
 
             this.spriteRenderer.EndDraw(graphics);
         }

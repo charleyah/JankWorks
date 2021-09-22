@@ -201,12 +201,14 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
 
             var vecColour = (Vector4)colour;
-            var bounds = new Bounds(position - (size * origin), size);
-
             var radians = MathF.PI / 180f * rotation;
 
-            var model = Matrix4x4.CreateTranslation(new Vector3(origin, 0)) * Matrix4x4.CreateRotationZ(radians);
-
+            var model = Matrix4x4.Identity;            
+            model = model * Matrix4x4.CreateScale(new Vector3(size, 0));            
+            model = model * Matrix4x4.CreateTranslation(-new Vector3(size * origin, 0));
+            model = model * Matrix4x4.CreateRotationZ(radians);
+            model = model * Matrix4x4.CreateTranslation(new Vector3(position, 0));            
+                        
             ref var rstate = ref this.state;
 
             var projection = rstate.projection;
@@ -214,10 +216,10 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
             var mvp = model * view * projection;
 
-            var tl = new Vertex(Vector2.Transform(bounds.TopLeft, mvp), textureBounds.TopLeft, vecColour);
-            var tr = new Vertex(Vector2.Transform(bounds.TopRight, mvp), textureBounds.TopRight, vecColour);
-            var bl = new Vertex(Vector2.Transform(bounds.BottomLeft, mvp), textureBounds.BottomLeft, vecColour);
-            var br = new Vertex(Vector2.Transform(bounds.BottomRight, mvp), textureBounds.BottomRight, vecColour);
+            var tl = new Vertex(Vector2.Transform(new Vector2(0, 0), mvp), textureBounds.TopLeft, vecColour);
+            var tr = new Vertex(Vector2.Transform(new Vector2(1, 0), mvp), textureBounds.TopRight, vecColour);
+            var bl = new Vertex(Vector2.Transform(new Vector2(0, 1), mvp), textureBounds.BottomLeft, vecColour);
+            var br = new Vertex(Vector2.Transform(new Vector2(1, 1), mvp), textureBounds.BottomRight, vecColour);
 
             this.Queue(tl, tr, bl, br, texture);
         }
@@ -233,15 +235,15 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
             /*
             quad draw order
-            tl, tr, bl, bl, br, tr
+            tl, tr, bl, bl, tr, br
             */
 
             this.vertices[vertexCount++] = tl;
             this.vertices[vertexCount++] = tr;
             this.vertices[vertexCount++] = bl;
             this.vertices[vertexCount++] = bl;
-            this.vertices[vertexCount++] = br;
             this.vertices[vertexCount++] = tr;
+            this.vertices[vertexCount++] = br;
 
             var batchUpperBound = this.batchCount - 1;
             Batch batch = (this.batchCount == 0) ? new Batch() : this.batches[batchUpperBound];
