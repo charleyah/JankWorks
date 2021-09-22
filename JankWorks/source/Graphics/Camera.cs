@@ -39,7 +39,7 @@ namespace JankWorks.Graphics
 
         public OrthoCamera(Vector2 size, float nearZ, float farZ)
         {
-            this.projection = Matrix4x4.Identity * Matrix4x4.CreateOrthographicOffCenter(0, size.X, size.Y, 0, nearZ, farZ);
+            this.projection = Matrix4x4.CreateOrthographicOffCenter(0, size.X, size.Y, 0, nearZ, farZ);
             this.size = size;
             this.Position = Vector2.Zero;
         }
