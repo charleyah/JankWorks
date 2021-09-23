@@ -5,9 +5,7 @@ using System.Text;
 using System.IO;
 using System.Threading;
 
-
 using JankWorks.Drivers.Graphics;
-using JankWorks.Drivers.OpenGL.Graphics;
 
 using JankWorks.Graphics;
 using JankWorks.Util;
@@ -15,7 +13,7 @@ using JankWorks.Util;
 using static JankWorks.Drivers.OpenGL.Native.Functions;
 using static JankWorks.Drivers.OpenGL.Native.Constants;
 
-namespace JankWorks.Drivers.OpenGL
+namespace JankWorks.Drivers.OpenGL.Graphics
 {
     sealed class GLGraphicsDevice : GraphicsDevice
     {
