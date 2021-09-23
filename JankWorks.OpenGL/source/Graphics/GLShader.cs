@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Collections.Generic;
 using System.Numerics;
 
 using JankWorks.Graphics;
@@ -15,12 +14,20 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         internal uint ProgramId { get; private set; }
         internal uint Vao { get; private set; }
 
-        private List<Sampler> samplers;
+        private const int initialSamplerCapacity = 16;
+        private Sampler[] samplers;
+        private int samplerCount;
+
+        private Encoder uniformNameEncoder;
 
         public GLShader(uint programId)
         {
             this.ProgramId = programId;
-            this.samplers = new List<Sampler>(8);
+            this.samplers = new Sampler[initialSamplerCapacity];
+            this.samplerCount = 0;
+                
+            var utf = Encoding.GetEncoding("utf-8", new EncoderExceptionFallback(), new DecoderExceptionFallback());
+            this.uniformNameEncoder = utf.GetEncoder();
         }
 
         private void AddTexture2DSampler(GLTexture2D texture, int unit)
@@ -30,16 +37,23 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             sampler.texture = texture.Id;
             sampler.type = GL_TEXTURE_2D;
 
-            var index = this.samplers.FindIndex((s) => s.unit == unit);
+            for (int index = 0; index < this.samplerCount; index++)
+            {
+                ref var currentSampler = ref this.samplers[index];
 
-            if(index > -1)
-            {
-                this.samplers[index] = sampler;
+                if(currentSampler.unit == unit)
+                {
+                    currentSampler = sampler;
+                    return;
+                }
             }
-            else
+
+            if (samplerCount >= this.samplers.Length)
             {
-                this.samplers.Add(sampler);
+                Array.Resize(ref this.samplers, this.samplers.Length + initialSamplerCapacity);
             }
+
+            this.samplers[samplerCount++] = sampler;
         }
 
         public override void Reset()
@@ -51,7 +65,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void ClearUniformTextures()
         {
-            this.samplers.Clear();
+            Array.Clear(this.samplers, 0, this.samplerCount);
+            this.samplerCount = 0;
         }
 
         internal void BindTextures()
@@ -71,7 +86,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         internal void UnBind()
         {
-            if (this.samplers.Count > 0)
+            if (this.samplers.Length > 0)
             {
                 glBindTexture(GL_TEXTURE_2D, 0);
             }
@@ -84,14 +99,19 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         {
             glUseProgram(this.ProgramId);
 
-            var utfName = Encoding.UTF8.GetBytes(name);
+            var utfLength = this.uniformNameEncoder.GetByteCount(name, false) + 1;
+
             var loc = -1;
             unsafe
             {
-                fixed(byte* namePtr = utfName)
+                byte* utfName = stackalloc byte[utfLength];                
+                utfName[utfLength - 1] = 0;
+
+                fixed (char* namePtr = name)
                 {
-                    loc = glGetUniformLocation(this.ProgramId, namePtr);
+                    this.uniformNameEncoder.GetBytes(namePtr, name.Length, utfName, utfLength, true);
                 }
+                loc = glGetUniformLocation(this.ProgramId, utfName);
             }
             //var loc = glGetUniformLocation(this.ProgramId, name);
 

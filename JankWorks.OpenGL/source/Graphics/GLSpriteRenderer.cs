@@ -310,7 +310,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
             else
             {
-                this.vertexBuffer.Update(GL_ARRAY_BUFFER, BufferUsage.Dynamic, this.vertices[0..vertexCount], 0);
+
+                this.vertexBuffer.Update(GL_ARRAY_BUFFER, BufferUsage.Dynamic, this.vertices.AsSpan(0, vertexCount), 0);
             }         
         }
        
