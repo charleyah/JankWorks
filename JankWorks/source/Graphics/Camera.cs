@@ -31,6 +31,10 @@ namespace JankWorks.Graphics
         private Matrix4x4 view;
         private readonly Matrix4x4 projection;
 
+        public OrthoCamera(Vector2i viewport) : this((Vector2)viewport, (Vector2)viewport) { }
+
+        public OrthoCamera(Vector2i viewport, Vector2 size) : this((Vector2)viewport, size) { }
+
         public OrthoCamera(Vector2 viewport) : this(viewport, viewport) { }
 
         public OrthoCamera(Vector2 viewport, Vector2 size) : this(viewport, size, -1, 1) { }

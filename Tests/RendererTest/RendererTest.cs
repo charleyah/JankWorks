@@ -50,7 +50,7 @@ namespace Tests.RendererTest
             this.screamer.DistanceScale = 0.2f;
             this.screamer.Volume = 1f;
 
-            this.camera = new OrthoCamera((Vector2)this.viewportSize);
+            this.camera = new OrthoCamera(this.viewportSize);
 
             this.spriteRenderer = graphics.CreateSpriteRenderer(this.camera);
             this.smiley = graphics.CreateTexture2D(GetEmbeddedStream("RendererTest.smiley.png"), ImageFormat.PNG);
