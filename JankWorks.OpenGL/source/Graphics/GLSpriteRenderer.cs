@@ -56,6 +56,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         }
 
         public override DrawOrder Order { get; set; }
+
         public override Camera Camera { get; set; }
 
         private const int dataSize = 42;
@@ -195,7 +196,13 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void Draw(Texture2D texture, Vector2 position, Vector2 size, Vector2 origin, float rotation, RGBA colour, Bounds textureBounds)
         {
-            if(texture == null)
+            ref var rstate = ref this.state;
+
+            if(!rstate.drawing)
+            {
+                throw new InvalidOperationException();
+            }
+            else if (texture == null)
             {
                 throw new NullReferenceException();
             }
@@ -208,8 +215,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             model = model * Matrix4x4.CreateTranslation(-new Vector3(size * origin, 0));
             model = model * Matrix4x4.CreateRotationZ(radians);
             model = model * Matrix4x4.CreateTranslation(new Vector3(position, 0));            
-                        
-            ref var rstate = ref this.state;
+                                 
 
             var mvp = model * rstate.view * rstate.projection;
 
