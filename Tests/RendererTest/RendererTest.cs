@@ -19,23 +19,25 @@ namespace Tests.RendererTest
         private Listener listener;
         private Sound scream;
         private Emitter screamer;
-        private Smile? screamySmile;
 
+        private Smile? screamySmile;
+        private Smile cursorSmile;
         private List<Smile> smiles;
 
-        private Vector2 mousePos;
         private Vector2i viewportSize;
-        private Bounds cursorTextureMap;
-
         private Random rng;
 
         public override void Setup(GraphicsDevice graphics, AudioDevice audio, Window window)
         {
+            this.cursorSmile = new Smile()
+            {
+                colour = Colour.White
+            };
+
             this.rng = new Random();
             this.smiles = new List<Smile>();
 
             this.viewportSize = graphics.Viewport.Size;
-            this.cursorTextureMap = Bounds.One;
 
             this.listener = audio;
             this.listener.Orientation = Orientation.Ortho;
@@ -68,16 +70,18 @@ namespace Tests.RendererTest
             var translated = this.camera.TranslateScreenCoordinate(screenPos);
             var pos = new Vector2(translated.X, translated.Y);
 
-            if(this.mousePos.X < pos.X)
+            ref var cursorSmile = ref this.cursorSmile;
+
+            if(cursorSmile.position.X < pos.X)
             {
-                this.cursorTextureMap = new Bounds(1, 0, 1, 0);
+                cursorSmile.uv = new Bounds(1, 0, 1, 0);
             }
-            else if (this.mousePos.X > pos.X)
+            else if (cursorSmile.position.X > pos.X)
             {
-                this.cursorTextureMap = Bounds.One;
+                cursorSmile.uv = Bounds.One;
             }
 
-            this.mousePos = pos;
+            cursorSmile.position = pos;
             this.listener.Position = new Vector3(pos, 0);
         }
 
@@ -95,16 +99,10 @@ namespace Tests.RendererTest
                     _ => Colour.Yellow
                 };
 
-                var smile = new Smile()
-                {
-                    position = this.mousePos,
-                    uv = this.cursorTextureMap,
-                    colour = shade
-                };
+                Smile smile = this.cursorSmile;
+                smile.colour = shade;
 
-                this.smiles.Add(smile);
-
-                
+                this.smiles.Add(smile);                
             }
             else if(e.Button == MouseButton.Right)
             {
@@ -132,14 +130,19 @@ namespace Tests.RendererTest
                 this.spriteRenderer.Draw(this.smiley, smile.position, new Vector2(100), new Vector2(0.5f), 0, smile.colour, smile.uv);
             }
 
-            this.spriteRenderer.Draw(this.smiley, this.mousePos, new Vector2(100), new Vector2(0.5f), 0, Colour.White, this.cursorTextureMap);
+            var cursorSmile = this.cursorSmile;
+            this.spriteRenderer.Draw(this.smiley, cursorSmile.position, new Vector2(100), new Vector2(0.5f), 0, cursorSmile.colour, cursorSmile.uv);
 
             if(this.screamySmile != null)
             {
                 var smile = this.screamySmile.Value;
+
                 this.spriteRenderer.Draw(this.smiley, smile.position, new Vector2(150), new Vector2(0.5f), 0, smile.colour, smile.uv);
+
                 smile.position += (Vector2.UnitX * 8);
+
                 this.screamer.Position = new Vector3(smile.position, 0);
+
                 if (smile.position.X > this.viewportSize.X + 100)
                 {
                     this.screamySmile = null;
@@ -148,8 +151,7 @@ namespace Tests.RendererTest
                 else
                 {
                     this.screamySmile = smile;
-                }
-                    
+                }                 
             }
 
             this.spriteRenderer.EndDraw(graphics);
@@ -161,6 +163,8 @@ namespace Tests.RendererTest
 
             this.spriteRenderer.Dispose();
             this.smiley.Dispose();
+            this.screamer.Dispose();
+            this.scream.Dispose();
             graphics.DefaultDrawState = DrawState.Default;
             audio.Orientation = default;           
         }
