@@ -73,6 +73,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         private RendererState state;
 
         private GLShader program;
+        private IntPtr textureParameter;
         private VertexLayout layout;
 
         public GLSpriteRenderer(GraphicsDevice device, Camera camera, DrawOrder order)
@@ -91,7 +92,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.SetupShaderProgram(device);
 
             this.program.SetVertexData(this.vertexBuffer, this.layout);
-
+            this.textureParameter = this.program.GetUniformNameHandle("Texture");
             this.state.Setup();            
         }
 
@@ -343,7 +344,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 if (!object.ReferenceEquals(currentTexture, batch.texture))
                 {
                     currentTexture = batch.texture;
-                    this.program.SetUniform("Texture", currentTexture, 0);
+                    this.program.SetUniform(this.textureParameter, currentTexture, 0);
                 }
 
                 if (drawState != null)

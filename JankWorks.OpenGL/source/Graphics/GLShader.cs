@@ -95,6 +95,12 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             glUseProgram(0);
         }
 
+        public override IntPtr GetUniformNameHandle(string name)
+        {
+            var handle = this.GetUniformLocation(name);
+            return (IntPtr)handle;
+        }
+
         private int GetUniformLocation(string name)
         {
             glUseProgram(this.ProgramId);
@@ -113,7 +119,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 }
                 loc = glGetUniformLocation(this.ProgramId, utfName);
             }
-            //var loc = glGetUniformLocation(this.ProgramId, name);
 
             if (loc == -1)
             {
@@ -178,6 +183,64 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             var loc = this.GetUniformLocation(name);
             glUniform1i(loc, unit);
         }
+
+        public override void SetUniform(IntPtr nameHandle, int value)
+        {
+            glUseProgram(this.ProgramId);
+            glUniform1i(nameHandle.ToInt32(), value);
+        }
+
+        public override void SetUniform(IntPtr nameHandle, uint value)
+        {
+            glUseProgram(this.ProgramId);
+            glUniform1ui(nameHandle.ToInt32(), value);
+        }
+
+        public override void SetUniform(IntPtr nameHandle, float value)
+        {
+            glUseProgram(this.ProgramId);
+            glUniform1f(nameHandle.ToInt32(), value);
+        }
+
+        public override void SetUniform(IntPtr nameHandle, RGBA value) => this.SetUniform(nameHandle, (Vector4)value);
+
+        public override void SetUniform(IntPtr nameHandle, Vector2 value)
+        {
+            glUseProgram(this.ProgramId);
+            glUniform2f(nameHandle.ToInt32(), value.X, value.Y);
+        }
+
+        public override void SetUniform(IntPtr nameHandle, Vector3 value)
+        {
+            glUseProgram(this.ProgramId);
+            glUniform3f(nameHandle.ToInt32(), value.X, value.Y, value.Z);
+        }
+
+        public override void SetUniform(IntPtr nameHandle, Vector4 value)
+        {
+            glUseProgram(this.ProgramId);
+            glUniform4f(nameHandle.ToInt32(), value.X, value.Y, value.Z, value.W);
+        }
+
+        public override void SetUniform(IntPtr nameHandle, Matrix3x2 value)
+        {
+            glUseProgram(this.ProgramId);
+            unsafe { glUniformMatrix3x2fv(nameHandle.ToInt32(), 1, false, (float*)&value); }
+        }
+
+        public override void SetUniform(IntPtr nameHandle, Matrix4x4 value)
+        {
+            glUseProgram(this.ProgramId);
+            unsafe { glUniformMatrix4fv(nameHandle.ToInt32(), 1, false, (float*)&value); }
+        }
+
+        public override void SetUniform(IntPtr nameHandle, Texture2D texture, int unit)
+        {            
+            this.AddTexture2DSampler((GLTexture2D)texture, unit);
+            glUseProgram(this.ProgramId);            
+            glUniform1i(nameHandle.ToInt32(), unit);
+        }
+
 
         public override void SetVertexData<T>(VertexBuffer<T> buffer, VertexLayout layout)
         {
@@ -247,6 +310,9 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             base.Dispose(finalising);
         }
 
+        
+
+        
 
         private struct Sampler : IEquatable<Sampler>
         {
