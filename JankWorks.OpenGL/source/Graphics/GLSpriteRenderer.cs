@@ -211,10 +211,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                         
             ref var rstate = ref this.state;
 
-            var projection = rstate.projection;
-            var view = rstate.view;
-
-            var mvp = model * view * projection;
+            var mvp = model * rstate.view * rstate.projection;
 
             var tl = new Vertex(Vector2.Transform(new Vector2(0, 0), mvp), textureBounds.TopLeft, vecColour);
             var tr = new Vertex(Vector2.Transform(new Vector2(1, 0), mvp), textureBounds.TopRight, vecColour);

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="RendererTest\scream.wav" />
     <None Remove="RendererTest\smiley.png" />
     <None Remove="SpriteTest\frag.glsl" />
     <None Remove="SpriteTest\punchy_512.png" />
@@ -18,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="RendererTest\scream.wav" />
     <EmbeddedResource Include="RendererTest\smiley.png" />
     <EmbeddedResource Include="SpriteTest\frag.glsl" />
     <EmbeddedResource Include="SpriteTest\punchy_512.png" />
