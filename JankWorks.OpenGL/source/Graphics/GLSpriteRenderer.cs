@@ -28,13 +28,20 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                
         private readonly struct Batch
         {
-            public readonly Texture2D texture;
+            public readonly GCHandle texture;
             public readonly int offset;
             public readonly int count;
 
             public Batch(Texture2D texture, int offset, int count)
             {
-                this.texture = texture;
+                this.texture = GCHandle.Alloc(texture, GCHandleType.Normal);
+                this.offset = offset;
+                this.count = count;
+            }
+
+            public Batch(GCHandle textureHandle, int offset, int count)
+            {
+                this.texture = textureHandle;
                 this.offset = offset;
                 this.count = count;
             }
@@ -157,6 +164,31 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
         }
 
+        public override void Clear()
+        {
+            unsafe
+            {
+                var currentBatch = 0;
+
+                fixed (Batch* batchptr = this.batches)
+                {
+                    while (currentBatch < this.batchCount)
+                    {
+                        Batch* batch = batchptr + currentBatch;
+
+                        batch->texture.Free();
+                        *batch = default;
+                        currentBatch++;
+                    }
+                }
+            }
+
+            this.batchCount = 0;
+
+            // vertices is just values so we don't need to iterate or clear
+            this.vertexCount = 0;
+        }
+
         public override void BeginDraw()
         {
             ref var rstate = ref this.state;
@@ -167,7 +199,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             rstate.view = this.Camera.GetView();
             rstate.drawState = null;
 
-            this.ClearData();
+            this.Clear();
             rstate.drawing = true;
         }
 
@@ -181,18 +213,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             rstate.view = this.Camera.GetView();
             rstate.drawState = state;
 
-            this.ClearData();
+            this.Clear();
             rstate.drawing = true;
-        }
-
-        private void ClearData()
-        {
-            // always clear batches due to texture reference
-            Array.Clear(this.batches, 0, this.batches.Length); 
-            this.batchCount = 0;
-
-            // vertices is just values so we don't need to clear
-            this.vertexCount = 0;
         }
 
         public override void Draw(Texture2D texture, Vector2 position, Vector2 size, Vector2 origin, float rotation, RGBA colour, Bounds textureBounds)
@@ -217,7 +239,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             model = model * Matrix4x4.CreateRotationZ(radians);
             model = model * Matrix4x4.CreateTranslation(new Vector3(position, 0));            
                                  
-
             var mvp = model * rstate.view * rstate.projection;
 
             var tl = new Vertex(Vector2.Transform(new Vector2(0, 0), mvp), textureBounds.TopLeft, vecColour);
@@ -235,24 +256,32 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 Array.Resize(ref this.vertices, this.vertices.Length + dataSize);
             }
 
-            var offset = vertexCount;
+            var offset = this.vertexCount;
 
             /*
             quad draw order
             tl, tr, bl, bl, tr, br
             */
 
-            this.vertices[vertexCount++] = tl;
-            this.vertices[vertexCount++] = tr;
-            this.vertices[vertexCount++] = bl;
-            this.vertices[vertexCount++] = bl;
-            this.vertices[vertexCount++] = tr;
-            this.vertices[vertexCount++] = br;
+            unsafe
+            {
+                fixed(Vertex* vertices = this.vertices.AsSpan(this.vertexCount))
+                {
+                    vertices[0] = tl;
+                    vertices[1] = tr;
+                    vertices[2] = bl;
+                    vertices[3] = bl;
+                    vertices[4] = tr;
+                    vertices[5] = br;
+                }
+            }
+
+            this.vertexCount += verticesPerSprite;
 
             var batchUpperBound = this.batchCount - 1;
             Batch batch = (this.batchCount == 0) ? new Batch() : this.batches[batchUpperBound];
 
-            if(object.ReferenceEquals(batch.texture, texture))
+            if(batch.texture.IsAllocated && object.ReferenceEquals(batch.texture.Target, texture))
             {
                 batch = new Batch(batch.texture, batch.offset, batch.count + verticesPerSprite);                
                 this.batches[batchUpperBound] = batch;
@@ -337,27 +366,35 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 currentBatch = 0;
             }
 
-            do
+            unsafe
             {
-                ref readonly var batch = ref this.batches[currentBatch];
+                fixed(Batch* batchPtr = this.batches)
+                {
+                    Batch* batch = batchPtr + currentBatch;
 
-                if (!object.ReferenceEquals(currentTexture, batch.texture))
-                {
-                    currentTexture = batch.texture;
-                    this.program.SetUniform(this.textureParameter, currentTexture, 0);
-                }
+                    object batchTexture = batch->texture.Target;
 
-                if (drawState != null)
-                {
-                    surface.DrawPrimitives(this.program, DrawPrimitiveType.Triangles, batch.offset, batch.count, drawState.Value);
+                    do
+                    {                       
+                        if (!object.ReferenceEquals(currentTexture, batchTexture))
+                        {
+                            currentTexture = (Texture2D)batchTexture;
+                            this.program.SetUniform(this.textureParameter, currentTexture, 0);
+                        }
+
+                        if (drawState != null)
+                        {
+                            surface.DrawPrimitives(this.program, DrawPrimitiveType.Triangles, batch->offset, batch->count, drawState.Value);
+                        }
+                        else
+                        {
+                            surface.DrawPrimitives(this.program, DrawPrimitiveType.Triangles, batch->offset, batch->count);
+                        }
+                        currentBatch += batchDirection;
+                    }
+                    while (++batchesDrawn < this.batchCount);
                 }
-                else
-                {
-                    surface.DrawPrimitives(this.program, DrawPrimitiveType.Triangles, batch.offset, batch.count);
-                }
-                currentBatch += batchDirection;
-            }
-            while (++batchesDrawn < this.batchCount);
+            }            
         }
 
         protected override void Dispose(bool finalising)
@@ -371,8 +408,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         private static int BatchCompareByTexture(Batch left, Batch right)
         {
-            var leftTexture = (GLTexture2D)left.texture;
-            var rightTexture = (GLTexture2D)right.texture;
+            var leftTexture = (GLTexture2D)left.texture.Target;
+            var rightTexture = (GLTexture2D)right.texture.Target;
 
             return leftTexture.Id.CompareTo(rightTexture.Id);
         }
