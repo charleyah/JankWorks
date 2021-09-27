@@ -418,6 +418,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         protected override void Dispose(bool finalising)
         {
+            this.Clear();
             this.program.Dispose();
             this.layout.Dispose();
             this.vertexBuffer.Delete();
