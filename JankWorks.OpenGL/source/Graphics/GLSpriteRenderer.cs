@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Numerics;
 
@@ -310,8 +311,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
             if(this.Order == DrawOrder.Texture)
             {
-                Array.Sort(this.batches, GLSpriteRenderer.BatchCompareByTexture);
-                // Improvement possible, reorder vertex data to remove duplicate texture batches
+                Array.Sort(this.batches, 0, this.batchCount, BatchComparer.Sorter);
+                // Improvement possible, reorder vertex data to remove duplicate texture batches                
             }
 
             this.Flush();
@@ -426,12 +427,18 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             base.Dispose(finalising);
         }
 
-        private static int BatchCompareByTexture(Batch left, Batch right)
-        {
-            var leftTexture = (GLTexture2D)left.texture.Target;
-            var rightTexture = (GLTexture2D)right.texture.Target;
 
-            return leftTexture.Id.CompareTo(rightTexture.Id);
-        }
+        private sealed class BatchComparer : IComparer<Batch>
+        {
+            public int Compare(Batch left, Batch right)
+            {
+                var leftTexture = (GLTexture2D)left.texture.Target;
+                var rightTexture = (GLTexture2D)right.texture.Target;
+
+                return leftTexture.Id.CompareTo(rightTexture.Id);
+            }
+
+            public static readonly BatchComparer Sorter = new BatchComparer();
+        }       
     }
 }
