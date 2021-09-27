@@ -135,76 +135,108 @@ namespace JankWorks.Drivers.Glfw.Interface
         private void HandleResizeEvent(IntPtr window, int width, int height)
         {
             var vp = new Rectangle(0, 0, width, height);
-            this.ResizeHandler.Notify(vp);
+
+            if(this.ResizeHandler.HasSubscribers)
+            {
+                this.ResizeHandler.Notify(vp);
+            }
         }
 
         private void HandleFocusEvent(IntPtr window, int focused)
         {
             var handler = focused == GLFW_TRUE ? this.FocusHandler : this.LostFocusHandler;
-            handler.Notify();
+            if (handler.HasSubscribers)
+            {
+                handler.Notify();
+            }
         }
 
         private void HandleMouseEnterOrLeaveEvent(IntPtr window, int entered)
-        {
+        {            
             var handler = entered == GLFW_TRUE ? this.MouseEnteredHandler : this.MouseLeftHandler;
-            handler.Notify();
+            if(handler.HasSubscribers)
+            {
+                handler.Notify();
+            }            
         }
 
-        private void HandleMouseMoveEvent(IntPtr window, double xpos, double ypos) 
-        => this.MouseMovedHandler.Notify(new Vector2(Convert.ToSingle(xpos), Convert.ToSingle(ypos)));
+        private void HandleMouseMoveEvent(IntPtr window, double xpos, double ypos)
+        {
+            if(this.MouseMovedHandler.HasSubscribers)
+            {
+                this.MouseMovedHandler.Notify(new Vector2(Convert.ToSingle(xpos), Convert.ToSingle(ypos)));
+            }            
+        }
+        
 
         private void HandleMouseButtonEvent(IntPtr window, int button, int action, int mods)
         {
-            var commonButton = MouseButton.Other;
-
-            if (button == GLFW_MOUSE_BUTTON_LEFT) { commonButton = MouseButton.Left; }
-            else if (button == GLFW_MOUSE_BUTTON_RIGHT) { commonButton = MouseButton.Right; }
-            else if (button == GLFW_MOUSE_BUTTON_MIDDLE) { commonButton = MouseButton.Middle; }
-
-            var mbe = new MouseButtonEvent(button, commonButton);
-
-            if (action == GLFW_PRESS)
+            if (this.MouseButtonPressedHandler.HasSubscribers || this.MouseButtonReleasedHandler.HasSubscribers)
             {
-                this.MouseButtonPressedHandler.Notify(mbe);
+                var commonButton = MouseButton.Other;
+
+                if (button == GLFW_MOUSE_BUTTON_LEFT) { commonButton = MouseButton.Left; }
+                else if (button == GLFW_MOUSE_BUTTON_RIGHT) { commonButton = MouseButton.Right; }
+                else if (button == GLFW_MOUSE_BUTTON_MIDDLE) { commonButton = MouseButton.Middle; }
+
+                var mbe = new MouseButtonEvent(button, commonButton);
+
+                if (action == GLFW_PRESS)
+                {
+                    this.MouseButtonPressedHandler.Notify(mbe);
+                }
+                else if (action == GLFW_RELEASE)
+                {
+                    this.MouseButtonReleasedHandler.Notify(mbe);
+                }
             }
-            else if (action == GLFW_RELEASE)
-            {
-                this.MouseButtonReleasedHandler.Notify(mbe);
-            }
+            
         }
 
-        private void HandleScrollEvent(IntPtr window, double xpos, double ypos) 
-        => this.ScrollHandler.Notify(new Vector2(Convert.ToSingle(xpos), Convert.ToSingle(ypos)));
-
+        private void HandleScrollEvent(IntPtr window, double xpos, double ypos)
+        {
+            if(this.ScrollHandler.HasSubscribers)
+            {
+                this.ScrollHandler.Notify(new Vector2(Convert.ToSingle(xpos), Convert.ToSingle(ypos)));
+            }            
+        }
+        
         private void HandleKeyEvent(IntPtr window, int key, int scancode, int action, int mods)
         {
-            var actionIsRepeat = action == GLFW_REPEAT;
-            var repeatEnabled = this.keyRepeatEnabled;
-
-            if (actionIsRepeat && !repeatEnabled)
+            if(this.KeyPressedHandler.HasSubscribers || this.KeyReleasedHandler.HasSubscribers)
             {
-                return;
-            }
+                var actionIsRepeat = action == GLFW_REPEAT;
+                var repeatEnabled = this.keyRepeatEnabled;
 
-            var input = new GlfwKeyInput(key, mods);
+                if (actionIsRepeat && !repeatEnabled)
+                {
+                    return;
+                }
 
-            var kye = new KeyEvent(scancode, input.Key, input.Modifiers, actionIsRepeat);
+                var input = new GlfwKeyInput(key, mods);
 
-            if (action == GLFW_PRESS || (actionIsRepeat && repeatEnabled))
-            {
-                this.KeyPressedHandler.Notify(kye);
-            }
-            else if (action == GLFW_RELEASE)
-            {
-                this.KeyReleasedHandler.Notify(kye);
-            }
+                var kye = new KeyEvent(scancode, input.Key, input.Modifiers, actionIsRepeat);
+
+                if (action == GLFW_PRESS || (actionIsRepeat && repeatEnabled))
+                {
+                    this.KeyPressedHandler.Notify(kye);
+                }
+                else if (action == GLFW_RELEASE)
+                {
+                    this.KeyReleasedHandler.Notify(kye);
+                }
+            }            
         }
 
         private void HandleTextEvent(IntPtr window, uint utf32code)
         {
-            var ch = char.MinValue;
-            unsafe { this.utf32Decoder.GetChars((byte*)&utf32code, sizeof(uint), &ch, 1, true); }
-            this.TextEnteredHandler.Notify(ch);
+            if(this.TextEnteredHandler.HasSubscribers)
+            {
+                var ch = char.MinValue;
+                unsafe { this.utf32Decoder.GetChars((byte*)&utf32code, sizeof(uint), &ch, 1, true); }
+                this.TextEnteredHandler.Notify(ch);
+            }
+            
         }
 
         private void ClearCallbacks()
