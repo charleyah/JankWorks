@@ -66,7 +66,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override Camera Camera { get; set; }
 
-        private const int dataSize = 42;
+        private const int dataSize = 128;
         private const int verticesPerSprite = 6;       
 
         private Vertex[] vertices;
@@ -219,7 +219,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void Draw(Texture2D texture, Vector2 position, Vector2 size, Vector2 origin, float rotation, RGBA colour, Bounds textureBounds)
         {
-            ref var rstate = ref this.state;
+            ref readonly var rstate = ref this.state;
 
             if(!rstate.drawing)
             {
@@ -227,7 +227,11 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
             else if (texture == null)
             {
-                throw new NullReferenceException();
+                throw new NullReferenceException("texture");
+            }
+            else if(texture.Disposed)
+            {
+                throw new ObjectDisposedException("texture");
             }
 
             var vecColour = (Vector4)colour;
@@ -317,7 +321,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override bool ReDraw(Surface surface)
         {
-            ref var rstate = ref this.state;
+            ref readonly var rstate = ref this.state;
             if (rstate.drawing) { throw new InvalidOperationException(); }
 
             var canReDraw = this.batchCount > 0 && rstate.projection.Equals(this.Camera.GetProjection()) && rstate.view.Equals(this.Camera.GetView());
@@ -347,52 +351,67 @@ namespace JankWorks.Drivers.OpenGL.Graphics
        
         private void DrawToSurface(Surface surface)
         {
-            ref var rstate = ref this.state;
-            var drawState = rstate.drawState;
+            var batchCount = this.batchCount;
 
-            var batchesDrawn = 0;
-            int batchDirection;
-            int currentBatch;
-            Texture2D currentTexture = null;
+            if(batchCount > 0)
+            {
+                ref readonly var rstate = ref this.state;
+                var drawState = rstate.drawState;
 
-            if (this.Order == DrawOrder.Reversed)
-            {
-                batchDirection = -1;
-                currentBatch = this.batchCount - 1;
-            }
-            else
-            {
-                batchDirection = 1;
-                currentBatch = 0;
-            }
-
-            unsafe
-            {
-                fixed(Batch* batchPtr = this.batches)
+                int batchDirection;
+                int currentBatch;
+                int lastBatch;
+                
+                if (this.Order == DrawOrder.Reversed)
                 {
-                    Batch* batch = batchPtr + currentBatch;
+                    batchDirection = -1;
+                    currentBatch = batchCount - 1;
+                    lastBatch = -1;
+                }
+                else
+                {
+                    batchDirection = 1;
+                    currentBatch = 0;
+                    lastBatch = batchCount;
+                }
 
-                    object batchTexture = batch->texture.Target;
+                Texture2D currentTexture = null;
 
-                    do
-                    {                       
-                        if (!object.ReferenceEquals(currentTexture, batchTexture))
-                        {
-                            currentTexture = (Texture2D)batchTexture;
-                            this.program.SetUniform(this.textureParameter, currentTexture, 0);
-                        }
+                unsafe
+                {
+                    fixed (Batch* batchesPtr = this.batches)
+                    {
+                        Batch* batch = batchesPtr + currentBatch;
 
-                        if (drawState != null)
+                        var batchTexture = (Texture2D)batch->texture.Target;
+
+                        do
                         {
-                            surface.DrawPrimitives(this.program, DrawPrimitiveType.Triangles, batch->offset, batch->count, drawState.Value);
+                            if (!object.ReferenceEquals(currentTexture, batchTexture))
+                            {
+                                if(batchTexture.Disposed)
+                                {
+                                    throw new ObjectDisposedException("texture");
+                                }
+                                else
+                                {
+                                    currentTexture = batchTexture;
+                                    this.program.SetUniform(this.textureParameter, currentTexture, 0);
+                                }                                
+                            }
+
+                            if (drawState != null)
+                            {
+                                var ds = drawState.Value;
+                                surface.DrawPrimitives(this.program, DrawPrimitiveType.Triangles, batch->offset, batch->count, in ds);
+                            }
+                            else
+                            {
+                                surface.DrawPrimitives(this.program, DrawPrimitiveType.Triangles, batch->offset, batch->count);
+                            }                            
                         }
-                        else
-                        {
-                            surface.DrawPrimitives(this.program, DrawPrimitiveType.Triangles, batch->offset, batch->count);
-                        }
-                        currentBatch += batchDirection;
+                        while ((currentBatch += batchDirection) != lastBatch);
                     }
-                    while (++batchesDrawn < this.batchCount);
                 }
             }            
         }

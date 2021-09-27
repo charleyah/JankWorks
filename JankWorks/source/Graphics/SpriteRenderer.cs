@@ -21,7 +21,7 @@ namespace JankWorks.Graphics
         public abstract void Clear();
 
         public abstract void Reserve(int spriteCount);
-       
+
         public abstract void BeginDraw();
 
         public abstract void BeginDraw(DrawState state);

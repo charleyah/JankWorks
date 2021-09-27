@@ -52,7 +52,8 @@ namespace Tests.RendererTest
 
             this.camera = new OrthoCamera(this.viewportSize);
 
-            this.spriteRenderer = graphics.CreateSpriteRenderer(this.camera);
+            this.spriteRenderer = graphics.CreateSpriteRenderer(this.camera, SpriteRenderer.DrawOrder.Reversed);
+            
             this.smiley = graphics.CreateTexture2D(GetEmbeddedStream("RendererTest.smiley.png"), ImageFormat.PNG);
 
             graphics.DefaultDrawState = new DrawState()
@@ -83,6 +84,7 @@ namespace Tests.RendererTest
 
             cursorSmile.position = pos;
             this.listener.Position = new Vector3(pos, 0);
+            this.spriteRenderer.Clear();
         }
 
         private void MousePressed(MouseButtonEvent e)
@@ -122,39 +124,41 @@ namespace Tests.RendererTest
 
         public override void Draw(GraphicsDevice graphics)
         {
-            this.spriteRenderer.BeginDraw();
-
-            for (int index = 0; index < this.smiles.Count; index++)
+            if(!this.spriteRenderer.ReDraw(graphics))
             {
-                var smile = this.smiles[index];
-                this.spriteRenderer.Draw(this.smiley, smile.position, new Vector2(100), new Vector2(0.5f), 0, smile.colour, smile.uv);
-            }
+                this.spriteRenderer.BeginDraw();
 
-            var cursorSmile = this.cursorSmile;
-            this.spriteRenderer.Draw(this.smiley, cursorSmile.position, new Vector2(100), new Vector2(0.5f), 0, cursorSmile.colour, cursorSmile.uv);
-
-            if(this.screamySmile != null)
-            {
-                var smile = this.screamySmile.Value;
-
-                this.spriteRenderer.Draw(this.smiley, smile.position, new Vector2(150), new Vector2(0.5f), 0, smile.colour, smile.uv);
-
-                smile.position += (Vector2.UnitX * 8);
-
-                this.screamer.Position = new Vector3(smile.position, 0);
-
-                if (smile.position.X > this.viewportSize.X + 100)
+                for (int index = 0; index < this.smiles.Count; index++)
                 {
-                    this.screamySmile = null;
-                    this.screamer.Stop();
+                    var smile = this.smiles[index];
+                    this.spriteRenderer.Draw(this.smiley, smile.position, new Vector2(100), new Vector2(0.5f), 0, smile.colour, smile.uv);
                 }
-                else
-                {
-                    this.screamySmile = smile;
-                }                 
-            }
 
-            this.spriteRenderer.EndDraw(graphics);
+                var cursorSmile = this.cursorSmile;
+                this.spriteRenderer.Draw(this.smiley, cursorSmile.position, new Vector2(100), new Vector2(0.5f), 0, cursorSmile.colour, cursorSmile.uv);
+
+                if (this.screamySmile != null)
+                {
+                    var smile = this.screamySmile.Value;
+
+                    this.spriteRenderer.Draw(this.smiley, smile.position, new Vector2(150), new Vector2(0.5f), 0, smile.colour, smile.uv);
+
+                    smile.position += (Vector2.UnitX * 8);
+
+                    this.screamer.Position = new Vector3(smile.position, 0);
+
+                    if (smile.position.X > this.viewportSize.X + 100)
+                    {
+                        this.screamySmile = null;
+                        this.screamer.Stop();
+                    }
+                    else
+                    {
+                        this.screamySmile = smile;
+                    }
+                }
+                this.spriteRenderer.EndDraw(graphics);
+            }          
         }
 
         public override void Dispose(GraphicsDevice graphics, AudioDevice audio, Window window)
