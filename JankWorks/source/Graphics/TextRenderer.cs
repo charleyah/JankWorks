@@ -12,6 +12,10 @@ namespace JankWorks.Graphics
 
         public Font Font { get; set; }
 
+        public abstract void Clear();
+
+        public abstract void Reserve(int charcount);
+
         public abstract void BeginDraw();
 
         public abstract void BeginDraw(DrawState state);
@@ -35,7 +39,5 @@ namespace JankWorks.Graphics
         public abstract void Draw(StringBuilder text, Vector2 position, Vector2 origin, RGBA colour);
 
         public abstract void EndDraw(Surface surface);
-
-        public abstract void Flush();
     }
 }
