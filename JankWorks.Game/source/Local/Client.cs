@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 
-using Thread = System.Threading.Thread;
 using ThreadPool = System.Threading.ThreadPool;
 
 using JankWorks.Core;
@@ -22,9 +21,9 @@ namespace JankWorks.Game.Local
     {
         private struct NewSceneRequest
         {
-            public string? SceneName;
-            public Host? Host;
-            public object? InitState;
+            public string SceneName;
+            public Host Host;
+            public object InitState;
         }
 
         public Settings Settings { get; private set; }
@@ -49,7 +48,7 @@ namespace JankWorks.Game.Local
 
         private AudioDevice audioDevice;
 
-        private LoadingScreen? loadingScreen;
+        private LoadingScreen loadingScreen;
 
         private Scene scene;
 
@@ -62,7 +61,6 @@ namespace JankWorks.Game.Local
         private Counter upsCounter;
         private Counter fpsCounter;
 
-#pragma warning disable CS8618
         public Client(Application application, ClientConfgiuration config, Host host)
         {
             var second = TimeSpan.FromSeconds(1);
@@ -103,14 +101,13 @@ namespace JankWorks.Game.Local
             this.graphicsDevice = GraphicsDevice.Create(surfs, this.window);
             this.audioDevice = AudioDevice.GetDefault();
         }
-#pragma warning restore CS8618
 
         private void LoadScene()
         {
             var changeState = this.newSceneRequest;
             string scene = changeState.SceneName ?? throw new ApplicationException();
             Host host = this.newSceneRequest.Host ?? throw new ApplicationException();
-            object? initstate = this.newSceneRequest.InitState;
+            object initstate = this.newSceneRequest.InitState;
 
 
             if (!object.ReferenceEquals(this.host, host))
@@ -135,7 +132,7 @@ namespace JankWorks.Game.Local
             this.state = ClientState.EndLoadingScene;
         }
 
-        private void LoadSceneWithRemoteHost(string scene, RemoteHost host, object? initState)
+        private void LoadSceneWithRemoteHost(string scene, RemoteHost host, object initState)
         {
             if (this.scene != null)
             {
@@ -167,7 +164,7 @@ namespace JankWorks.Game.Local
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         }
 
-        private void LoadSceneWithLocalHost(string scene, LocalHost host, object? initState)
+        private void LoadSceneWithLocalHost(string scene, LocalHost host, object initState)
         {
             if (this.scene != null)
             {
@@ -192,8 +189,8 @@ namespace JankWorks.Game.Local
             this.scene.ClientInitialised(initState);            
         }
 
-        public void ChangeScene(string scene, object? initsate = null) => this.ChangeScene(scene, this.host, initsate);     
-        public void ChangeScene(string scene, Host host, object? initsate = null)
+        public void ChangeScene(string scene, object initsate = null) => this.ChangeScene(scene, this.host, initsate);     
+        public void ChangeScene(string scene, Host host, object initsate = null)
         {
             if (object.ReferenceEquals(this.host, host) && host.IsRemote && host.IsConnected)
             {
@@ -209,8 +206,8 @@ namespace JankWorks.Game.Local
             this.state = ClientState.BeginLoadingScene;
         }
 
-        public void Run(string scene, object? initState = null) => this.Run(scene, this.host, initState);
-        public void Run(string scene, Host host, object? initState = null)
+        public void Run(string scene, object initState = null) => this.Run(scene, this.host, initState);
+        public void Run(string scene, Host host, object initState = null)
         {
             this.graphicsDevice.Activate();
 
@@ -364,13 +361,7 @@ namespace JankWorks.Game.Local
                     this.graphicsDevice.Deactivate();
                     state = ClientState.LoadingScene;
                     this.state = state;
-
-#pragma warning disable CS8602
-#pragma warning disable CS8600
                     ThreadPool.QueueUserWorkItem((client) => ((Client)client).LoadScene(), this);                    
-#pragma warning restore CS8600
-#pragma warning restore CS8602
-
                     break;
             }
 

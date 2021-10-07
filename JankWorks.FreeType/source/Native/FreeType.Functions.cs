@@ -1,6 +1,4 @@
-﻿#pragma warning disable CS8618
-
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 
 using JankWorks.Util;

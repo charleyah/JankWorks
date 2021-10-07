@@ -1,6 +1,4 @@
-﻿#pragma warning disable CS8603 // Yes this does mean some functions are not null safe
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace JankWorks.Game.Configuration
@@ -29,7 +27,7 @@ namespace JankWorks.Game.Configuration
             this.source = source;
         }
 
-        public T GetEntry<T>(string key, Func<string, T> cast, string? section = null, T defaultValue = default)
+        public T GetEntry<T>(string key, Func<string, T> cast, string section = null, T defaultValue = default)
         {
             var strvalue = this.ReadEntry(key, section);
 
@@ -40,7 +38,7 @@ namespace JankWorks.Game.Configuration
             }
         }
 
-        public T? ReadEntry<T>(string key, Func<string, T> cast, string? section = null)
+        public T ReadEntry<T>(string key, Func<string, T> cast, string section = null)
         {
             var entry = this.ReadEntry(key, section);
 
@@ -54,14 +52,12 @@ namespace JankWorks.Game.Configuration
             }
         }
 
-        public bool TryGetEntry<T>(string key, Func<string, T> cast, out T? value, string? section = null)
+        public bool TryGetEntry<T>(string key, Func<string, T> cast, out T value, string section = null)
         {
             var entry = this.ReadEntry(key, section);
             var found = entry != null;
 
-#nullable disable
             value = found ? cast(entry) : default(T);
-#nullable enable
 
             return found;        
         }
@@ -77,14 +73,14 @@ namespace JankWorks.Game.Configuration
 
         public bool ContainsSection(string section) => this.entries.ContainsKey(section);
         public IEnumerable<string> GetSections() => this.entries.Keys;
-        public IEnumerable<KeyValuePair<string, string>> GetEntries(string? section = null)
+        public IEnumerable<KeyValuePair<string, string>> GetEntries(string section = null)
         {
             section ??= string.Empty;
 
             return this.entries[section];
         }
 
-        public string? ReadEntry(string key, string? section = null)
+        public string ReadEntry(string key, string section = null)
         {
             section ??= string.Empty;
 
@@ -98,7 +94,7 @@ namespace JankWorks.Game.Configuration
             }
         }
 
-        public bool TryGetEntry(string key, out string? value, string? section = null)
+        public bool TryGetEntry(string key, out string value, string section = null)
         {
             section ??= string.Empty;
             value = null;
@@ -106,9 +102,9 @@ namespace JankWorks.Game.Configuration
             return found;
         }
 
-        public string GetEntry(string key, string? section = null, string? defaultValue = null) => this.ReadEntry(key, section) ?? defaultValue;           
+        public string GetEntry(string key, string section = null, string defaultValue = null) => this.ReadEntry(key, section) ?? defaultValue;           
         
-        public void SetEntry(string key, string value, string? section = null)
+        public void SetEntry(string key, string value, string section = null)
         {
             section ??= string.Empty;
 

@@ -24,7 +24,7 @@ namespace JankWorks.Game
             this.PerfMetrics = false;
         }
 
-        public virtual void PreInitialise(object? state) { }
+        public virtual void PreInitialise(object state) { }
         public virtual void Initialise(Application app, AssetManager assets) 
         {
             this.PerfMetrics = app.Settings.GetEntry(Application.PerfMetricsEntry, (ent) => bool.Parse(ent), defaultValue: false);
@@ -69,7 +69,7 @@ namespace JankWorks.Game
             }
         }
 
-        public virtual void HostInitialised(object? state) { }
+        public virtual void HostInitialised(object state) { }
         
         private void BuildHostObjectContainers()
         {
@@ -162,7 +162,7 @@ namespace JankWorks.Game
                 this.resources[index].InitialiseResources(assets);
             }
         }
-        public virtual void ClientInitialised(object? state) { }
+        public virtual void ClientInitialised(object state) { }
         
         private void BuildClientObjectContainers()
         {

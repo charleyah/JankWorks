@@ -11,9 +11,9 @@ namespace JankWorks.Game.Hosting
     {
         protected struct NewHostSceneRequest
         {
-            public string? SceneName;
-            public HostScene? Scene;
-            public object? InitState;
+            public string SceneName;
+            public HostScene Scene;
+            public object InitState;
         }
 
         public abstract bool IsRemote { get; }
@@ -46,19 +46,19 @@ namespace JankWorks.Game.Hosting
     public abstract class LocalHost : Host
     {
         protected LocalHost(Application application) : base(application) { }
-        public abstract void LoadScene(HostScene scene, object? initState = null);
+        public abstract void LoadScene(HostScene scene, object initState = null);
 
         public abstract void Start();
 
-        public abstract void Start(string scene, object? initState = null);
+        public abstract void Start(string scene, object initState = null);
 
-        public abstract void Run(string scene, object? initState = null);              
+        public abstract void Run(string scene, object initState = null);              
     }
 
     public abstract class RemoteHost : Host
     {
         protected RemoteHost(Application application) : base(application) { }
 
-        public abstract void LoadScene(string scene, object? initState = null);
+        public abstract void LoadScene(string scene, object initState = null);
     }     
 }

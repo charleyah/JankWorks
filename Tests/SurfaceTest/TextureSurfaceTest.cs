@@ -1,13 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Numerics;
 
 using JankWorks.Audio;
 using JankWorks.Graphics;
 using JankWorks.Interface;
-
-#pragma warning disable CS8618
 
 namespace Tests.SurfaceTest
 {

@@ -56,7 +56,7 @@ namespace JankWorks.Game
 
         public abstract AssetManager RegisterAssetManager();
 
-        public abstract LoadingScreen? RegisterLoadingScreen();
+        public abstract LoadingScreen RegisterLoadingScreen();
 
 
         public virtual ApplicationParameters ApplicationParameters => ApplicationParameters.Default;
@@ -86,7 +86,7 @@ namespace JankWorks.Game
         }
 
 
-        public static void Run<App>(string scene, object? initstate) where App : Application, new()
+        public static void Run<App>(string scene, object initstate) where App : Application, new()
         {
             using var app = new App();
             var host = new OfflineHost(app);
@@ -94,18 +94,18 @@ namespace JankWorks.Game
             Application.Run(app, host, scene, initstate);
         }
 
-        public static void Run<App>(Host host, string scene, object? initstate) where App : Application, new()
+        public static void Run<App>(Host host, string scene, object initstate) where App : Application, new()
         {
             using var app = new App();
             Application.Run(app, host, scene, initstate);
         }
 
-        public static void Run(Application app, Host host, string scene, object? initstate)
+        public static void Run(Application app, Host host, string scene, object initstate)
         {
             Application.Run(app, host, ClientConfgiuration.Default, scene, initstate);
         }
 
-        public static void Run(Application app, Host host, ClientConfgiuration config, string scene, object? initstate)
+        public static void Run(Application app, Host host, ClientConfgiuration config, string scene, object initstate)
         {
             using var client = new Client(app, config, host);            
             client.Run(scene, host, initstate);

@@ -93,7 +93,7 @@ namespace JankWorks.Game
 
         public override string ToString() => this.Interpolation.ToString();
         public override int GetHashCode() => this.Interpolation.GetHashCode();
-        public override bool Equals(object? obj) => obj is Frame other && this == other;
+        public override bool Equals(object obj) => obj is Frame other && this == other;
         public bool Equals(Frame other) => this == other;
         public static bool operator ==(Frame left, Frame right) => left.Interpolation == right.Interpolation;
         public static bool operator !=(Frame left, Frame right) => left.Interpolation != right.Interpolation;

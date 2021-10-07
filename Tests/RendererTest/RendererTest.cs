@@ -6,8 +6,6 @@ using JankWorks.Audio;
 using JankWorks.Graphics;
 using JankWorks.Interface;
 
-#pragma warning disable CS8618
-
 namespace Tests.RendererTest
 {
     class RendererTest : Test

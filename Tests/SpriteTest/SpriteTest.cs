@@ -5,8 +5,6 @@ using JankWorks.Audio;
 using JankWorks.Graphics;
 using JankWorks.Interface;
 
-#pragma warning disable CS8618
-
 namespace Tests.SpriteTest
 {
     class SpriteTest : Test

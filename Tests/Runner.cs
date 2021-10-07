@@ -7,9 +7,6 @@ using JankWorks.Graphics;
 using JankWorks.Audio;
 using JankWorks.Interface;
 
-
-#pragma warning disable CS8602, CS8600
-
 namespace Tests
 {
     class Runner
@@ -36,7 +33,7 @@ namespace Tests
 
             var tests = Runner.GetTestClasses().GetEnumerator();
             var testsRemaining = tests.MoveNext();
-            Test? test = null;
+            Test test = null;
 
             if (testsRemaining)
             {

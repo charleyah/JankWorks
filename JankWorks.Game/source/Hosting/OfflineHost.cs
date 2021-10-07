@@ -28,8 +28,6 @@ namespace JankWorks.Game.Hosting
 
         private Task runner;
 
-
-#pragma warning disable CS8618
         public OfflineHost(Application application) : base(application)
         {
             var parms = application.HostParameters;
@@ -37,7 +35,6 @@ namespace JankWorks.Game.Hosting
 
             this.runner = new Task(this.Run, TaskCreationOptions.LongRunning);            
         }
-#pragma warning restore CS8618
 
         public override bool IsRemote => false;
 
@@ -143,7 +140,7 @@ namespace JankWorks.Game.Hosting
             this.state = HostState.WaitingOnClients;
         }
 
-        public override void LoadScene(HostScene scene, object? initState = null)
+        public override void LoadScene(HostScene scene, object initState = null)
         {
             this.newHostSceneRequest = new NewHostSceneRequest()
             {
@@ -162,7 +159,7 @@ namespace JankWorks.Game.Hosting
             this.runner.Start();
         }
 
-        public override void Start(string scene, object? initState = null)
+        public override void Start(string scene, object initState = null)
         {
             this.newHostSceneRequest = new NewHostSceneRequest()
             {
@@ -174,7 +171,7 @@ namespace JankWorks.Game.Hosting
             this.runner.Start();
         }
 
-        public override void Run(string scene, object? initState = null)
+        public override void Run(string scene, object initState = null)
         {
             this.newHostSceneRequest = new NewHostSceneRequest()
             {
