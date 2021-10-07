@@ -7,20 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="RendererTest\scream.wav" />
-    <None Remove="RendererTest\smiley.png" />
-    <None Remove="SpriteTest\frag.glsl" />
-    <None Remove="SpriteTest\punchy_512.png" />
-    <None Remove="SpriteTest\vert.glsl" />
-    <None Remove="SurfaceTest\Surface.frag.glsl" />
-    <None Remove="SurfaceTest\Surface.vert.glsl" />
-    <None Remove="SurfaceTest\Triangle.frag.glsl" />
-    <None Remove="SurfaceTest\Triangle.vert.glsl" />
-    <None Remove="TextTest\ibm-plex-mono.regular.ttf" />
-    <None Remove="TextTest\Minecraft.ttf" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="RendererTest\scream.wav" />
     <EmbeddedResource Include="RendererTest\smiley.png" />
     <EmbeddedResource Include="SpriteTest\frag.glsl" />
