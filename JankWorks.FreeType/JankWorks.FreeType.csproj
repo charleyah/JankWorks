@@ -15,11 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="source\FreeType.Enums.cs" />
-    <Compile Remove="source\Graphics\FreeType.Functions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="runtimes\linux-x64\native\" />
   </ItemGroup>
 
