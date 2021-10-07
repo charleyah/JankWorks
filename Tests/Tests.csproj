@@ -16,6 +16,8 @@
     <None Remove="SurfaceTest\Surface.vert.glsl" />
     <None Remove="SurfaceTest\Triangle.frag.glsl" />
     <None Remove="SurfaceTest\Triangle.vert.glsl" />
+    <None Remove="TextTest\ibm-plex-mono.regular.ttf" />
+    <None Remove="TextTest\Minecraft.ttf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +30,7 @@
     <EmbeddedResource Include="SurfaceTest\Surface.vert.glsl" />
     <EmbeddedResource Include="SurfaceTest\Triangle.frag.glsl" />
     <EmbeddedResource Include="SurfaceTest\Triangle.vert.glsl" />
+    <EmbeddedResource Include="TextTest\ibm-plex-mono.regular.ttf" />
   </ItemGroup>
 
   <ItemGroup>

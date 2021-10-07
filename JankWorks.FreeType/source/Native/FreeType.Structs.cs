@@ -19,21 +19,21 @@ using FT_UInt64 = System.UInt64;
 using FT_Short = System.Int16;
 using FT_UShort = System.UInt16;
 
-using FT_Long = nint;
-using FT_ULong = nuint;
+using FT_Long = System.IntPtr;
+using FT_ULong = System.UIntPtr;
 
-using FT_Fixed = nint;
+using FT_Fixed = System.IntPtr;
 
 using FT_String = JankWorks.Util.CString;
 
-using FT_Pos = nint;
+using FT_Pos = System.IntPtr;
 
 namespace JankWorks.Drivers.FreeType.Native
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct FT_Library
     {
-        IntPtr handle;
+        IntPtr handle;        
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -115,7 +115,7 @@ namespace JankWorks.Drivers.FreeType.Native
         public FT_Short underline_thickness;
 
         public FT_GlyphSlot glyph;
-        public IntPtr size;
+        public FT_Size size;
         public IntPtr charmap;
 
         public IntPtr driver;
@@ -219,5 +219,35 @@ namespace JankWorks.Drivers.FreeType.Native
         public short* contours;
 
         public int flags;           
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct FT_Size_Metrics
+    {
+        public FT_UShort x_ppem;
+        public FT_UShort y_ppem;
+
+        public FT_Fixed x_scale;
+        public FT_Fixed y_scale;
+
+        public FT_Pos ascender;
+        public FT_Pos descender;
+        public FT_Pos height;
+        public FT_Pos max_advance; 
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct FT_Size
+    {
+        public FT_Size_Rec* Rec;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct FT_Size_Rec
+    {
+        public FT_Face face;
+        public FT_Generic generic;
+        public FT_Size_Metrics metrics;
+        public IntPtr @internal;           
     }
 }

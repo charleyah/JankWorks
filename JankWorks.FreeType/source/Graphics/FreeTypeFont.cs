@@ -24,6 +24,39 @@ namespace JankWorks.Drivers.FreeType.Graphics
             }                
         }
 
+        public override int GlyphCount 
+        {
+            get
+            {
+                unsafe
+                {
+                    return this.face.Rec->num_glyphs.ToInt32();
+                }                
+            }            
+        }
+
+        public override int LineSpacing
+        {
+            get
+            {
+                unsafe
+                {
+                    return this.face.Rec->size.Rec->metrics.height.ToInt32() >> 6;
+                }
+            }
+        }
+
+        public override int MaxAdvance 
+        { 
+            get
+            {
+                unsafe
+                {
+                    return this.face.Rec->size.Rec->metrics.max_advance.ToInt32() >> 6;
+                }
+            }
+        }
+
         private IDisposable source;
         private FT_Face face;
         private char? current;
@@ -60,9 +93,9 @@ namespace JankWorks.Drivers.FreeType.Graphics
 
                 return new Glyph()
                 {
-                    Size = new Vector2(ftglyph->bitmap.width, ftglyph->bitmap.rows),
-                    Bearing = new Vector2(ftglyph->bitmap_left, ftglyph->bitmap_top),
-                    Advance = (uint)ftglyph->advance.x,
+                    Size = new Vector2i(ftglyph->bitmap.width, (int)ftglyph->bitmap.rows),
+                    Bearing = new Vector2i(ftglyph->bitmap_left, ftglyph->bitmap_top),
+                    Advance = new Vector2i(ftglyph->advance.x.ToInt32() >> 6, ftglyph->advance.y.ToInt32() >> 6),
                     Value = character                                 
                 };
             }           
@@ -85,7 +118,7 @@ namespace JankWorks.Drivers.FreeType.Graphics
 
                 var bufferSize = (int)bitmap.rows * bitmap.width;
 
-                return new GlyphBitmap(new ReadOnlySpan<byte>(bitmap.buffer, bufferSize), new Vector2(bitmap.width, bitmap.rows), format);
+                return new GlyphBitmap(new ReadOnlySpan<byte>(bitmap.buffer, bufferSize), new Vector2i(bitmap.width, (int)bitmap.rows), format);
             }
         }
 

@@ -48,21 +48,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        private readonly struct Vertex
-        {
-            public readonly Vector2 position;
-            public readonly Vector2 texcoord;
-            public readonly Vector4 colour;
-
-            public Vertex(Vector2 position, Vector2 texcoord, Vector4 colour)
-            {
-                this.position = position;
-                this.texcoord = texcoord;
-                this.colour = colour;
-            }           
-        }
-
         public override DrawOrder Order { get; set; }
 
         public override Camera Camera { get; set; }
@@ -70,13 +55,13 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         private const int dataSize = 128;
         private const int verticesPerSprite = 6;       
 
-        private Vertex[] vertices;
+        private Vertex2[] vertices;
         private int vertexCount;
 
         private Batch[] batches;
         private int batchCount;
 
-        private GLBuffer<Vertex> vertexBuffer;
+        private GLBuffer<Vertex2> vertexBuffer;
 
         private RendererState state;
 
@@ -89,7 +74,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.Camera = camera;
             this.Order = order;
 
-            this.vertices = new Vertex[dataSize];
+            this.vertices = new Vertex2[dataSize];
             this.vertexCount = 0;
 
             this.batches = new Batch[dataSize];
@@ -118,7 +103,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
             attribute.Index = 0;
             attribute.Offset = 0;
-            attribute.Stride = Marshal.SizeOf<Vertex>();
+            attribute.Stride = Marshal.SizeOf<Vertex2>();
             attribute.Format = VertexAttributeFormat.Vector2f;            
             attribute.Usage = VertexAttributeUsage.Position;
             layout.SetAttribute(attribute);
@@ -126,14 +111,14 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
             attribute.Index = 1;
             attribute.Offset = Marshal.SizeOf<Vector2>();
-            attribute.Stride = Marshal.SizeOf<Vertex>();
+            attribute.Stride = Marshal.SizeOf<Vertex2>();
             attribute.Format = VertexAttributeFormat.Vector2f;
             attribute.Usage = VertexAttributeUsage.TextureCoordinate;
             layout.SetAttribute(attribute);
 
             attribute.Index = 2;
             attribute.Offset = Marshal.SizeOf<Vector2>() * 2;
-            attribute.Stride = Marshal.SizeOf<Vertex>();
+            attribute.Stride = Marshal.SizeOf<Vertex2>();
             attribute.Format = VertexAttributeFormat.Vector4f;
             attribute.Usage = VertexAttributeUsage.Colour;
             layout.SetAttribute(attribute);
@@ -155,9 +140,11 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             if (rstate.drawing) { throw new InvalidOperationException(); }
 
             var requestedVerticesCount = verticesPerSprite * spriteCount;
+            var remaining = this.vertices.Length - this.vertexCount;
 
-            if(requestedVerticesCount > this.vertices.Length)
+            if (requestedVerticesCount > remaining)
             {
+                requestedVerticesCount += this.vertices.Length;
                 var diff = requestedVerticesCount % dataSize;
                 var newSize = (diff == 0) ? requestedVerticesCount : (dataSize - diff) + requestedVerticesCount;
 
@@ -246,15 +233,15 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                                  
             var mvp = model * rstate.view * rstate.projection;
 
-            var tl = new Vertex(Vector2.Transform(new Vector2(0, 0), mvp), textureBounds.TopLeft, vecColour);
-            var tr = new Vertex(Vector2.Transform(new Vector2(1, 0), mvp), textureBounds.TopRight, vecColour);
-            var bl = new Vertex(Vector2.Transform(new Vector2(0, 1), mvp), textureBounds.BottomLeft, vecColour);
-            var br = new Vertex(Vector2.Transform(new Vector2(1, 1), mvp), textureBounds.BottomRight, vecColour);
+            var tl = new Vertex2(Vector2.Transform(new Vector2(0, 0), mvp), textureBounds.TopLeft, vecColour);
+            var tr = new Vertex2(Vector2.Transform(new Vector2(1, 0), mvp), textureBounds.TopRight, vecColour);
+            var bl = new Vertex2(Vector2.Transform(new Vector2(0, 1), mvp), textureBounds.BottomLeft, vecColour);
+            var br = new Vertex2(Vector2.Transform(new Vector2(1, 1), mvp), textureBounds.BottomRight, vecColour);
 
             this.Queue(tl, tr, bl, br, texture);
         }
 
-        private void Queue(Vertex tl, Vertex tr, Vertex bl, Vertex br, Texture2D texture)
+        private void Queue(Vertex2 tl, Vertex2 tr, Vertex2 bl, Vertex2 br, Texture2D texture)
         {
             if((this.vertices.Length - this.vertexCount) < verticesPerSprite)
             {
@@ -270,7 +257,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
             unsafe
             {
-                fixed(Vertex* vertices = this.vertices.AsSpan(this.vertexCount))
+                fixed(Vertex2* vertices = this.vertices.AsSpan(this.vertexCount))
                 {
                     vertices[0] = tl;
                     vertices[1] = tr;
@@ -345,7 +332,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
             else
             {
-
                 this.vertexBuffer.Update(GL_ARRAY_BUFFER, BufferUsage.Dynamic, this.vertices.AsSpan(0, vertexCount), 0);
             }         
         }

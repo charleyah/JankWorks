@@ -30,11 +30,11 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.uniformNameEncoder = utf.GetEncoder();
         }
 
-        private void AddTexture2DSampler(GLTexture2D texture, int unit)
+        private void AddTexture2DSampler(uint textureId, int unit)
         {
             var sampler = new Sampler();
             sampler.unit = unit;
-            sampler.texture = texture.Id;
+            sampler.texture = textureId;
             sampler.type = GL_TEXTURE_2D;
 
             for (int index = 0; index < this.samplerCount; index++)
@@ -71,11 +71,27 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         internal void BindTextures()
         {
-            foreach(var sampler in this.samplers)
+            int count = this.samplerCount;
+
+            if (count > 0)
             {
-                glActiveTexture(GL_TEXTURE0 + sampler.unit);
-                glBindTexture(sampler.type, sampler.texture);
-            }
+                unsafe
+                {
+                    int index = 0;
+                    
+                    fixed (Sampler* samplersptr = this.samplers)
+                    {
+                        do
+                        {
+                            Sampler* sampler = samplersptr + index;
+                            glActiveTexture(GL_TEXTURE0 + sampler->unit);
+                            glBindTexture(sampler->type, sampler->texture);
+
+                        }
+                        while (++index < count);
+                    }
+                }
+            }          
         }
 
         internal void Bind()
@@ -86,7 +102,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         internal void UnBind()
         {
-            if (this.samplers.Length > 0)
+            if (this.samplerCount > 0)
             {
                 glBindTexture(GL_TEXTURE_2D, 0);
             }
@@ -179,7 +195,14 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void SetUniform(string name, Texture2D texture, int unit)
         {
-            this.AddTexture2DSampler((GLTexture2D)texture, unit);
+            this.AddTexture2DSampler(((GLTexture2D)texture).Id, unit);
+            var loc = this.GetUniformLocation(name);
+            glUniform1i(loc, unit);
+        }
+
+        internal void SetUniformTexture(string name, uint textureId, int unit)
+        {
+            this.AddTexture2DSampler(textureId, unit);
             var loc = this.GetUniformLocation(name);
             glUniform1i(loc, unit);
         }
@@ -236,11 +259,17 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void SetUniform(IntPtr nameHandle, Texture2D texture, int unit)
         {            
-            this.AddTexture2DSampler((GLTexture2D)texture, unit);
+            this.AddTexture2DSampler(((GLTexture2D)texture).Id, unit);
             glUseProgram(this.ProgramId);            
             glUniform1i(nameHandle.ToInt32(), unit);
         }
 
+        internal void SetUniformTexture(IntPtr nameHandle, uint textureId, int unit)
+        {
+            this.AddTexture2DSampler(textureId, unit);
+            glUseProgram(this.ProgramId);
+            glUniform1i(nameHandle.ToInt32(), unit);
+        }
 
         public override void SetVertexData<T>(VertexBuffer<T> buffer, VertexLayout layout)
         {
@@ -302,6 +331,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
+
         protected override void Dispose(bool finalising)
         {
             this.ClearUniformTextures();
@@ -309,11 +339,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             glDeleteProgram(this.ProgramId);
             base.Dispose(finalising);
         }
-
-        
-
-        
-
+             
         private struct Sampler : IEquatable<Sampler>
         {
             public int unit;

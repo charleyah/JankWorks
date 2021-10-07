@@ -16,11 +16,15 @@
   <ItemGroup>
     <None Remove="source\Graphics\GLSpriteRenderer.frag.glsl" />
     <None Remove="source\Graphics\GLSpriteRenderer.vert.glsl" />
+    <None Remove="source\Graphics\GLTextRenderer.frag.glsl" />
+    <None Remove="source\Graphics\GLTextRenderer.vert.glsl" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="source\Graphics\GLSpriteRenderer.frag.glsl" />
     <EmbeddedResource Include="source\Graphics\GLSpriteRenderer.vert.glsl" />
+    <EmbeddedResource Include="source\Graphics\GLTextRenderer.frag.glsl" />
+    <EmbeddedResource Include="source\Graphics\GLTextRenderer.vert.glsl" />
   </ItemGroup>
 
   <ItemGroup>

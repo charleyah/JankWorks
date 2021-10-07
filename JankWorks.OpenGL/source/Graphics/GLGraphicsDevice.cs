@@ -181,7 +181,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override SpriteRenderer CreateSpriteRenderer(Camera camera, SpriteRenderer.DrawOrder drawOrder) => new GLSpriteRenderer(this, camera, drawOrder);
 
-        public override TextRenderer CreateTextRenderer(Camera camera, Font font) => throw new NotImplementedException();
+        public override TextRenderer CreateTextRenderer(Camera camera, Font font) => new GLTextRenderer(this, font, camera);
         
         public override VertexBuffer<T> CreateVertexBuffer<T>() => new GLVertexBuffer<T>();
 

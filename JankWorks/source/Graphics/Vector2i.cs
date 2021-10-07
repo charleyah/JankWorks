@@ -33,9 +33,15 @@ namespace JankWorks.Graphics
         public static Vector2i operator /(Vector2i a, Vector2i b) => new Vector2i(a.X / b.X, a.Y / b.Y);
         public static Vector2i operator *(Vector2i a, Vector2i b) => new Vector2i(a.X * b.X, a.Y * b.Y);
 
+        public static Vector2i FromVector2(Vector2 vec, MidpointRounding rounding)
+        {
+            return new Vector2i((int)Math.Round(vec.X, 0, rounding), (int)Math.Round(vec.Y, 0, rounding));
+        }
 
         public static explicit operator Vector2i(Vector2 vec) => new Vector2i(Convert.ToInt32(vec.X), Convert.ToInt32(vec.Y));
 
         public static explicit operator Vector2(Vector2i vec) => new Vector2(Convert.ToSingle(vec.X), Convert.ToSingle(vec.Y));
+
+        public static Vector2i Zero => new Vector2i(0);
     }
 }

@@ -44,6 +44,13 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.Id = id;
         }
 
+        internal void Reconstruct(uint id, Vector2i size, PixelFormat format)
+        {
+            this.Id = id;
+            this.Size = size;
+            this.Format = format;                
+        }
+
         internal void Bind() => glBindTexture(GL_TEXTURE_2D, this.Id);
 
         internal void UnBind() => glBindTexture(GL_TEXTURE_2D, 0);
