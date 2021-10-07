@@ -244,7 +244,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.Draw(text, position, origin, rotation, this.colourpicker);
         }
 
-
         public override void Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, float rotation, Func<char, int, RGBA> colourpicker)
         {
             ref readonly var rstate = ref this.state;
