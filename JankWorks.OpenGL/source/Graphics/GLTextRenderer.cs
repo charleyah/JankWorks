@@ -260,7 +260,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
                 var vertices = new Span<Vertex2>(this.vertices, this.vertexCount, drawableCharCount * verticesPerChar);
                 var charsProcessed = 0;
-                var glyphpos = new Vector2(0, 0);
+                var glyphpos = Vector2.Zero;
                 var textSize = new Vector2(0, this.lineSpacing);
                 var line = (this.lineSpacing / 4) * 3;
 
