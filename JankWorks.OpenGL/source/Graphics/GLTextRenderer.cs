@@ -59,6 +59,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         private RendererState state;
         private RGBA currentDrawColour = Colour.White;
         private Func<char, int, RGBA> colourpicker;
+
         public GLTextRenderer(GLGraphicsDevice device, Font font, Camera camera)
         {
             this.colourpicker = (c, i) => this.currentDrawColour;
@@ -118,6 +119,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void SetFont(Font font)
         {
+            const int paddingX = 1;
+
             var size = Vector2i.Zero;
 
             this.lineSpacing = font.LineSpacing;
@@ -131,7 +134,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
                 if (IsCharDrawable(c))
                 {
-                    size.X += glyph.Size.X;
+                    size.X += glyph.Size.X + paddingX;
                 }
             }
             
@@ -165,7 +168,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
 
                     var texturedGlyph = new TexturedGlyph(glyph, bounds);
-                    pos.X += bitmap.Size.X + 1;
+                    pos.X += bitmap.Size.X + paddingX;
 
                     this.glyphs.Add(glyph.Value, texturedGlyph);
                 }
@@ -265,7 +268,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 unsafe
                 {
                     int currentCharIndex = 0;
-                    var lastW = 0;
+
                     fixed (char* textptr = text)
                     {
                         do
@@ -285,7 +288,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                             else if (currentChar == '\n')
                             {
                                 glyphpos.Y += this.lineSpacing;
-                                textSize.X = Math.Max(textSize.X, glyphpos.X - lastW);
+                                textSize.X = Math.Max(textSize.X, glyphpos.X);
                                 glyphpos.X = 0;
                             }
                             else if (IsCharDrawable(currentChar))
@@ -300,7 +303,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
                                 glyphModel = glyphModel * Matrix4x4.CreateTranslation(new Vector3(glyphpos + h, 0));
                                 glyphpos.X += w;
-                                lastW = w;
 
                                 var tl = new Vertex2(Vector2.Transform(new Vector2(0, 0), glyphModel), texturedglyph.bounds.TopLeft, colour);
                                 var tr = new Vertex2(Vector2.Transform(new Vector2(1, 0), glyphModel), texturedglyph.bounds.TopRight, colour);
@@ -321,7 +323,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                         }
                         while (++currentCharIndex < text.Length);
 
-                        textSize.X = Math.Max(textSize.X, glyphpos.X - lastW);
+                        textSize.X = Math.Max(textSize.X, glyphpos.X);
                         textSize.Y = textSize.Y + glyphpos.Y;
                     }
 
@@ -421,6 +423,12 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         protected override void Dispose(bool finalising)
         {
+            this.Clear();
+            this.fontTexture.Dispose();
+            this.program.Dispose();
+            this.layout.Dispose();
+            this.vertexBuffer.Delete();
+
             base.Dispose(finalising);
         }
 
