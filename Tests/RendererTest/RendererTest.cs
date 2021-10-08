@@ -73,7 +73,7 @@ namespace Tests.RendererTest
 
             if(cursorSmile.position.X < pos.X)
             {
-                cursorSmile.uv = new Bounds(1, 0, 1, 0);
+                cursorSmile.uv = new Bounds(1, 0, 0, 1);
             }
             else if (cursorSmile.position.X > pos.X)
             {
@@ -112,7 +112,7 @@ namespace Tests.RendererTest
                     {
                         position = new Vector2(-100, ((Vector2)this.viewportSize / 2).Y),
                         colour = Colour.Red,
-                        uv = new Bounds(1, 0, 1, 0)
+                        uv = new Bounds(1, 0, 0, 1)
                     };
                     this.screamer.Position = new Vector3(this.screamySmile.Value.position, 0);
                     this.screamer.Play();

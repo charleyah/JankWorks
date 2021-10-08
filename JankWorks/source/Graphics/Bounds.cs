@@ -16,7 +16,7 @@ namespace JankWorks.Graphics
 
         public Vector2 BottomRight { get; set; }
 
-        public Bounds(float left, float top, float bottom, float right)
+        public Bounds(float left, float top, float right, float bottom)
         {
             this.TopLeft = new Vector2(left, top);
             this.BottomRight = new Vector2(right, bottom);

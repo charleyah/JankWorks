@@ -178,7 +178,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                     Vector2 topleft = (Vector2)pos / (Vector2)size;
                     Vector2 bottomright = (Vector2)(pos + bitmap.Size) / (Vector2)size;
 
-                    var bounds = new Bounds(topleft.X, topleft.Y, bottomright.Y, bottomright.X);
+                    var bounds = new Bounds(topleft.X, topleft.Y, bottomright.X, bottomright.Y);
                     var texturedGlyph = new TexturedGlyph(glyph, bounds);
                     
                     if(++charsOnRow == charsPerRow)
