@@ -14,10 +14,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="source\Graphics\GLSpriteRenderer.frag.glsl" />
-    <EmbeddedResource Include="source\Graphics\GLSpriteRenderer.vert.glsl" />
-    <EmbeddedResource Include="source\Graphics\GLTextRenderer.frag.glsl" />
-    <EmbeddedResource Include="source\Graphics\GLTextRenderer.vert.glsl" />
+    <EmbeddedResource Include="source\Graphics\GLSpriteRenderer.frag.glsl">
+      <LogicalName>GLSpriteRenderer.frag.glsl</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="source\Graphics\GLSpriteRenderer.vert.glsl">
+      <LogicalName>GLSpriteRenderer.vert.glsl</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="source\Graphics\GLTextRenderer.frag.glsl">
+      <LogicalName>GLTextRenderer.frag.glsl</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="source\Graphics\GLTextRenderer.vert.glsl">
+      <LogicalName>GLTextRenderer.vert.glsl</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

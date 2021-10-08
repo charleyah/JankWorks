@@ -106,8 +106,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             layout.SetAttribute(attribute);
 
             var asm = typeof(GLTextRenderer).Assembly;
-            var vertpath = $"JankWorks.Drivers.OpenGL.source.Graphics.{nameof(GLTextRenderer)}.vert.glsl";
-            var fragpath = $"JankWorks.Drivers.OpenGL.source.Graphics.{nameof(GLTextRenderer)}.frag.glsl";
+            var vertpath = $"{nameof(GLTextRenderer)}.vert.glsl";
+            var fragpath = $"{nameof(GLTextRenderer)}.frag.glsl";
             this.program = (GLShader)device.CreateShader(ShaderFormat.GLSL, asm.GetManifestResourceStream(vertpath), asm.GetManifestResourceStream(fragpath));
 
             this.program.SetVertexData(this.vertexBuffer, this.layout);

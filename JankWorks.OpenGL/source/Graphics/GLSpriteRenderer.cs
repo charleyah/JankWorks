@@ -129,8 +129,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         private void SetupShaderProgram(GraphicsDevice device)
         {
             var asm = typeof(GLSpriteRenderer).Assembly;
-            var vertpath = $"JankWorks.Drivers.OpenGL.source.Graphics.{nameof(GLSpriteRenderer)}.vert.glsl";
-            var fragpath = $"JankWorks.Drivers.OpenGL.source.Graphics.{nameof(GLSpriteRenderer)}.frag.glsl";
+            var vertpath = $"{nameof(GLSpriteRenderer)}.vert.glsl";
+            var fragpath = $"{nameof(GLSpriteRenderer)}.frag.glsl";
             this.program = (GLShader)device.CreateShader(ShaderFormat.GLSL, asm.GetManifestResourceStream(vertpath), asm.GetManifestResourceStream(fragpath));
         }
 
