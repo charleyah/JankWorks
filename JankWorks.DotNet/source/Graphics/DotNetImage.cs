@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
-using JankWorks.Drivers.Graphics;
 using JankWorks.Graphics;
 
 namespace JankWorks.Drivers.DotNet.Graphics
@@ -63,12 +62,7 @@ namespace JankWorks.Drivers.DotNet.Graphics
             finally
             {
                 this.bitmap.UnlockBits(data);
-            }
-
-            if (DriverConfiguration.Drivers.graphicsApi.GraphicsApi == GraphicsApi.OpenGL)
-            {
-                bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-            }
+            }            
         }
 
         public override void Save(Stream stream, JankWorks.Graphics.ImageFormat format) => this.bitmap.Save(stream, format.GetDotNetImageFormat());

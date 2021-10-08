@@ -44,7 +44,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         private int lineSpacing;
         private int maxAdvance;
         private Texture2D fontTexture;
-        private Dictionary<char, TexturedGlyph> glyphs;
+        private Dictionary<uint, TexturedGlyph> glyphs;
 
         private VertexLayout layout;
         private GLBuffer<Vertex2> vertexBuffer;
@@ -69,9 +69,8 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.vertexCount = 0;
             this.vertices = new Vertex2[dataSize];
             this.Camera = camera;
-            this.glyphs = new Dictionary<char, TexturedGlyph>();
+            this.glyphs = new Dictionary<uint, TexturedGlyph>();
                 
-
             this.SetupGrahpicsResources(device);
             this.SetFont(font);                
         }
@@ -113,20 +112,23 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
             this.program.SetVertexData(this.vertexBuffer, this.layout);
 
-            this.fontTexture = device.CreateTexture2D(new Vector2i(2048, 20), PixelFormat.GrayScale);
+            this.fontTexture = device.CreateTexture2D(new Vector2i(1024, 2048), PixelFormat.GrayScale);
             this.program.SetUniform("Texture", this.fontTexture, 0);
         }
 
         public override void SetFont(Font font)
         {
-            const int paddingX = 1;
+            const int padding = 10;
+            const int charsPerRow = 100;
+            int charsOnRow = 0;
 
             var size = Vector2i.Zero;
 
             this.lineSpacing = font.LineSpacing;
             this.maxAdvance = font.MaxAdvance;
 
-            size.Y = this.lineSpacing;
+            size.Y = this.lineSpacing + padding;
+            int rowWidth = 0;
 
             foreach (var glyph in font)
             {
@@ -134,15 +136,30 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
                 if (IsCharDrawable(c))
                 {
-                    size.X += glyph.Size.X + paddingX;
+                    if (++charsOnRow == charsPerRow)
+                    {
+                        size.Y += this.lineSpacing + padding;
+                        size.X = Math.Max(size.X, rowWidth);
+                        rowWidth = 0;
+                        charsOnRow = 0;
+                    }
+                    else
+                    {
+                        rowWidth += glyph.Size.X + padding;
+                    }
                 }
             }
+
+            size.X = Math.Max(size.X, rowWidth);
+
+            charsOnRow = 0;
             
             this.fontTexture.SetPixels(size, ReadOnlySpan<byte>.Empty, PixelFormat.GrayScale);
 
             this.glyphs.Clear();
 
             var pos = Vector2i.Zero;
+
 
             foreach (var glyph in font)
             {
@@ -158,18 +175,23 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
                     this.fontTexture.SetPixels(bitmap.Size, pos, bitmap.Pixels, PixelFormat.GrayScale);
 
-                    var bounds = new Bounds
-                    (
-                        (float)Math.Round((double)pos.X / size.X, 15),
-                        0,
-                        (float)Math.Round((double)bitmap.Size.Y / size.Y, 15),
-                        (float)Math.Round((double)(pos.X + bitmap.Size.X) / size.X, 15)
-                    );
+                    Vector2 topleft = (Vector2)pos / (Vector2)size;
+                    Vector2 bottomright = (Vector2)(pos + bitmap.Size) / (Vector2)size;
 
-
+                    var bounds = new Bounds(topleft.X, topleft.Y, bottomright.Y, bottomright.X);
                     var texturedGlyph = new TexturedGlyph(glyph, bounds);
-                    pos.X += bitmap.Size.X + paddingX;
-
+                    
+                    if(++charsOnRow == charsPerRow)
+                    {
+                        pos.Y += this.lineSpacing + padding;
+                        pos.X = 0;
+                        charsOnRow = 0;
+                    }
+                    else
+                    {
+                        pos.X += bitmap.Size.X + padding;
+                    }
+                   
                     this.glyphs.Add(glyph.Value, texturedGlyph);
                 }
             }
@@ -292,32 +314,38 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                             }
                             else if (IsCharDrawable(currentChar))
                             {
-                                var texturedglyph = this.glyphs[currentChar];
-                                var glyph = texturedglyph.glyph;
-                                var glyhSize = (Vector2)glyph.Size;
-                                var glyphModel = Matrix4x4.CreateScale(new Vector3(glyhSize, 0));
-
-                                var h = new Vector2(0, line - glyph.Bearing.Y);
-                                var w = glyph.Advance.X - glyph.Bearing.X;
-
-                                glyphModel = glyphModel * Matrix4x4.CreateTranslation(new Vector3(glyphpos + h, 0));
-                                glyphpos.X += w;
-
-                                var tl = new Vertex2(Vector2.Transform(new Vector2(0, 0), glyphModel), texturedglyph.bounds.TopLeft, colour);
-                                var tr = new Vertex2(Vector2.Transform(new Vector2(1, 0), glyphModel), texturedglyph.bounds.TopRight, colour);
-                                var bl = new Vertex2(Vector2.Transform(new Vector2(0, 1), glyphModel), texturedglyph.bounds.BottomLeft, colour);
-                                var br = new Vertex2(Vector2.Transform(new Vector2(1, 1), glyphModel), texturedglyph.bounds.BottomRight, colour);
-
-                                fixed (Vertex2* glyhvertices = vertices.Slice(charsProcessed * verticesPerChar))
+                                if(this.glyphs.TryGetValue(currentChar, out var texturedglyph))
                                 {
-                                    glyhvertices[0] = tl;
-                                    glyhvertices[1] = tr;
-                                    glyhvertices[2] = bl;
-                                    glyhvertices[3] = bl;
-                                    glyhvertices[4] = tr;
-                                    glyhvertices[5] = br;
+                                    var glyph = texturedglyph.glyph;
+                                    var glyhSize = (Vector2)glyph.Size;
+                                    var glyphModel = Matrix4x4.CreateScale(new Vector3(glyhSize, 0));
+
+                                    var h = new Vector2(0, line - glyph.Bearing.Y);
+                                    var w = glyph.Advance.X - glyph.Bearing.X;
+
+                                    glyphModel = glyphModel * Matrix4x4.CreateTranslation(new Vector3(glyphpos + h, 0));
+                                    glyphpos.X += w;
+
+                                    var tl = new Vertex2(Vector2.Transform(new Vector2(0, 0), glyphModel), texturedglyph.bounds.TopLeft, colour);
+                                    var tr = new Vertex2(Vector2.Transform(new Vector2(1, 0), glyphModel), texturedglyph.bounds.TopRight, colour);
+                                    var bl = new Vertex2(Vector2.Transform(new Vector2(0, 1), glyphModel), texturedglyph.bounds.BottomLeft, colour);
+                                    var br = new Vertex2(Vector2.Transform(new Vector2(1, 1), glyphModel), texturedglyph.bounds.BottomRight, colour);
+
+                                    fixed (Vertex2* glyhvertices = vertices.Slice(charsProcessed * verticesPerChar))
+                                    {
+                                        glyhvertices[0] = tl;
+                                        glyhvertices[1] = tr;
+                                        glyhvertices[2] = bl;
+                                        glyhvertices[3] = bl;
+                                        glyhvertices[4] = tr;
+                                        glyhvertices[5] = br;
+                                    }
+                                    charsProcessed++;
                                 }
-                                charsProcessed++;
+                                else
+                                {
+                                    glyphpos.X += this.maxAdvance;
+                                }                                                              
                             }
                         }
                         while (++currentCharIndex < text.Length);
@@ -431,6 +459,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             base.Dispose(finalising);
         }
 
-        private static bool IsCharDrawable(char c) => char.IsLetterOrDigit(c) || char.IsPunctuation(c) || char.IsSymbol(c);
+        private static bool IsCharDrawable(char c) => !char.IsWhiteSpace(c);
     }
 }

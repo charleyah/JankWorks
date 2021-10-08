@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Numerics;
+﻿using System.Numerics;
 
 using JankWorks.Audio;
 using JankWorks.Graphics;
@@ -23,7 +21,7 @@ namespace Tests.TextTest
             this.camera = new OrthoCamera(graphics.Viewport.Size);
             this.center = (Vector2)graphics.Viewport.Size / 2;
             this.font = Font.LoadFromStream(GetEmbeddedStream("TextTest.ibm-plex-mono.regular.ttf"), FontFormat.TrueType);
-            this.font.FontSize = 40;
+            this.font.FontSize = 38;
             this.txtrenderer = graphics.CreateTextRenderer(this.camera, this.font);
 
             var ds = new DrawState()
