@@ -14,8 +14,6 @@ namespace JankWorks.Game
 {
     public abstract class Application : Disposable
     {
-        public const string PerfMetricsEntry = "perfmetrics";
-
         protected readonly DirectoryInfo DataFolder;
         protected readonly DirectoryInfo SaveFolder;
 

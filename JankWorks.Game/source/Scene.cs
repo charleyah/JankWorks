@@ -17,21 +17,14 @@ namespace JankWorks.Game
     {
         internal const int InitialObjectContainerCount = 8;
 
-        internal protected bool PerfMetrics;
-
-        protected ApplicationScene()
-        {
-            this.PerfMetrics = false;
-        }
-
         public virtual void PreInitialise(object state) { }
-        public virtual void Initialise(Application app, AssetManager assets) 
-        {
-            this.PerfMetrics = app.Settings.GetEntry(Application.PerfMetricsEntry, (ent) => bool.Parse(ent), defaultValue: false);
-        }
+
+        public virtual void Initialise(Application app, AssetManager assets) { }
+
         public virtual void Initialised() { }
 
         public virtual void PreDispose() { }
+
         public virtual void Dispose(Application app) { }
     }
 
