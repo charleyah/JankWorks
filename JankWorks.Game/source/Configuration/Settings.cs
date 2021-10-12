@@ -69,6 +69,7 @@ namespace JankWorks.Game.Configuration
                 section.Value.Clear();
             }
             this.entries.Clear();
+            this.entries.Add(string.Empty, new Dictionary<string, string>());
         }
 
         public bool ContainsSection(string section) => this.entries.ContainsKey(section);
