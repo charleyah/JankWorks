@@ -43,12 +43,12 @@ namespace JankWorks.Drivers.Glfw
         {
             unsafe
             {
-                nint* ptr = (nint*)glfwGetMonitors(out var count).ToPointer();
+                void** ptr = (void**)glfwGetMonitors(out var count).ToPointer();
 
                 var monitors = new GlfwMonitor[count];
                 for (int index = 0; index < count; index++)
                 {
-                    monitors[index] = new GlfwMonitor((IntPtr)ptr);
+                    monitors[index] = new GlfwMonitor(new IntPtr(*ptr));
                     ptr++;
                 }
 
