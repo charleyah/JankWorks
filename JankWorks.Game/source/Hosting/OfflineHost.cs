@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+
+using System.Threading;
 using System.Threading.Tasks;
 
 using JankWorks.Game.Platform;
@@ -83,12 +85,18 @@ namespace JankWorks.Game.Hosting
                             this.state = HostState.RunningScene;
                             timer.Start();
                         }
-
                         continue;
 
                     case HostState.Constructed:
+                        Thread.Yield();
                         continue;
-                    case HostState.Shutdown:
+
+                    case HostState.BeginShutdown:
+                        this.UnloadScene();
+                        this.state = HostState.Shutdown;
+                        base.Dispose(false);
+                        return;
+                    case HostState.Shutdown:                       
                         return;
                 }
 
@@ -121,16 +129,21 @@ namespace JankWorks.Game.Hosting
             }
         }
 
-        private void LoadScene()
+        private void UnloadScene()
         {
-            if(this.scene != null)
+            if (this.scene != null)
             {
                 this.scene.PreDispose();
                 this.scene.HostDispose(this);
                 this.scene.Dispose(this.Application);
             }
+        }
 
-            this.scene = this.newHostSceneRequest.Scene ?? this.Application.Scenes[this.newHostSceneRequest.SceneName ?? throw new ApplicationException()]();
+        private void LoadScene()
+        {
+            this.UnloadScene();
+
+            this.scene = this.newHostSceneRequest.Scene ?? this.Application.RegisteredScenes[this.newHostSceneRequest.SceneName]();
             this.scene.PreInitialise(this.newHostSceneRequest.InitState);
             this.scene.Initialise(this.Application, this.AssetManager);
             this.scene.HostInitialise(this, this.AssetManager);
@@ -151,15 +164,16 @@ namespace JankWorks.Game.Hosting
             this.state = HostState.LoadingScene;
         }
 
-        public override void Start()
+        public override Task RunAsync()
         {
             this.localClient.Loaded = false;
             this.localClient.Connected = false;
             this.state = HostState.Constructed;
             this.runner.Start();
+            return this.runner;
         }
 
-        public override void Start(string scene, object initState = null)
+        public override Task RunAsync(int scene, object initState = null)
         {
             this.newHostSceneRequest = new NewHostSceneRequest()
             {
@@ -169,9 +183,10 @@ namespace JankWorks.Game.Hosting
             this.localClient.Loaded = false;
             this.state = HostState.LoadingScene;
             this.runner.Start();
+            return this.runner;
         }
 
-        public override void Run(string scene, object initState = null)
+        public override void Run(int scene, object initState = null)
         {
             this.newHostSceneRequest = new NewHostSceneRequest()
             {
@@ -184,12 +199,18 @@ namespace JankWorks.Game.Hosting
 
         protected override void Dispose(bool finalising)
         {
-            this.state = HostState.BeginShutdown;
-            if(this.runner.Status == TaskStatus.Running)
-            {
-                this.runner.Wait();
-            }
+            this.UnloadScene();
+            this.state = HostState.Shutdown;
             base.Dispose(finalising);
+        }
+
+        public override Task DisposeAsync()
+        {
+            if (this.state != HostState.BeginShutdown)
+            {
+                this.state = HostState.BeginShutdown;
+            }
+            return this.runner;
         }
     }
 

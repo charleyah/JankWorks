@@ -21,7 +21,7 @@ namespace JankWorks.Game.Local
     {
         private struct NewSceneRequest
         {
-            public string SceneName;
+            public int Scene;
             public Host Host;
             public object InitState;
         }
@@ -61,7 +61,7 @@ namespace JankWorks.Game.Local
         private Counter upsCounter;
         private Counter fpsCounter;
 
-        public Client(Application application, ClientConfgiuration config, Host host)
+        public Client(Application application, Host host)
         {
             var second = TimeSpan.FromSeconds(1);
             this.upsCounter = new Counter(second);
@@ -73,13 +73,15 @@ namespace JankWorks.Game.Local
             this.assetManager = application.RegisterAssetManager();
 
             var settings = application.GetClientSettings();
+
+            var config = application.ClientConfiguration;
+
             config.Load(settings);
             this.Configuration = config;
             this.Settings = settings;
 
             var parms = application.ClientParameters;
             this.parameters = parms;
-
 
             var winds = new WindowSettings()
             {
@@ -105,7 +107,7 @@ namespace JankWorks.Game.Local
         private void LoadScene()
         {
             var changeState = this.newSceneRequest;
-            string scene = changeState.SceneName ?? throw new ApplicationException();
+            int scene = changeState.Scene;
             Host host = this.newSceneRequest.Host ?? throw new ApplicationException();
             object initstate = this.newSceneRequest.InitState;
 
@@ -132,7 +134,7 @@ namespace JankWorks.Game.Local
             this.state = ClientState.EndLoadingScene;
         }
 
-        private void LoadSceneWithRemoteHost(string scene, RemoteHost host, object initState)
+        private void LoadSceneWithRemoteHost(int scene, RemoteHost host, object initState)
         {
             if (this.scene != null)
             {
@@ -151,7 +153,7 @@ namespace JankWorks.Game.Local
 
             host.LoadScene(scene, initState);
 
-            this.scene = this.application.Scenes[scene]();
+            this.scene = this.application.RegisteredScenes[scene]();
 
             this.scene.PreInitialise(initState);
             this.scene.Initialise(this.application, this.assetManager);
@@ -164,7 +166,7 @@ namespace JankWorks.Game.Local
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
         }
 
-        private void LoadSceneWithLocalHost(string scene, LocalHost host, object initState)
+        private void LoadSceneWithLocalHost(int scene, LocalHost host, object initState)
         {
             if (this.scene != null)
             {
@@ -174,7 +176,7 @@ namespace JankWorks.Game.Local
                 this.scene.ClientDispose(this);
             }
 
-            this.scene = this.application.Scenes[scene]();
+            this.scene = this.application.RegisteredScenes[scene]();
 
             if (!host.IsConnected)
             {
@@ -189,8 +191,9 @@ namespace JankWorks.Game.Local
             this.scene.ClientInitialised(initState);            
         }
 
-        public void ChangeScene(string scene, object initsate = null) => this.ChangeScene(scene, this.host, initsate);     
-        public void ChangeScene(string scene, Host host, object initsate = null)
+        public void ChangeScene(int scene, object initsate = null) => this.ChangeScene(scene, this.host, initsate);
+        
+        public void ChangeScene(int scene, Host host, object initsate = null)
         {
             if (object.ReferenceEquals(this.host, host) && host.IsRemote && host.IsConnected)
             {
@@ -201,13 +204,14 @@ namespace JankWorks.Game.Local
             {
                 Host = host,
                 InitState = initsate,
-                SceneName = scene
+                Scene = scene
             };
             this.state = ClientState.BeginLoadingScene;
         }
 
-        public void Run(string scene, object initState = null) => this.Run(scene, this.host, initState);
-        public void Run(string scene, Host host, object initState = null)
+        public void Run(int scene, object initState = null) => this.Run(scene, this.host, initState);
+
+        public void Run(int scene, Host host, object initState = null)
         {
             this.graphicsDevice.Activate();
 
@@ -223,6 +227,7 @@ namespace JankWorks.Game.Local
             this.ChangeScene(scene, host, initState);
             this.Run();
         }
+
         private void Run()
         {
             var updateTime = TimeSpan.FromMilliseconds((1f / this.parameters.UpdateRate) * 1000);
@@ -260,6 +265,7 @@ namespace JankWorks.Game.Local
                     }
 
                     var frame = new Frame(accumulator.TotalMilliseconds / updateTime.TotalMilliseconds);
+
                     this.Render(state, frame, updateTime);
 
                     accumulator -= frameTime;

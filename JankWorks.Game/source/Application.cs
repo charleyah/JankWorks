@@ -17,7 +17,8 @@ namespace JankWorks.Game
         protected readonly DirectoryInfo DataFolder;
         protected readonly DirectoryInfo SaveFolder;
 
-        public IReadOnlyDictionary<string, Func<Scene>> Scenes { get; private set; }
+        public Func<Scene>[] RegisteredScenes { get; private set; }
+
         public DriverConfiguration Drivers { get; private set; }
 
         public Settings Settings { get; private set; }
@@ -39,7 +40,7 @@ namespace JankWorks.Game
                 this.SaveFolder.Create();
             }
 
-            this.Scenes = this.RegisterScenes();
+            this.RegisteredScenes = this.RegisterScenes();
 
             this.Drivers = this.RegisterDrivers();
 
@@ -50,32 +51,67 @@ namespace JankWorks.Game
 
         protected abstract DriverConfiguration RegisterDrivers();
 
-        protected abstract IReadOnlyDictionary<string, Func<Scene>> RegisterScenes();
+        protected abstract Func<Scene>[] RegisterScenes();
 
         public abstract AssetManager RegisterAssetManager();
 
-        public abstract LoadingScreen RegisterLoadingScreen();
+        public virtual LoadingScreen RegisterLoadingScreen() => null;
 
 
         public virtual ApplicationParameters ApplicationParameters => ApplicationParameters.Default;
-        public virtual ClientParameters ClientParameters => ClientParameters.Default;
+
         public virtual HostParameters HostParameters => HostParameters.Default;
 
-        public virtual Settings GetApplicationSettings()
+        public virtual ClientParameters ClientParameters => ClientParameters.Default;
+
+        public virtual ClientConfgiuration ClientConfiguration => ClientConfgiuration.Default;
+
+
+        public Settings GetApplicationSettings()
+        {
+            if (this.ApplicationParameters.AppSettingsMode == ApplicationParameters.SettingsMode.NoSettings)
+            {
+                return new Settings(SettingsSource.Transient);
+            }
+            else
+            {
+                return this.GetPersistentApplicationSettings();
+            }
+        }
+
+        public Settings GetHostSettings()
+        {
+            if (this.ApplicationParameters.HostSettingsMode == ApplicationParameters.SettingsMode.NoSettings)
+            {
+                return new Settings(SettingsSource.Transient);
+            }
+            else
+            {
+                return this.GetPersistentHostSettings();
+            }
+        }
+
+        public Settings GetClientSettings()
+        {
+            if (this.ApplicationParameters.ClientSettingsMode == ApplicationParameters.SettingsMode.NoSettings)
+            {
+                return new Settings(SettingsSource.Transient);                
+            }
+            else
+            {
+                return this.GetPersistentClientSettings();
+            }
+        }
+
+        protected virtual Settings GetPersistentApplicationSettings()
         {
             var path = Path.Combine(this.DataFolder.FullName, "app.ini");
             var settings = new Settings(new IniSettingsSource(path, Encoding.UTF8));
             settings.Load();
             return settings;
         }
-        public virtual Settings GetClientSettings()
-        {
-            var path = Path.Combine(this.DataFolder.FullName, "client.ini");
-            var settings = new Settings(new IniSettingsSource(path, Encoding.UTF8));
-            settings.Load();
-            return settings;
-        }
-        public virtual Settings GetHostSettings()
+
+        protected virtual Settings GetPersistentHostSettings()
         {
             var path = Path.Combine(this.DataFolder.FullName, "host.ini");
             var settings = new Settings(new IniSettingsSource(path, Encoding.UTF8));
@@ -83,55 +119,84 @@ namespace JankWorks.Game
             return settings;
         }
 
-
-        public static void Run<App>(string scene, object initstate) where App : Application, new()
+        protected virtual Settings GetPersistentClientSettings()
         {
-            using var app = new App();
-            var host = new OfflineHost(app);
-            host.Start();
-            Application.Run(app, host, scene, initstate);
+            var path = Path.Combine(this.DataFolder.FullName, "client.ini");
+            var settings = new Settings(new IniSettingsSource(path, Encoding.UTF8));
+            settings.Load();
+            return settings;
         }
 
-        public static void Run<App>(Host host, string scene, object initstate) where App : Application, new()
+        public static void Run<App>(int scene) where App : Application, new()
         {
-            using var app = new App();
-            Application.Run(app, host, scene, initstate);
+            using var application = new App();
+            Run(application, scene, null);
         }
 
-        public static void Run(Application app, Host host, string scene, object initstate)
+        public static void Run<App>(int scene, int state) where App : Application, new()
         {
-            Application.Run(app, host, ClientConfgiuration.Default, scene, initstate);
+            using var application = new App();
+            Run(application, scene, state);
         }
 
-        public static void Run(Application app, Host host, ClientConfgiuration config, string scene, object initstate)
+        public static void Run<App>(int scene, object state, Host host) where App : Application, new()
         {
-            using var client = new Client(app, config, host);            
-            client.Run(scene, host, initstate);
+            using var application = new App();
+            using var client = new Client(application, host);
+            client.Run(scene, state);
+        }
+
+        public static void Run(Application application, int scene)
+        {
+            Run(application, scene, null);
+        }
+
+        public static void Run(Application application, int scene, object state)
+        {
+            var host = new OfflineHost(application);
+
+            try
+            {
+                using (var client = new Client(application, host))
+                {
+                    host.RunAsync();
+                    client.Run(scene, state);
+                }
+            }
+            finally
+            {
+                host.DisposeAsync().Wait();
+            }            
+        }
+
+        public static void Run(Application application, int scene, object state, Host host)
+        {
+            using var client = new Client(application, host);           
+            client.Run(scene, state);
         }
     }
 
     public struct ApplicationParameters
     {
-        public bool ParseArguments { get; set; }
-        public ArgumentOptions ParseOptions { get; set; }
-        public bool EnableConsole { get; set; }
+        public SettingsMode AppSettingsMode { get; set; }
+
+        public SettingsMode ClientSettingsMode { get; set; }
+
+        public SettingsMode HostSettingsMode { get; set; }
+
         public static ApplicationParameters Default => new ApplicationParameters()
         {
-            ParseArguments = false,
-            ParseOptions = ArgumentOptions.Parse,
-            EnableConsole = false
+            AppSettingsMode = SettingsMode.Persisted,
+            ClientSettingsMode = SettingsMode.Persisted,
+            HostSettingsMode = SettingsMode.Persisted
         };
-
+        
         [Flags]
-        public enum ArgumentOptions
-        {           
-            Parse = 1,
+        public enum SettingsMode
+        {
+            NoSettings = 0,
 
-            OverrideAppSettings = 2,
-
-            OverrideClientSettings = 4,
-
-            OverrideHostSettings = 8
+            Persisted = 1
         }
     }
 }

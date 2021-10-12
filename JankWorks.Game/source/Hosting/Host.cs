@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Threading.Tasks;
 
 using JankWorks.Core;
 using JankWorks.Game.Configuration;
@@ -11,7 +11,7 @@ namespace JankWorks.Game.Hosting
     {
         protected struct NewHostSceneRequest
         {
-            public string SceneName;
+            public int SceneName;
             public HostScene Scene;
             public object InitState;
         }
@@ -32,33 +32,37 @@ namespace JankWorks.Game.Hosting
 
         protected AssetManager AssetManager { get; init; }
 
-        protected Host(Application application)
+        protected Host(Application application, Settings settings)
         {
             this.Application = application;
-            this.Settings = application.Settings;
+            this.Settings = settings;
             this.AssetManager = application.RegisterAssetManager();
         }
        
         public abstract void Connect();
+
         public abstract void NotifyClientLoaded();
+
+        public abstract Task DisposeAsync();
     }
 
     public abstract class LocalHost : Host
     {
-        protected LocalHost(Application application) : base(application) { }
+        protected LocalHost(Application application) : base(application, application.GetHostSettings()) { }
+
         public abstract void LoadScene(HostScene scene, object initState = null);
 
-        public abstract void Start();
+        public abstract Task RunAsync();
 
-        public abstract void Start(string scene, object initState = null);
+        public abstract Task RunAsync(int scene, object initState = null);
 
-        public abstract void Run(string scene, object initState = null);              
+        public abstract void Run(int scene, object initState = null);              
     }
 
     public abstract class RemoteHost : Host
     {
-        protected RemoteHost(Application application) : base(application) { }
+        protected RemoteHost(Application application) : base(application, application.GetClientSettings()) { }
 
-        public abstract void LoadScene(string scene, object initState = null);
+        public abstract void LoadScene(int scene, object initState = null);
     }     
 }

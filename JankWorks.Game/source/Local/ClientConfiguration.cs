@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Diagnostics;
 
 using JankWorks.Interface;
 
@@ -10,9 +11,13 @@ namespace JankWorks.Game.Local
     public struct ClientConfgiuration
     {
         public Monitor Monitor { get; set; }
+
         public VideoMode VideoMode { get; set; }
+
         public WindowStyle WindowStyle { get; set; }
-        public float FrameRate { get; set; }
+
+        public uint FrameRate { get; set; }
+
         public bool Vsync { get; set; }
 
         const string VideoSection = "Video";
@@ -66,20 +71,29 @@ namespace JankWorks.Game.Local
                 }
 
                 this.WindowStyle = settings.GetEntry(WindowStyleEntry, (entry) => Enum.Parse<WindowStyle>(entry), VideoSection, this.WindowStyle);
-                this.FrameRate = settings.GetEntry(FrameRateEntry, (entry) => float.Parse(entry), VideoSection, this.FrameRate);
+                this.FrameRate = settings.GetEntry(FrameRateEntry, (entry) => uint.Parse(entry), VideoSection, this.FrameRate);
                 this.Vsync = settings.GetEntry(VsyncEntry, (entry) => bool.Parse(entry), VideoSection, this.Vsync);
             }
         }
 
 #nullable enable
 
-        public static ClientConfgiuration Default => new ClientConfgiuration()
+        public static ClientConfgiuration Default
         {
-            Monitor = Monitor.PrimaryMonitor,
-            VideoMode = Monitor.PrimaryMonitor.VideoMode,
-            FrameRate = 60,
-            Vsync = true,
-            WindowStyle = WindowStyle.FullScreen
-        };
+            get
+            {
+                var monitor = Monitor.PrimaryMonitor;
+                var videoMode = monitor.VideoMode;
+
+                return new ClientConfgiuration()
+                {
+                    Monitor = monitor,
+                    VideoMode = videoMode,
+                    FrameRate = videoMode.RefreshRate,
+                    Vsync = false,
+                    WindowStyle = Debugger.IsAttached ? WindowStyle.Borderless : WindowStyle.FullScreen
+                };                
+            }            
+        }
     }
 }

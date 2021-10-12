@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace JankWorks.Game.Hosting
 {
     public struct HostParameters
