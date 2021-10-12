@@ -2,17 +2,16 @@
 
 using JankWorks.Core;
 
+using JankWorks.Interface;
+
 using JankWorks.Drivers;
 using JankWorks.Drivers.Graphics;
 using JankWorks.Drivers.Interface;
 
-using JankWorks.Interface;
-
 using JankWorks.Drivers.Glfw.Interface;
-
 using JankWorks.Drivers.Glfw.Native;
-using static JankWorks.Drivers.Glfw.Native.Functions;
 
+using static JankWorks.Drivers.Glfw.Native.Functions;
 
 [assembly: JankWorksDriver(typeof(JankWorks.Drivers.Glfw.Driver))]
 
@@ -20,11 +19,14 @@ namespace JankWorks.Drivers.Glfw
 {
     public sealed class Driver : Disposable, IWindowDriver, IMonitorDriver
     {
+        private readonly GLFWerrorfun errorHandler;
+
         public Driver()
         {
+            this.errorHandler = new GLFWerrorfun((ec, des) => Console.Out.WriteLine(des));
             Functions.Init();
             glfwInit();
-            glfwSetErrorCallback(new GLFWerrorfun((ec, des) => Console.Out.WriteLine(des)));
+            glfwSetErrorCallback(this.errorHandler);
         }
 
         public Window CreateWindow(WindowSettings settings, IGraphicsDriver graphicDriver)
