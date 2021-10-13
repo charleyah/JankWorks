@@ -47,8 +47,6 @@ namespace JankWorks.Game.Local
             settings.SetEntry(VsyncEntry, this.Vsync.ToString(), VideoSection);
         }
 
-#nullable disable
-
         public void Load(Settings settings)
         {
             if (settings.ContainsSection(VideoSection))
@@ -75,8 +73,6 @@ namespace JankWorks.Game.Local
                 this.Vsync = settings.GetEntry(VsyncEntry, (entry) => bool.Parse(entry), VideoSection, this.Vsync);
             }
         }
-
-#nullable enable
 
         public static ClientConfgiuration Default
         {
