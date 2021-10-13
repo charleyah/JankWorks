@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 using JankWorks.Core;
@@ -63,6 +63,9 @@ namespace JankWorks.Game
         public virtual HostParameters HostParameters => HostParameters.Default;
 
         public virtual ClientParameters ClientParameters => ClientParameters.Default;
+
+
+        public virtual ApplicationConfiguration ApplicationConfiguration => ApplicationConfiguration.Default;
 
         public virtual ClientConfgiuration ClientConfiguration => ClientConfgiuration.Default;
 
@@ -197,6 +200,35 @@ namespace JankWorks.Game
             NoSettings = 0,
 
             Persisted = 1
+        }
+    }
+
+    public struct ApplicationConfiguration
+    {
+        private const string DebugSection = "Debug";
+
+        private const string PerformanceMetricsEnabledEntry = "PerformanceMetrics";
+
+        public bool PerformanceMetricsEnabled { get; set; }
+
+        public void Load(Settings settings)
+        {
+            this.PerformanceMetricsEnabled = settings.GetEntry(PerformanceMetricsEnabledEntry, (s) => bool.Parse(s), DebugSection, false);
+        }
+
+        public void Save(Settings settings)
+        {
+            settings.SetEntry(PerformanceMetricsEnabledEntry, this.PerformanceMetricsEnabled.ToString(), DebugSection);
+        }
+
+        public static ApplicationConfiguration Default
+        {
+            get
+            {
+                ApplicationConfiguration ac = default;
+                ac.PerformanceMetricsEnabled = Debugger.IsAttached;
+                return ac;
+            }
         }
     }
 }

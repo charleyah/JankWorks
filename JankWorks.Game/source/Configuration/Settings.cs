@@ -34,7 +34,14 @@ namespace JankWorks.Game.Configuration
             if (strvalue == null) { return defaultValue; }
             else
             {
-                return cast(strvalue);
+                try
+                {
+                    return cast(strvalue);
+                }
+                catch
+                {
+                    return defaultValue;
+                }                
             }
         }
 
@@ -44,7 +51,14 @@ namespace JankWorks.Game.Configuration
 
             if(entry != null)
             {
-                return cast(entry);
+                try
+                {
+                    return cast(entry);
+                }
+                catch
+                {
+                    return default(T);
+                }
             }
             else
             {
