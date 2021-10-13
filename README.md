@@ -38,7 +38,7 @@ var windowsettings = WindowSettings.Default;
 var surfacesettings = new SurfaceSettings()
 {
     ClearColour = Colour.Black,
-    Size = windowsettings.VideoMode.Viewport.Size
+    Size = windowsettings.Display.Viewport.Size
 };
 
 using var window = Window.Create(windowsettings);
@@ -47,7 +47,7 @@ using var device = GraphicsDevice.Create(surfacesettings, window);
 
 We start with specifying the window settings, which include information such as window size, what style it is (e.g windowed, borderless or full screen) and other things like VSync and cursor visibility. Selecting Default will make a borderless full screen window on the primary monitor.
 
-Next is the surface settings, that describe information about the surface we'll draw on. We set the clear colour to black and the size to that of the video mode viewport specified by the window settings.
+Next is the surface settings, that describe information about the surface we'll draw on. We set the clear colour to black and the size to that of the display mode viewport specified by the window settings.
 
 We finish with creating the window and then the graphics device, specifying the window as its render target.
 

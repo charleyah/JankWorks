@@ -75,7 +75,7 @@ namespace JankWorks.Drivers.Glfw.Interface
 
             checked
             {
-                var mode = settings.VideoMode;
+                var mode = settings.DisplayMode;
                 int bitspercolour = (int)mode.BitsPerPixel / 4;
 
                 glfwWindowHint(GLFW_RED_BITS, bitspercolour);

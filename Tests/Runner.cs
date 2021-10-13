@@ -16,14 +16,14 @@ namespace Tests
             DriverConfiguration.Initialise("JankWorks.Glfw", "JankWorks.OpenGL", "JankWorks.FreeType", "JankWorks.DotNet", "JankWorks.OpenAL");
 
             var windowsettings = WindowSettings.Default;
-            windowsettings.VideoMode = new VideoMode(1024, 768, 32, 60);
+            windowsettings.DisplayMode = new DisplayMode(1024, 768, 32, 60);
             windowsettings.VSync = true;
             windowsettings.Style = WindowStyle.Windowed;                    
 
             var surfacesettings = new SurfaceSettings()
             {
                 ClearColour = Colour.Black,
-                Size = windowsettings.VideoMode.Viewport.Size
+                Size = windowsettings.DisplayMode.Viewport.Size
             };
 
             using var window = Window.Create(windowsettings);

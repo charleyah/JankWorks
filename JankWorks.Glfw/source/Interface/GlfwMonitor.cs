@@ -18,7 +18,7 @@ namespace JankWorks.Drivers.Glfw.Interface
             this.Name = new CString(glfwGetMonitorName(handle));
         }
 
-        public override VideoMode VideoMode
+        public override DisplayMode DisplayMode
         {
             get
             {
@@ -28,7 +28,7 @@ namespace JankWorks.Drivers.Glfw.Interface
 
                     checked
                     {
-                        return new VideoMode((uint)mode->width, (uint)mode->height, (uint)mode->redBits * 4, (uint)mode->refreshRate);
+                        return new DisplayMode((uint)mode->width, (uint)mode->height, (uint)mode->redBits * 4, (uint)mode->refreshRate);
                     }
                 }
                 
@@ -36,7 +36,7 @@ namespace JankWorks.Drivers.Glfw.Interface
         }
             
 
-        public override VideoMode[] SupportedVideoModes
+        public override DisplayMode[] SupportedDisplayModes
         {
             get
             {
@@ -44,14 +44,14 @@ namespace JankWorks.Drivers.Glfw.Interface
                 {
                     ReadOnlySpan<GLFWvidmode> modes = new ReadOnlySpan<GLFWvidmode>(glfwGetVideoModes(this.Handle, out var count), count);
 
-                    var vmodes = new VideoMode[modes.Length];
+                    var vmodes = new DisplayMode[modes.Length];
 
                     for (int i = 0; i < vmodes.Length; i++)
                     {
                         var mode = modes[i];
                         checked
                         {
-                            vmodes[i] = new VideoMode((uint)mode.width, (uint)mode.height, (uint)mode.redBits * 4, (uint)mode.refreshRate);
+                            vmodes[i] = new DisplayMode((uint)mode.width, (uint)mode.height, (uint)mode.redBits * 4, (uint)mode.refreshRate);
                         }
                     }
                     return vmodes;

@@ -8,7 +8,7 @@ namespace JankWorks.Interface
     {
         public string Title;
         public Monitor Monitor;
-        public VideoMode VideoMode;
+        public DisplayMode DisplayMode;
         public WindowStyle Style;
         public bool VSync;
         public bool ShowCursor;
@@ -22,7 +22,7 @@ namespace JankWorks.Interface
                 {
                     Title = Assembly.GetEntryAssembly().GetName().Name,
                     Monitor = primary,
-                    VideoMode = primary.VideoMode,
+                    DisplayMode = primary.DisplayMode,
                     Style = WindowStyle.Borderless,
                     VSync = true,
                     ShowCursor = true

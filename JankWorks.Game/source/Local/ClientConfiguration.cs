@@ -12,7 +12,7 @@ namespace JankWorks.Game.Local
     {
         public Monitor Monitor { get; set; }
 
-        public VideoMode VideoMode { get; set; }
+        public DisplayMode DisplayMode { get; set; }
 
         public WindowStyle WindowStyle { get; set; }
 
@@ -37,11 +37,11 @@ namespace JankWorks.Game.Local
             settings.SetEntry(MonitorEntry, this.Monitor.Name, DisplaySection);
             settings.SetEntry(WindowStyleEntry, this.WindowStyle.ToString(), DisplaySection);
 
-            var videomode = this.VideoMode;
-            settings.SetEntry(WidthEntry, videomode.Width.ToString(), DisplaySection);
-            settings.SetEntry(HeightEntry, videomode.Height.ToString(), DisplaySection);
-            settings.SetEntry(BitsEntry, videomode.BitsPerPixel.ToString(), DisplaySection);
-            settings.SetEntry(RefreshRateEntry, videomode.RefreshRate.ToString(), DisplaySection);
+            var displaymode = this.DisplayMode;
+            settings.SetEntry(WidthEntry, displaymode.Width.ToString(), DisplaySection);
+            settings.SetEntry(HeightEntry, displaymode.Height.ToString(), DisplaySection);
+            settings.SetEntry(BitsEntry, displaymode.BitsPerPixel.ToString(), DisplaySection);
+            settings.SetEntry(RefreshRateEntry, displaymode.RefreshRate.ToString(), DisplaySection);
 
             settings.SetEntry(FrameRateEntry, this.FrameRate.ToString(), DisplaySection);
             settings.SetEntry(VsyncEntry, this.Vsync.ToString(), DisplaySection);
@@ -58,14 +58,14 @@ namespace JankWorks.Game.Local
                 if (monitor != null)
                 {
                     this.Monitor = monitor;
-                    var videomode = this.VideoMode;
+                    var displaymode = this.DisplayMode;
 
-                    uint width = settings.GetEntry(WidthEntry, (entry) => uint.Parse(entry), DisplaySection, videomode.Width);
-                    uint height = settings.GetEntry(HeightEntry, (entry) => uint.Parse(entry), DisplaySection, videomode.Height);
-                    uint bits = settings.GetEntry(BitsEntry, (entry) => uint.Parse(entry), DisplaySection, videomode.BitsPerPixel);
-                    uint refreshRate = settings.GetEntry(RefreshRateEntry, (entry) => uint.Parse(entry), DisplaySection, videomode.RefreshRate);
+                    uint width = settings.GetEntry(WidthEntry, (entry) => uint.Parse(entry), DisplaySection, displaymode.Width);
+                    uint height = settings.GetEntry(HeightEntry, (entry) => uint.Parse(entry), DisplaySection, displaymode.Height);
+                    uint bits = settings.GetEntry(BitsEntry, (entry) => uint.Parse(entry), DisplaySection, displaymode.BitsPerPixel);
+                    uint refreshRate = settings.GetEntry(RefreshRateEntry, (entry) => uint.Parse(entry), DisplaySection, displaymode.RefreshRate);
 
-                    this.VideoMode = new VideoMode(width, height, bits, refreshRate);
+                    this.DisplayMode = new DisplayMode(width, height, bits, refreshRate);
                 }
 
                 this.WindowStyle = settings.GetEntry(WindowStyleEntry, (entry) => Enum.Parse<WindowStyle>(entry), DisplaySection, this.WindowStyle);
@@ -79,15 +79,15 @@ namespace JankWorks.Game.Local
             get
             {
                 var monitor = Monitor.PrimaryMonitor;
-                var videoMode = monitor.VideoMode;
+                var displaymode = monitor.DisplayMode;
 
                 if(Debugger.IsAttached)
                 {
                     return new ClientConfgiuration()
                     {
                         Monitor = monitor,
-                        VideoMode = new VideoMode(1280, 800, 32, 60),
-                        FrameRate = videoMode.RefreshRate,
+                        DisplayMode = new DisplayMode(1280, 800, 32, 60),
+                        FrameRate = displaymode.RefreshRate,
                         Vsync = false,
                         WindowStyle = WindowStyle.Windowed
                     };
@@ -97,8 +97,8 @@ namespace JankWorks.Game.Local
                     return new ClientConfgiuration()
                     {
                         Monitor = monitor,
-                        VideoMode = videoMode,
-                        FrameRate = videoMode.RefreshRate,
+                        DisplayMode = displaymode,
+                        FrameRate = displaymode.RefreshRate,
                         Vsync = false,
                         WindowStyle = WindowStyle.FullScreen
                     };

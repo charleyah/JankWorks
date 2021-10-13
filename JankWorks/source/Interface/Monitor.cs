@@ -7,9 +7,9 @@ namespace JankWorks.Interface
     {
         public string Name { get; protected set; }
 
-        public abstract VideoMode VideoMode { get; }
+        public abstract DisplayMode DisplayMode { get; }
 
-        public abstract VideoMode[] SupportedVideoModes { get; }
+        public abstract DisplayMode[] SupportedDisplayModes { get; }
 
         public static Monitor PrimaryMonitor => DriverConfiguration.Drivers.monitorApi.GetPrimaryMonitor();
 

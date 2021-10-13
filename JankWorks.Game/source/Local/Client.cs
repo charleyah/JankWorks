@@ -89,14 +89,14 @@ namespace JankWorks.Game.Local
                 Monitor = config.Monitor,
                 ShowCursor = parms.ShowCursor,
                 Style = config.WindowStyle,
-                VideoMode = config.VideoMode,
+                DisplayMode = config.DisplayMode,
                 VSync = config.Vsync
             };
 
             var surfs = new SurfaceSettings()
             {
                 ClearColour = parms.ClearColour,
-                Size = config.VideoMode.Viewport.Size
+                Size = config.DisplayMode.Viewport.Size
             };
 
             this.window = Window.Create(winds);

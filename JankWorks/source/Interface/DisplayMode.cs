@@ -4,14 +4,14 @@ using JankWorks.Graphics;
 
 namespace JankWorks.Interface
 {
-    public readonly struct VideoMode : IEquatable<VideoMode>
+    public readonly struct DisplayMode : IEquatable<DisplayMode>
     {
         public readonly uint Width;
         public readonly uint Height;
         public readonly uint BitsPerPixel;
         public readonly uint RefreshRate;
 
-        public VideoMode(uint width, uint height, uint bitsPerPixel, uint refreshRate)
+        public DisplayMode(uint width, uint height, uint bitsPerPixel, uint refreshRate)
         {
             this.Width = width;
             this.Height = height;
@@ -32,8 +32,8 @@ namespace JankWorks.Interface
 
         public override string ToString() => $"{this.Width}x{this.Height} {this.BitsPerPixel} Bits {this.RefreshRate} Hz";
 
-        public bool Equals(VideoMode other) => this == other;
-        public override bool Equals(object obj) => obj is VideoMode other && this == other;
+        public bool Equals(DisplayMode other) => this == other;
+        public override bool Equals(object obj) => obj is DisplayMode other && this == other;
         
         // what is this... F#?
         public override int GetHashCode() 
@@ -43,14 +43,14 @@ namespace JankWorks.Interface
         this.BitsPerPixel.GetHashCode() ^ 
         this.RefreshRate.GetHashCode();
 
-        public static bool operator ==(VideoMode a, VideoMode b) 
+        public static bool operator ==(DisplayMode a, DisplayMode b) 
         => 
         a.Width == b.Width && 
         a.Height == b.Height && 
         a.BitsPerPixel == b.BitsPerPixel && 
         a.RefreshRate == b.RefreshRate;
 
-        public static bool operator !=(VideoMode a, VideoMode b) 
+        public static bool operator !=(DisplayMode a, DisplayMode b) 
         => 
         a.Width != b.Width || 
         a.Height != b.Height || 
