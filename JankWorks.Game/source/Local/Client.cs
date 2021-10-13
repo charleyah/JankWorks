@@ -99,8 +99,15 @@ namespace JankWorks.Game.Local
                 Size = config.DisplayMode.Viewport.Size
             };
 
+            var drawState = new DrawState()
+            {
+                Blend = BlendMode.Alpha,
+                DepthTest = DepthTestMode.None                 
+            };
+
             this.window = Window.Create(winds);
             this.graphicsDevice = GraphicsDevice.Create(surfs, this.window);
+            this.graphicsDevice.DefaultDrawState = drawState;
             this.audioDevice = AudioDevice.GetDefault();
         }
 
