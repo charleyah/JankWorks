@@ -38,7 +38,7 @@ var windowsettings = WindowSettings.Default;
 var surfacesettings = new SurfaceSettings()
 {
     ClearColour = Colour.Black,
-    Size = windowsettings.Display.Viewport.Size
+    Size = windowsettings.DisplayMode.Viewport.Size
 };
 
 using var window = Window.Create(windowsettings);
