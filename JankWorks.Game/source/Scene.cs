@@ -171,7 +171,7 @@ namespace JankWorks.Game
 
         protected void RegisterClientObject(object obj) => this.clientObjects.Add(obj);
 
-        public virtual void ClientInitialise(Client client, AssetManager assets)
+        public virtual void ClientInitialise(Client client, Host host, AssetManager assets)
         { 
             this.BuildClientObjectContainers();
 
@@ -214,7 +214,7 @@ namespace JankWorks.Game
             }            
         }
 
-        public virtual void ClientDispose(Client client) 
+        public virtual void ClientDispose(Client client, Host host) 
         {
             Array.ForEach(this.disposables, (d) => d.Dispose());
             Array.ForEach(this.resources, (r) => r.DisposeResources());

@@ -120,19 +120,11 @@ namespace JankWorks.Game.Local
             Host host = this.newSceneRequest.Host ?? throw new ApplicationException();
             object initstate = this.newSceneRequest.InitState;
 
-
-            if (!object.ReferenceEquals(this.host, host))
-            {
-                this.host.Dispose();
-                this.host = host;
-            }
-
-
-            if(this.host is RemoteHost remoteHost)
+            if(host is RemoteHost remoteHost)
             {
                 this.LoadSceneWithRemoteHost(scene, remoteHost, initstate);
             }
-            else if(this.host is LocalHost localHost)
+            else if(host is LocalHost localHost)
             {
                 this.LoadSceneWithLocalHost(scene, localHost, initstate);
             }
@@ -151,11 +143,17 @@ namespace JankWorks.Game.Local
                 this.scene.UnsubscribeInputs(this.window);
                 this.scene.DisposeSoundResources(this.audioDevice);
                 this.scene.DisposeGraphicsResources(this.graphicsDevice);
-                this.scene.ClientDispose(this);
+                this.scene.ClientDispose(this, this.host);
                 this.scene.Dispose(this.application);
             }
 
-            if(!host.IsConnected)
+            if (!object.ReferenceEquals(this.host, host))
+            {
+                this.host.DisposeAsync();
+                this.host = host;
+            }
+
+            if (!host.IsConnected)
             {
                 host.Connect();
             }
@@ -166,7 +164,7 @@ namespace JankWorks.Game.Local
 
             this.scene.PreInitialise(initState);
             this.scene.Initialise(this.application, this.assetManager);
-            this.scene.ClientInitialise(this, this.assetManager);
+            this.scene.ClientInitialise(this, host, this.assetManager);
             this.scene.InitialiseGraphicsResources(this.graphicsDevice, this.assetManager);
             this.scene.InitialiseSoundResources(this.audioDevice, this.assetManager);
             this.scene.ClientInitialised(initState);
@@ -182,7 +180,13 @@ namespace JankWorks.Game.Local
                 this.scene.UnsubscribeInputs(this.window);
                 this.scene.DisposeSoundResources(this.audioDevice);
                 this.scene.DisposeGraphicsResources(this.graphicsDevice);
-                this.scene.ClientDispose(this);
+                this.scene.ClientDispose(this, this.host);
+            }
+
+            if (!object.ReferenceEquals(this.host, host))
+            {
+                this.host.DisposeAsync();
+                this.host = host;
             }
 
             this.scene = this.application.RegisteredScenes[scene]();
@@ -194,7 +198,7 @@ namespace JankWorks.Game.Local
 
             host.LoadScene(this.scene, initState);
 
-            this.scene.ClientInitialise(this, this.assetManager);
+            this.scene.ClientInitialise(this, host, this.assetManager);
             this.scene.InitialiseGraphicsResources(this.graphicsDevice, this.assetManager);
             this.scene.InitialiseSoundResources(this.audioDevice, this.assetManager);
             this.scene.ClientInitialised(initState);            
