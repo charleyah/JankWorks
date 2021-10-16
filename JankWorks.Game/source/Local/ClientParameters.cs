@@ -1,12 +1,11 @@
-﻿using System;
-
+﻿
 using JankWorks.Graphics;
 
 namespace JankWorks.Game.Local
 {
     public struct ClientParameters
     {
-        public float UpdateRate { get; set; }
+        public ushort UpdateRate { get; set; }
 
         public RGBA ClearColour { get; set; }
 
