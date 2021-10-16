@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using JankWorks.Audio;
 using JankWorks.Interface;
@@ -20,11 +21,19 @@ namespace JankWorks.Game
 
         internal bool PerformanceMetricsEnabled { get; private set; }
 
+        protected ManualResetEvent sharedInitialisedSignal;
+
+        protected ApplicationScene()
+        {
+            this.sharedInitialisedSignal = new ManualResetEvent(false);
+        }
+
         public virtual void PreInitialise(object state) { }
 
         public virtual void Initialise(Application app, AssetManager assets) 
         {
             this.PerformanceMetricsEnabled = app.Configuration.PerformanceMetricsEnabled;
+            this.sharedInitialisedSignal.Set();
         }
 
         public virtual void Initialised() { }
@@ -171,8 +180,14 @@ namespace JankWorks.Game
 
         protected void RegisterClientObject(object obj) => this.clientObjects.Add(obj);
 
+        internal void SharedClientInitialise(Client client, Host host, AssetManager assets)
+        {
+            this.sharedInitialisedSignal.WaitOne();
+            this.ClientInitialise(client, host, assets);
+        }
+
         public virtual void ClientInitialise(Client client, Host host, AssetManager assets)
-        { 
+        {
             this.BuildClientObjectContainers();
 
             for (int index = 0; index < this.resources.Length; index++)

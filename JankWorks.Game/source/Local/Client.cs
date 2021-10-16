@@ -198,7 +198,7 @@ namespace JankWorks.Game.Local
 
             host.LoadScene(this.scene, initState);
 
-            this.scene.ClientInitialise(this, host, this.assetManager);
+            this.scene.SharedClientInitialise(this, host, this.assetManager);
             this.scene.InitialiseGraphicsResources(this.graphicsDevice, this.assetManager);
             this.scene.InitialiseSoundResources(this.audioDevice, this.assetManager);
             this.scene.ClientInitialised(initState);            
