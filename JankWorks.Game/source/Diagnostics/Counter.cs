@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace JankWorks.Game
+namespace JankWorks.Game.Diagnostics
 {
     internal sealed class Counter
     {
