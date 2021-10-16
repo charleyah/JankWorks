@@ -31,7 +31,9 @@ namespace JankWorks.Game
 
     public interface IAsyncTickable
     {
-        void BeginTick(ulong tick, TimeSpan delta);
+        void BeginTick(ulong tick, TimeSpan delta) => this.BeginTick(tick, delta, null);
+
+        void BeginTick(ulong tick, TimeSpan delta, Action<IAsyncTickable> callback);
 
         void EndTick(ulong tick, TimeSpan delta);
     }
@@ -43,11 +45,12 @@ namespace JankWorks.Game
 
     public interface IAsyncUpdatable
     {
-        void BeginUpdate(TimeSpan delta);
+        void BeginUpdate(TimeSpan delta) => this.BeginUpdate(delta, null);
+
+        void BeginUpdate(TimeSpan delta, Action<IAsyncUpdatable> callback);
 
         void EndUpdate(TimeSpan delta);
     }
-
 
     public interface ISoundResource
     {
@@ -75,7 +78,9 @@ namespace JankWorks.Game
 
     public interface IAsyncRenderable : IGraphicsResource
     {
-        void BeginRender(Surface surface, Frame frame);
+        void BeginRender(Surface surface, Frame frame) => this.BeginRender(surface, frame, null);
+
+        void BeginRender(Surface surface, Frame frame, Action<IAsyncRenderable> callback);
 
         void EndRender(Surface surface, Frame frame);
     }

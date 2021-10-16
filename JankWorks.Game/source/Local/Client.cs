@@ -8,10 +8,10 @@ using JankWorks.Audio;
 using JankWorks.Graphics;
 using JankWorks.Interface;
 
+using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Configuration;
 using JankWorks.Game.Assets;
 using JankWorks.Game.Hosting;
-
 
 using JankWorks.Game.Platform;
 
@@ -74,7 +74,7 @@ namespace JankWorks.Game.Local
 
             var settings = application.GetClientSettings();
 
-            var config = application.ClientConfiguration;
+            var config = application.DefaultClientConfiguration;
 
             config.Load(settings);
             this.Configuration = config;
@@ -110,6 +110,8 @@ namespace JankWorks.Game.Local
             this.graphicsDevice.DefaultDrawState = drawState;
             this.audioDevice = AudioDevice.GetDefault();
         }
+
+        public MetricCounter[] GetMetrics() => this.scene.ClientMetricCounters;
 
         private void LoadScene()
         {
@@ -376,7 +378,7 @@ namespace JankWorks.Game.Local
 
             return state;
         }
-
+        
         protected override void Dispose(bool finalising)
         {
             var ls = this.loadingScreen;

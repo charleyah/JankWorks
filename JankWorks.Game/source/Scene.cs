@@ -10,6 +10,7 @@ using JankWorks.Graphics;
 using JankWorks.Game.Local;
 using JankWorks.Game.Hosting;
 using JankWorks.Game.Assets;
+using JankWorks.Game.Diagnostics;
 
 namespace JankWorks.Game
 {    
@@ -17,9 +18,14 @@ namespace JankWorks.Game
     {
         internal const int InitialObjectContainerCount = 8;
 
+        internal bool PerformanceMetricsEnabled { get; private set; }
+
         public virtual void PreInitialise(object state) { }
 
-        public virtual void Initialise(Application app, AssetManager assets) { }
+        public virtual void Initialise(Application app, AssetManager assets) 
+        {
+            this.PerformanceMetricsEnabled = app.Configuration.PerformanceMetricsEnabled;
+        }
 
         public virtual void Initialised() { }
 
@@ -40,6 +46,8 @@ namespace JankWorks.Game
 
         private IAsyncTickable[] asyncTickables;
 
+        internal MetricCounter[] HostMetricCounters { get; private set; }
+
         public HostScene()
         {
             this.hostObjects = new List<object>(ApplicationScene.InitialObjectContainerCount);
@@ -47,10 +55,10 @@ namespace JankWorks.Game
             this.disposables = Array.Empty<IDisposable>();
             this.tickables = Array.Empty<ITickable>();
             this.asyncTickables = Array.Empty<IAsyncTickable>();
-        }
+            this.HostMetricCounters = Array.Empty<MetricCounter>();
+        }                
 
         protected void RegisterHostObject(object obj) => this.hostObjects.Add(obj);
-
 
         public virtual void HostInitialise(Host host, AssetManager assets)
         { 
@@ -69,12 +77,27 @@ namespace JankWorks.Game
             this.resources = (from obj in this.hostObjects where obj is IResource select (IResource)obj).Reverse().ToArray();
             this.disposables = (from obj in this.hostObjects where obj is IDisposable select (IDisposable)obj).Reverse().ToArray();
 
-            this.tickables = (from obj in this.hostObjects where obj is ITickable select (ITickable)obj).ToArray();
-            this.asyncTickables = (from obj in this.hostObjects where obj is IAsyncTickable select (IAsyncTickable)obj).ToArray();
+            if (this.PerformanceMetricsEnabled)
+            {
+                this.tickables = (from obj in this.hostObjects where obj is ITickable select new TickableMetricCounter((ITickable)obj)).ToArray();
+                this.asyncTickables = (from obj in this.hostObjects where obj is IAsyncTickable select new AsyncTickableMetricCounter((IAsyncTickable)obj)).ToArray();
+
+                this.HostMetricCounters =
+                (from tickable in this.tickables select (MetricCounter)tickable)
+                .Concat(from asyncTickable in this.asyncTickables select (MetricCounter)asyncTickable).ToArray();
+            }
+            else
+            {
+                this.tickables = (from obj in this.hostObjects where obj is ITickable select (ITickable)obj).ToArray();
+                this.asyncTickables = (from obj in this.hostObjects where obj is IAsyncTickable select (IAsyncTickable)obj).ToArray();
+                this.HostMetricCounters = Array.Empty<MetricCounter>();
+            }            
         }
 
         public virtual void HostDispose(Host host) 
         {
+            this.HostMetricCounters = Array.Empty<MetricCounter>();
+
             Array.ForEach(this.disposables, (d) => d.Dispose());
             Array.ForEach(this.resources, (r) => r.DisposeResources());
            
@@ -84,6 +107,7 @@ namespace JankWorks.Game
             this.asyncTickables = Array.Empty<IAsyncTickable>();
             this.hostObjects.Clear();
         }
+
         public virtual void Tick(ulong tick, TimeSpan delta)
         {
             for(int index = 0; index < this.asyncTickables.Length; index++)
@@ -125,10 +149,12 @@ namespace JankWorks.Game
 
         private IAsyncRenderable[] asyncRenderables;
 
-        private IDrawable[] drawables;
+        internal MetricCounter[] ClientMetricCounters { get; private set; }
 
         protected Scene() : base()
         {
+            this.ClientMetricCounters = Array.Empty<MetricCounter>();
+
             this.clientObjects = new List<object>(ApplicationScene.InitialObjectContainerCount);
             this.resources = Array.Empty<IResource>();
             this.graphicsResources = Array.Empty<IGraphicsResource>();
@@ -141,7 +167,6 @@ namespace JankWorks.Game
 
             this.renderables = Array.Empty<IRenderable>();
             this.asyncRenderables = Array.Empty<IAsyncRenderable>();
-            this.drawables = Array.Empty<IDrawable>();
         }
 
         protected void RegisterClientObject(object obj) => this.clientObjects.Add(obj);
@@ -155,6 +180,7 @@ namespace JankWorks.Game
                 this.resources[index].InitialiseResources(assets);
             }
         }
+
         public virtual void ClientInitialised(object state) { }
         
         private void BuildClientObjectContainers()
@@ -165,12 +191,27 @@ namespace JankWorks.Game
             this.disposables = (from obj in this.clientObjects where obj is IDisposable select (IDisposable)obj).Reverse().ToArray();
 
             this.inputlisteners = (from obj in this.clientObjects where obj is IInputListener select (IInputListener)obj).ToArray();
-            this.updatables = (from obj in this.clientObjects where obj is IUpdatable select (IUpdatable)obj).ToArray();
-            this.asyncUpdatables = (from obj in this.clientObjects where obj is IAsyncUpdatable select (IAsyncUpdatable)obj).ToArray();
 
-            this.renderables = (from obj in this.clientObjects where obj is IRenderable select (IRenderable)obj).ToArray();
-            this.asyncRenderables = (from obj in this.clientObjects where obj is IAsyncRenderable select (IAsyncRenderable)obj).ToArray();
-            this.drawables = (from obj in this.clientObjects where obj is IDrawable select (IDrawable)obj).ToArray();
+            if (this.PerformanceMetricsEnabled)
+            {
+                this.updatables = (from obj in this.clientObjects where obj is IUpdatable select new UpdatableMetricCounter((IUpdatable)obj)).ToArray();               
+                this.renderables = (from obj in this.clientObjects where obj is IRenderable select new RenderableMetricCounter((IRenderable)obj)).ToArray();
+                this.asyncUpdatables = (from obj in this.clientObjects where obj is IAsyncUpdatable select new AsyncUpdatableMetricCounter((IAsyncUpdatable)obj)).ToArray();
+                this.asyncRenderables = (from obj in this.clientObjects where obj is IAsyncRenderable select new AsyncRenderableMetricCounter((IAsyncRenderable)obj)).ToArray();
+
+                this.ClientMetricCounters =
+                (from updatable in this.updatables select (MetricCounter)updatable)
+                .Concat(from asyncUpdatable in this.asyncUpdatables select (MetricCounter)asyncUpdatable)
+                .Concat(from renderable in this.renderables select (MetricCounter)renderable)
+                .Concat(from asyncRenderable in this.asyncRenderables select (MetricCounter)asyncRenderable).ToArray();
+            }
+            else
+            {
+                this.updatables = (from obj in this.clientObjects where obj is IUpdatable select (IUpdatable)obj).ToArray();               
+                this.renderables = (from obj in this.clientObjects where obj is IRenderable select (IRenderable)obj).ToArray();
+                this.asyncUpdatables = (from obj in this.clientObjects where obj is IAsyncUpdatable select (IAsyncUpdatable)obj).ToArray();
+                this.asyncRenderables = (from obj in this.clientObjects where obj is IAsyncRenderable select (IAsyncRenderable)obj).ToArray();
+            }            
         }
 
         public virtual void ClientDispose(Client client) 
@@ -194,6 +235,7 @@ namespace JankWorks.Game
                 this.inputlisteners[index].SubscribeInputs(inputManager);
             }
         }
+
         public virtual void UnsubscribeInputs(IInputManager inputManager) 
         {
             for (int index = 0; index < this.inputlisteners.Length; index++)
@@ -216,7 +258,6 @@ namespace JankWorks.Game
             this.graphicsResources = Array.Empty<IGraphicsResource>();
             this.renderables = Array.Empty<IRenderable>();
             this.asyncRenderables = Array.Empty<IAsyncRenderable>();
-            this.drawables = Array.Empty<IDrawable>();
         }
 
         public virtual void InitialiseSoundResources(AudioDevice device, AssetManager assets) 
@@ -266,14 +307,6 @@ namespace JankWorks.Game
             for (int index = 0; index < this.asyncRenderables.Length; index++)
             {
                 this.asyncRenderables[index].EndRender(surface, frame);
-            }
-        }
-
-        protected void Draw(Surface surface)
-        {
-            for (int index = 0; index < this.drawables.Length; index++)
-            {
-                this.drawables[index].Draw(surface);
             }
         }
     }

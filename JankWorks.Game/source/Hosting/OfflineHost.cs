@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 using System.Threading;
 using System.Threading.Tasks;
-
+using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Platform;
 
 namespace JankWorks.Game.Hosting
@@ -46,9 +46,9 @@ namespace JankWorks.Game.Hosting
 
         public override void Connect() => this.localClient.Connected = true;
 
-
         public override void NotifyClientLoaded() => this.localClient.Loaded = true;
 
+        public override MetricCounter[] GetMetrics() => this.scene.HostMetricCounters;
 
         private void Run()
         {

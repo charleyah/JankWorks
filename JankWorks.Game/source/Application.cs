@@ -23,6 +23,8 @@ namespace JankWorks.Game
 
         public Settings Settings { get; private set; }
 
+        public ApplicationConfiguration Configuration { get; private set; }
+
         protected Application()
         {
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), this.Name);
@@ -45,6 +47,10 @@ namespace JankWorks.Game
             this.Drivers = this.RegisterDrivers();
 
             this.Settings = this.GetApplicationSettings();
+
+            var conf = this.DefaultApplicationConfiguration;
+            conf.Load(this.Settings);
+            this.Configuration = conf;
         }
 
         public abstract string Name { get; }
@@ -65,9 +71,9 @@ namespace JankWorks.Game
         public virtual ClientParameters ClientParameters => ClientParameters.Default;
 
 
-        public virtual ApplicationConfiguration ApplicationConfiguration => ApplicationConfiguration.Default;
+        public virtual ApplicationConfiguration DefaultApplicationConfiguration => ApplicationConfiguration.Default;
 
-        public virtual ClientConfgiuration ClientConfiguration => ClientConfgiuration.Default;
+        public virtual ClientConfgiuration DefaultClientConfiguration => ClientConfgiuration.Default;
 
 
         public Settings GetApplicationSettings()
@@ -142,13 +148,6 @@ namespace JankWorks.Game
             Run(application, scene, state);
         }
 
-        public static void Run<App>(int scene, object state, Host host) where App : Application, new()
-        {
-            using var application = new App();
-            using var client = new Client(application, host);
-            client.Run(scene, state);
-        }
-
         public static void Run(Application application, int scene)
         {
             Run(application, scene, null);
@@ -213,7 +212,7 @@ namespace JankWorks.Game
 
         public void Load(Settings settings)
         {
-            this.PerformanceMetricsEnabled = settings.GetEntry(PerformanceMetricsEnabledEntry, (s) => bool.Parse(s), DebugSection, false);
+            this.PerformanceMetricsEnabled = settings.GetEntry(PerformanceMetricsEnabledEntry, (s) => bool.Parse(s), DebugSection, this.PerformanceMetricsEnabled);
         }
 
         public void Save(Settings settings)

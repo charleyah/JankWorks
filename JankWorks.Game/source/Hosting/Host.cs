@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 
 using JankWorks.Core;
+
+using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Configuration;
 using JankWorks.Game.Assets;
 
@@ -38,7 +40,9 @@ namespace JankWorks.Game.Hosting
             this.Settings = settings;
             this.AssetManager = application.RegisterAssetManager();
         }
-       
+
+        public abstract MetricCounter[] GetMetrics();
+
         public abstract void Connect();
 
         public abstract void NotifyClientLoaded();
