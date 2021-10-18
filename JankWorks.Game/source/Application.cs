@@ -165,7 +165,7 @@ namespace JankWorks.Game
             client.Run(scene, state);
         }
 
-        public static void Run(Application application, Host host, int scene, object state = null)
+        public static void Run(Application application, ClientHost host, int scene, object state = null)
         {
             using var client = new Client(application, host);           
             client.Run(scene, state);

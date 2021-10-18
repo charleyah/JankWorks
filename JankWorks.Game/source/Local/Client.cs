@@ -20,7 +20,7 @@ namespace JankWorks.Game.Local
         private struct NewSceneRequest
         {
             public int Scene;
-            public Host Host;
+            public ClientHost Host;
             public object InitState;
         }
 
@@ -38,7 +38,7 @@ namespace JankWorks.Game.Local
 
         private Application application;
 
-        private Host host;
+        private ClientHost host;
 
         private Window window;
 
@@ -59,7 +59,7 @@ namespace JankWorks.Game.Local
         private Counter upsCounter;
         private Counter fpsCounter;
 
-        public Client(Application application, Host host)
+        public Client(Application application, ClientHost host)
         {
             var second = TimeSpan.FromSeconds(1);
             this.upsCounter = new Counter(second);
@@ -114,7 +114,7 @@ namespace JankWorks.Game.Local
         {
             var changeState = this.newSceneRequest;
             int scene = changeState.Scene;
-            Host host = this.newSceneRequest.Host ?? throw new ApplicationException();
+            var host = this.newSceneRequest.Host ?? throw new ApplicationException();
             object initstate = this.newSceneRequest.InitState;
 
             this.UnloadScene();
@@ -123,14 +123,10 @@ namespace JankWorks.Game.Local
             {
                 this.LoadSceneWithNoHost(scene, nullhost, initstate);
             }
-            else if (host is ClientHost clienthost)
-            {
-                this.LoadSceneWithHost(scene, clienthost, initstate);
-            }            
             else
             {
-                throw new NotImplementedException();
-            }
+                this.LoadSceneWithHost(scene, host, initstate);
+            }            
 
             System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
@@ -147,18 +143,18 @@ namespace JankWorks.Game.Local
 
                 scene.PreDispose();
                 
-                if(this.host is ClientHost clientHost)
-                {
-                    clientHost.UnloadScene();
-                    scene.DisposeSoundResources(this.audioDevice);
-                    scene.DisposeGraphicsResources(this.graphicsDevice);
-                    scene.ClientDisposeAfterShared(this);
-                }
-                else
+                if(this.host is NullHost)
                 {
                     scene.DisposeSoundResources(this.audioDevice);
                     scene.DisposeGraphicsResources(this.graphicsDevice);
                     scene.ClientDispose(this);
+                }
+                else
+                {
+                    this.host.UnloadScene();
+                    scene.DisposeSoundResources(this.audioDevice);
+                    scene.DisposeGraphicsResources(this.graphicsDevice);
+                    scene.ClientDisposeAfterShared(this);                    
                 }
 
                 scene.Dispose(this.application);
@@ -200,7 +196,7 @@ namespace JankWorks.Game.Local
 
         public void ChangeScene(int scene, object initsate = null) => this.ChangeScene(scene, this.host, initsate);
         
-        public void ChangeScene(int scene, Host host, object initsate = null)
+        public void ChangeScene(int scene, ClientHost host, object initsate = null)
         {
             if (host is NullHost == false && object.ReferenceEquals(this.host, host) && host.IsRemote && host.IsConnected)
             {
@@ -218,7 +214,7 @@ namespace JankWorks.Game.Local
 
         public void Run(int scene, object initState = null) => this.Run(scene, this.host, initState);
 
-        public void Run(int scene, Host host, object initState = null)
+        public void Run(int scene, ClientHost host, object initState = null)
         {           
             this.graphicsDevice.Activate();
 
