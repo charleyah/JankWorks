@@ -26,13 +26,14 @@ namespace JankWorks.Game
         protected AssetManager Assets { get; private set; }
 
         internal ManualResetEvent sharedSignal;
+
         protected ApplicationScene()
         {
-            this.sharedSignal = new ManualResetEvent(false);
+            this.sharedSignal = new ManualResetEvent(true);
         }
 
-        public virtual void PreInitialise(object state) => this.sharedSignal.Reset();       
-
+        public virtual void PreInitialise(object state) => this.sharedSignal.Reset();
+             
         public virtual void Initialise(Application app, AssetManager assets) 
         {
             this.PerformanceMetricsEnabled = app.Configuration.PerformanceMetricsEnabled;
@@ -65,7 +66,7 @@ namespace JankWorks.Game
         internal MetricCounter[] HostMetricCounters { get; private set; }
 
         public HostScene()
-        {
+        {            
             this.hostObjects = new List<object>(ApplicationScene.InitialObjectContainerCount);
             this.resources = Array.Empty<IResource>();
             this.disposables = Array.Empty<IDisposable>();
@@ -124,8 +125,14 @@ namespace JankWorks.Game
 
         public virtual void SharedDispose(Host host, Client client)
         {
-            this.InternalHostDispose(host);
-            this.sharedSignal.Set();
+            try
+            {
+                this.InternalHostDispose(host);
+            }
+            finally
+            {
+                this.sharedSignal.Set();
+            }                       
         }
 
         public virtual void HostDispose(Host host) => this.InternalHostDispose(host);

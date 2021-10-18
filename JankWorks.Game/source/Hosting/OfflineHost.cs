@@ -134,7 +134,7 @@ namespace JankWorks.Game.Hosting
                         else
                         {
                             Thread.Yield();
-                        }
+                        }    
                         continue;
 
                     case HostState.Constructed:
@@ -163,7 +163,7 @@ namespace JankWorks.Game.Hosting
                         lag -= tickTime;
                         this.TicksPerSecond = Convert.ToSingle(Math.Round(1000 / delta.TotalMilliseconds, 0));
                     }
-                    while (lag >= tickTime);
+                    while (lag >= tickTime);                                      
                 }
                 else
                 {
@@ -188,7 +188,7 @@ namespace JankWorks.Game.Hosting
 
         private void LoadScene()
         {
-            this.scene = this.newHostSceneRequest.Scene ?? this.Application.RegisteredScenes[this.newHostSceneRequest.SceneName]();
+            this.scene = this.newHostSceneRequest.Scene;
             this.scene.SharedInitialise(this, this.client);
             this.scene.SharedInitialised(this.newHostSceneRequest.InitState);
 

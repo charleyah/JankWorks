@@ -323,7 +323,8 @@ namespace JankWorks.Game.Local
                 {
                     try
                     {
-                        this.loadingScreen.Render(this.graphicsDevice, frame);                        
+                        this.loadingScreen.Render(this.graphicsDevice, frame);
+                        this.graphicsDevice.Display();
                         this.fpsCounter.Count();
                     }
                     finally
@@ -335,6 +336,7 @@ namespace JankWorks.Game.Local
             else
             {
                 this.scene.Render(this.graphicsDevice, frame);
+                this.graphicsDevice.Display();
                 this.fpsCounter.Count();
             }
         }
@@ -360,7 +362,6 @@ namespace JankWorks.Game.Local
                     {
                         Thread.Yield();
                     }
-                   
                     break;
 
                 case ClientState.EndLoadingScene:
@@ -377,6 +378,7 @@ namespace JankWorks.Game.Local
                     this.state = state;
 
                     var loaderThread = new Thread(new ThreadStart(() => this.LoadScene()));
+                    loaderThread.IsBackground = false;
                     loaderThread.Name = $"{this.application.Name} Loader Thread";
                     loaderThread.Start();                    
                     break;
