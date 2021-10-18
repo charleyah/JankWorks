@@ -14,8 +14,9 @@ namespace JankWorks.Game
 {
     public abstract class Application : Disposable
     {
-        protected readonly DirectoryInfo DataFolder;
-        protected readonly DirectoryInfo SaveFolder;
+        public DirectoryInfo DataFolder { get; protected set; }
+
+        public DirectoryInfo SaveFolder { get; protected set; }
 
         public Func<Scene>[] RegisteredScenes { get; private set; }
 
