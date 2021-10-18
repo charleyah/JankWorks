@@ -118,6 +118,7 @@ namespace JankWorks.Game.Hosting
                         continue;
                     case HostState.UnloadingScene:
                         timer.Stop();
+                        this.scene.HostDispose(this);
                         this.scene.SharedDispose(this, this.client);
                         this.scene = null;
                         this.state = HostState.Constructed;
@@ -189,7 +190,10 @@ namespace JankWorks.Game.Hosting
         private void LoadScene()
         {
             this.scene = this.newHostSceneRequest.Scene;
+            this.scene.HostInitialise(this);
             this.scene.SharedInitialise(this, this.client);
+            this.scene.InternalHostInitialise(this);
+            this.scene.HostInitialised(this.newHostSceneRequest.Scene);
             this.scene.SharedInitialised(this.newHostSceneRequest.InitState);
 
             this.newHostSceneRequest = default;
