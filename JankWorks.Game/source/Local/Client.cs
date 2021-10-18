@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-
-using ThreadPool = System.Threading.ThreadPool;
+using System.Threading;
 
 using JankWorks.Core;
 using JankWorks.Audio;
@@ -10,7 +9,6 @@ using JankWorks.Interface;
 
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Configuration;
-using JankWorks.Game.Assets;
 using JankWorks.Game.Hosting;
 
 using JankWorks.Game.Platform;
@@ -219,7 +217,7 @@ namespace JankWorks.Game.Local
         public void Run(int scene, object initState = null) => this.Run(scene, this.host, initState);
 
         public void Run(int scene, Host host, object initState = null)
-        {
+        {           
             this.graphicsDevice.Activate();
 
             var ls = this.application.RegisterLoadingScreen();
@@ -238,6 +236,8 @@ namespace JankWorks.Game.Local
 
         private void Run()
         {
+            Thread.CurrentThread.Name = $"{this.application.Name} Client Thread";
+
             var updateTime = TimeSpan.FromMilliseconds((1f / this.parameters.UpdateRate) * 1000);
             var frameTime = TimeSpan.FromMilliseconds((1f / this.Configuration.FrameRate) * 1000);
 
@@ -369,8 +369,11 @@ namespace JankWorks.Game.Local
 
                     this.graphicsDevice.Deactivate();
                     state = ClientState.LoadingScene;
-                    this.state = state;                    
-                    ThreadPool.QueueUserWorkItem((client) => ((Client)client).LoadScene(), this);                    
+                    this.state = state;
+
+                    var loaderThread = new Thread(new ThreadStart(() => this.LoadScene()));
+                    loaderThread.Name = $"{this.application.Name} Loader Thread";
+                    loaderThread.Start();                    
                     break;
             }
 

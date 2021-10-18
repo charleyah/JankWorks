@@ -55,6 +55,8 @@ namespace JankWorks.Game.Hosting
 
         private void Run()
         {
+            Thread.CurrentThread.Name = $"{this.Application.Name} Host Thread";
+
             var timer = new Stopwatch();
             var tickTime = TimeSpan.FromMilliseconds((1f / this.parameters.TickRate) * 1000);
 
@@ -77,7 +79,12 @@ namespace JankWorks.Game.Hosting
                         timer.Stop();
                         this.LoadScene();
                         continue;
-
+                    case HostState.UnloadingScene:
+                        timer.Stop();
+                        this.scene.SharedDispose(this, this.client);
+                        this.scene = null;
+                        this.state = HostState.Constructed;
+                        continue;
 
                     case HostState.WaitingOnClients:
 
@@ -85,7 +92,7 @@ namespace JankWorks.Game.Hosting
                         {
                             this.tick = 0;
                             this.state = HostState.RunningScene;
-                            timer.Start();
+                            timer.Restart();
                         }
                         continue;
 
@@ -111,7 +118,7 @@ namespace JankWorks.Game.Hosting
                     do
                     {
                         var delta = (lag > tickTime) ? tickTime : lag;
-                        this.scene?.Tick(this.tick++, delta);
+                        this.scene.Tick(this.tick++, delta);
                         lag -= tickTime;
                         this.TicksPerSecond = Convert.ToSingle(Math.Round(1000 / delta.TotalMilliseconds, 0));
                     }
@@ -132,9 +139,9 @@ namespace JankWorks.Game.Hosting
 
         public override void UnloadScene()
         {
-            if (this.scene != null)
+            if(this.state == HostState.RunningScene)
             {
-                this.scene.SharedDispose(this, this.client);                
+                this.state = HostState.UnloadingScene;
             }
         }
 
@@ -214,7 +221,7 @@ namespace JankWorks.Game.Hosting
                 this.state = HostState.BeginShutdown;
             }
             return task;
-        }
+        }        
     }
 
     public enum HostState
@@ -228,6 +235,8 @@ namespace JankWorks.Game.Hosting
         RunningScene,
 
         LoadingScene,
+
+        UnloadingScene,
 
         WaitingOnClients,
     }
