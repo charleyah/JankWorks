@@ -10,7 +10,7 @@ using JankWorks.Game.Platform;
 
 namespace JankWorks.Game.Hosting
 {
-    public sealed class OfflineHost : LocalHost
+    public sealed class OfflineHost : ClientHost
     {
         private struct LocalClientState
         {
@@ -33,7 +33,7 @@ namespace JankWorks.Game.Hosting
 
         private Thread runner;
 
-        public OfflineHost(Application application) : base(application)
+        public OfflineHost(Application application) : base(application, application.GetClientSettings())
         {
             var parms = application.HostParameters;
             this.parameters = parms;

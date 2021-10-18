@@ -64,15 +64,5 @@ namespace JankWorks.Game.Hosting
         public abstract void Run(Client client, int scene, object initState = null);
 
         public abstract void Start(Client client, int scene, object initState = null);
-    }
-
-    public abstract class LocalHost : ClientHost
-    {
-        protected LocalHost(Application application) : base(application, application.GetHostSettings()) { }     
-    }
-
-    public abstract class RemoteHost : ClientHost
-    {
-        protected RemoteHost(Application application) : base(application, application.GetClientSettings()) { }
     }     
 }
