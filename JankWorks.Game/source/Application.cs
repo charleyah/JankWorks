@@ -136,42 +136,36 @@ namespace JankWorks.Game
             return settings;
         }
 
-        public static void Run<App>(int scene) where App : Application, new()
-        {
-            using var application = new App();
-            Run(application, scene, null);
-        }
-
-        public static void Run<App>(int scene, int state) where App : Application, new()
+        public static void Run<App>(int scene, object state = null) where App : Application, new()
         {
             using var application = new App();
             Run(application, scene, state);
         }
 
-        public static void Run(Application application, int scene)
+        public static void RunWithoutHost<App>(int scene, object state = null) where App : Application, new()
         {
-            Run(application, scene, null);
+            using var application = new App();
+            RunWithoutHost(application, scene, state);
         }
 
-        public static void Run(Application application, int scene, object state)
+        public static void RunWithoutHost(Application application, int scene, object state = null)
+        {
+            var host = new NullHost(application);
+            using var client = new Client(application, host);
+
+            client.Run(scene, state);
+        }
+
+        public static void Run(Application application, int scene, object state = null)
         {
             var host = new OfflineHost(application);
-
-            try
-            {
-                using (var client = new Client(application, host))
-                {
-                    host.RunAsync();
-                    client.Run(scene, state);
-                }
-            }
-            finally
-            {
-                host.DisposeAsync().Wait();
-            }            
+            using var client = new Client(application, host);
+            
+            host.RunAsync(client);
+            client.Run(scene, state);
         }
 
-        public static void Run(Application application, int scene, object state, Host host)
+        public static void Run(Application application, Host host, int scene, object state = null)
         {
             using var client = new Client(application, host);           
             client.Run(scene, state);

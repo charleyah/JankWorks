@@ -40,8 +40,6 @@ namespace JankWorks.Game.Local
 
         private Host host;
 
-        private AssetManager assetManager;
-
         private Window window;
 
         private GraphicsDevice graphicsDevice;
@@ -70,7 +68,6 @@ namespace JankWorks.Game.Local
             this.state = ClientState.Constructed;
             this.application = application;
             this.host = host;
-            this.assetManager = application.RegisterAssetManager();
 
             var settings = application.GetClientSettings();
 
@@ -120,95 +117,92 @@ namespace JankWorks.Game.Local
             Host host = this.newSceneRequest.Host ?? throw new ApplicationException();
             object initstate = this.newSceneRequest.InitState;
 
-            if(host is RemoteHost remoteHost)
+            this.UnloadScene();
+
+            if (host is NullHost nullhost)
             {
-                this.LoadSceneWithRemoteHost(scene, remoteHost, initstate);
+                this.LoadSceneWithNoHost(scene, nullhost, initstate);
             }
-            else if(host is LocalHost localHost)
+            else if (host is ClientHost clienthost)
             {
-                this.LoadSceneWithLocalHost(scene, localHost, initstate);
-            }
+                this.LoadSceneWithHost(scene, clienthost, initstate);
+            }            
             else
             {
                 throw new NotImplementedException();
             }
-            this.state = ClientState.EndLoadingScene;
-        }
-
-        private void LoadSceneWithRemoteHost(int scene, RemoteHost host, object initState)
-        {
-            if (this.scene != null)
-            {
-                this.scene.PreDispose();
-                this.scene.UnsubscribeInputs(this.window);
-                this.scene.DisposeSoundResources(this.audioDevice);
-                this.scene.DisposeGraphicsResources(this.graphicsDevice);
-                this.scene.ClientDispose(this, this.host);
-                this.scene.Dispose(this.application);
-            }
-
-            if (!object.ReferenceEquals(this.host, host))
-            {
-                this.host.DisposeAsync();
-                this.host = host;
-            }
-
-            if (!host.IsConnected)
-            {
-                host.Connect();
-            }
-
-            host.LoadScene(scene, initState);
-
-            this.scene = this.application.RegisteredScenes[scene]();
-
-            this.scene.PreInitialise(initState);
-            this.scene.Initialise(this.application, this.assetManager);
-            this.scene.ClientInitialise(this, host, this.assetManager);
-            this.scene.InitialiseGraphicsResources(this.graphicsDevice, this.assetManager);
-            this.scene.InitialiseSoundResources(this.audioDevice, this.assetManager);
-            this.scene.ClientInitialised(initState);
 
             System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
+
+            this.state = ClientState.EndLoadingScene;
         }
 
-        private void LoadSceneWithLocalHost(int scene, LocalHost host, object initState)
+        private void UnloadScene()
         {
-            if (this.scene != null)
+            var scene = this.scene;
+            if (scene != null)
             {
-                this.scene.UnsubscribeInputs(this.window);
-                this.scene.DisposeSoundResources(this.audioDevice);
-                this.scene.DisposeGraphicsResources(this.graphicsDevice);
-                this.scene.ClientDispose(this, this.host);
+                scene.UnsubscribeInputs(this.window);
+
+                scene.PreDispose();
+                
+                if(this.host is ClientHost clientHost)
+                {
+                    clientHost.UnloadScene();
+                    scene.DisposeSoundResources(this.audioDevice);
+                    scene.DisposeGraphicsResources(this.graphicsDevice);
+                    scene.ClientDisposeAfterShared(this);
+                }
+                else
+                {
+                    scene.DisposeSoundResources(this.audioDevice);
+                    scene.DisposeGraphicsResources(this.graphicsDevice);
+                    scene.ClientDispose(this);
+                }
+
+                scene.Dispose(this.application);
             }
+        }
 
-            if (!object.ReferenceEquals(this.host, host))
-            {
-                this.host.DisposeAsync();
-                this.host = host;
-            }
+        private void LoadSceneWithNoHost(int scene, NullHost host, object initState)
+        {            
+            var sceneToLoad = this.application.RegisteredScenes[scene]();
 
-            this.scene = this.application.RegisteredScenes[scene]();
+            sceneToLoad.PreInitialise(initState);
+            sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
+            sceneToLoad.ClientInitialise(this);
+            sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+            sceneToLoad.InitialiseSoundResources(this.audioDevice);
+            sceneToLoad.ClientInitialised(initState);
 
-            if (!host.IsConnected)
-            {
-                host.Connect();
-            }
+            this.host = host;
+            this.scene = sceneToLoad;
+        }
 
-            host.LoadScene(this.scene, initState);
+        private void LoadSceneWithHost(int scene, ClientHost host, object initState)
+        {
+            var sceneToLoad = this.application.RegisteredScenes[scene]();
+            
+            sceneToLoad.PreInitialise(initState);
+            sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
 
-            this.scene.SharedClientInitialise(this, host, this.assetManager);
-            this.scene.InitialiseGraphicsResources(this.graphicsDevice, this.assetManager);
-            this.scene.InitialiseSoundResources(this.audioDevice, this.assetManager);
-            this.scene.ClientInitialised(initState);            
+            host.LoadScene(sceneToLoad, initState);
+
+            sceneToLoad.ClientInitialiseAfterShared(this);
+            sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+            sceneToLoad.InitialiseSoundResources(this.audioDevice);
+            sceneToLoad.ClientInitialised(initState);
+
+            this.host = host;
+            this.scene = sceneToLoad;
         }
 
         public void ChangeScene(int scene, object initsate = null) => this.ChangeScene(scene, this.host, initsate);
         
         public void ChangeScene(int scene, Host host, object initsate = null)
         {
-            if (object.ReferenceEquals(this.host, host) && host.IsRemote && host.IsConnected)
+            if (host is NullHost == false && object.ReferenceEquals(this.host, host) && host.IsRemote && host.IsConnected)
             {
                 throw new ArgumentException();
             }
@@ -232,8 +226,9 @@ namespace JankWorks.Game.Local
 
             if (ls != null)
             {
-                ls.InitialiseResources(this.assetManager);
-                ls.InitialiseGraphicsResources(this.graphicsDevice, this.assetManager);
+                using var assets = this.application.RegisterAssetManager();
+                ls.InitialiseResources(assets);
+                ls.InitialiseGraphicsResources(this.graphicsDevice, assets);
                 this.loadingScreen = ls;
             }
             this.window.Show();
@@ -295,6 +290,9 @@ namespace JankWorks.Game.Local
 
                 lastrun = now;
             }
+
+            this.UnloadScene();
+            this.host.DisposeAsync();
         }
 
         private void Update(ClientState state, TimeSpan delta)
@@ -353,11 +351,7 @@ namespace JankWorks.Game.Local
                         state = ClientState.RunningScene;
                         this.state = state;
 
-                        if(this.host.IsRemote)
-                        {
-                            this.scene.Initialised();
-                        }
-                        
+                        this.scene.Initialised();
                         this.scene.SubscribeInputs(this.window);
                     }
                    
@@ -375,7 +369,7 @@ namespace JankWorks.Game.Local
 
                     this.graphicsDevice.Deactivate();
                     state = ClientState.LoadingScene;
-                    this.state = state;
+                    this.state = state;                    
                     ThreadPool.QueueUserWorkItem((client) => ((Client)client).LoadScene(), this);                    
                     break;
             }

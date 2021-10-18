@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 using JankWorks.Core;
 
+using JankWorks.Game.Local;
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Configuration;
-using JankWorks.Game.Assets;
 
 namespace JankWorks.Game.Hosting
 {   
@@ -32,13 +32,10 @@ namespace JankWorks.Game.Hosting
 
         protected Application Application { get; init; }
 
-        protected AssetManager AssetManager { get; init; }
-
         protected Host(Application application, Settings settings)
         {
             this.Application = application;
             this.Settings = settings;
-            this.AssetManager = application.RegisterAssetManager();
         }
 
         public abstract MetricCounter[] GetMetrics();
@@ -50,23 +47,28 @@ namespace JankWorks.Game.Hosting
         public abstract Task DisposeAsync();
     }
 
-    public abstract class LocalHost : Host
+    public abstract class ClientHost : Host
     {
-        protected LocalHost(Application application) : base(application, application.GetHostSettings()) { }
+        protected ClientHost(Application application, Settings settings) : base(application, settings) { }
 
-        public abstract void LoadScene(HostScene scene, object initState = null);
+        public abstract void UnloadScene();
 
-        public abstract Task RunAsync();
+        public abstract void LoadScene(HostScene scene, object initState);
 
-        public abstract Task RunAsync(int scene, object initState = null);
+        public abstract Task RunAsync(Client client);
 
-        public abstract void Run(int scene, object initState = null);              
+        public abstract Task RunAsync(Client client, int scene, object initState = null);
+
+        public abstract void Run(Client client, int scene, object initState = null);
     }
 
-    public abstract class RemoteHost : Host
+    public abstract class LocalHost : ClientHost
+    {
+        protected LocalHost(Application application) : base(application, application.GetHostSettings()) { }     
+    }
+
+    public abstract class RemoteHost : ClientHost
     {
         protected RemoteHost(Application application) : base(application, application.GetClientSettings()) { }
-
-        public abstract void LoadScene(int scene, object initState = null);
     }     
 }

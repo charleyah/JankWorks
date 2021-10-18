@@ -21,26 +21,33 @@ namespace JankWorks.Game
 
         internal bool PerformanceMetricsEnabled { get; private set; }
 
-        protected ManualResetEvent sharedInitialisedSignal;
+        protected Application Application { get; private set; }
 
+        protected AssetManager Assets { get; private set; }
+
+        internal ManualResetEvent sharedSignal;
         protected ApplicationScene()
         {
-            this.sharedInitialisedSignal = new ManualResetEvent(false);
+            this.sharedSignal = new ManualResetEvent(false);
         }
 
-        public virtual void PreInitialise(object state) { }
+        public virtual void PreInitialise(object state) => this.sharedSignal.Reset();       
 
         public virtual void Initialise(Application app, AssetManager assets) 
         {
             this.PerformanceMetricsEnabled = app.Configuration.PerformanceMetricsEnabled;
-            this.sharedInitialisedSignal.Set();
+            this.Application = app;
+            this.Assets = assets;
         }
 
         public virtual void Initialised() { }
 
-        public virtual void PreDispose() { }
-
-        public virtual void Dispose(Application app) { }
+        public virtual void PreDispose() => this.sharedSignal.Reset();
+        
+        public virtual void Dispose(Application app) 
+        {
+            this.Assets.Dispose();
+        }
     }
 
     public abstract class HostScene : ApplicationScene, ITickable
@@ -69,14 +76,26 @@ namespace JankWorks.Game
 
         protected void RegisterHostObject(object obj) => this.hostObjects.Add(obj);
 
-        public virtual void HostInitialise(Host host, AssetManager assets)
-        { 
+        public virtual void SharedInitialise(Host host, Client client)
+        {
+            this.InternalHostInitialise(host);
+        }
+
+        public virtual void HostInitialise(Host host) => this.InternalHostInitialise(host);
+
+        private void InternalHostInitialise(Host host)
+        {
             this.BuildHostObjectContainers();
 
             for (int index = 0; index < this.resources.Length; index++)
             {
-                this.resources[index].InitialiseResources(assets);
+                this.resources[index].InitialiseResources(this.Assets);
             }
+        }
+
+        public virtual void SharedInitialised(object state) 
+        {
+            this.sharedSignal.Set();
         }
 
         public virtual void HostInitialised(object state) { }
@@ -103,13 +122,28 @@ namespace JankWorks.Game
             }            
         }
 
-        public virtual void HostDispose(Host host) 
+        public virtual void SharedDispose(Host host, Client client)
+        {
+            this.InternalHostDispose(host);
+            this.sharedSignal.Set();
+        }
+
+        public virtual void HostDispose(Host host) => this.InternalHostDispose(host);
+
+        private void InternalHostDispose(Host host)
         {
             this.HostMetricCounters = Array.Empty<MetricCounter>();
 
-            Array.ForEach(this.disposables, (d) => d.Dispose());
-            Array.ForEach(this.resources, (r) => r.DisposeResources());
-           
+            foreach(var disposable in this.disposables)
+            {
+                disposable.Dispose();
+            }
+
+            foreach(var resource in this.resources)
+            {
+                resource.DisposeResources();
+            }
+
             this.disposables = Array.Empty<IDisposable>();
             this.resources = Array.Empty<IResource>();
             this.tickables = Array.Empty<ITickable>();
@@ -136,7 +170,7 @@ namespace JankWorks.Game
         }
     }
 
-    public abstract class Scene : HostScene, IGraphicsResource, ISoundResource, IRenderable, IUpdatable, IInputListener
+    public abstract class Scene : HostScene
     {
         private List<object> clientObjects;
 
@@ -180,19 +214,19 @@ namespace JankWorks.Game
 
         protected void RegisterClientObject(object obj) => this.clientObjects.Add(obj);
 
-        internal void SharedClientInitialise(Client client, Host host, AssetManager assets)
+        internal void ClientInitialiseAfterShared(Client client)
         {
-            this.sharedInitialisedSignal.WaitOne();
-            this.ClientInitialise(client, host, assets);
+            this.sharedSignal.WaitOne();
+            this.ClientInitialise(client);
         }
 
-        public virtual void ClientInitialise(Client client, Host host, AssetManager assets)
+        public virtual void ClientInitialise(Client client)
         {
             this.BuildClientObjectContainers();
 
             for (int index = 0; index < this.resources.Length; index++)
             {
-                this.resources[index].InitialiseResources(assets);
+                this.resources[index].InitialiseResources(this.Assets);
             }
         }
 
@@ -229,10 +263,23 @@ namespace JankWorks.Game
             }            
         }
 
-        public virtual void ClientDispose(Client client, Host host) 
+        internal void ClientDisposeAfterShared(Client client)
         {
-            Array.ForEach(this.disposables, (d) => d.Dispose());
-            Array.ForEach(this.resources, (r) => r.DisposeResources());
+            this.sharedSignal.WaitOne();
+            this.ClientDispose(client);
+        }
+
+        public virtual void ClientDispose(Client client) 
+        {
+            foreach (var disposable in this.disposables)
+            {
+                disposable.Dispose();
+            }
+
+            foreach (var resource in this.resources)
+            {
+                resource.DisposeResources();
+            }
 
             this.resources = Array.Empty<IResource>();                       
             this.disposables = Array.Empty<IDisposable>();
@@ -259,33 +306,41 @@ namespace JankWorks.Game
             }
         }
 
-        public virtual void InitialiseGraphicsResources(GraphicsDevice device, AssetManager assets) 
+        public virtual void InitialiseGraphicsResources(GraphicsDevice device) 
         {
             for (int index = 0; index < this.graphicsResources.Length; index++)
             {
-                this.graphicsResources[index].InitialiseGraphicsResources(device, assets);
+                this.graphicsResources[index].InitialiseGraphicsResources(device, this.Assets);
             }
         }
 
         public virtual void DisposeGraphicsResources(GraphicsDevice device) 
         {
-            Array.ForEach(this.graphicsResources, (gr) => gr.DisposeGraphicsResources(device));
+            foreach(var graphicsResource in this.graphicsResources)
+            {
+                graphicsResource.DisposeGraphicsResources(device);
+            }
+
             this.graphicsResources = Array.Empty<IGraphicsResource>();
             this.renderables = Array.Empty<IRenderable>();
             this.asyncRenderables = Array.Empty<IAsyncRenderable>();
         }
 
-        public virtual void InitialiseSoundResources(AudioDevice device, AssetManager assets) 
+        public virtual void InitialiseSoundResources(AudioDevice device) 
         {
             for (int index = 0; index < this.soundResources.Length; index++)
             {
-                this.soundResources[index].InitialiseSoundResources(device, assets);
+                this.soundResources[index].InitialiseSoundResources(device, this.Assets);
             }
         }
 
         public virtual void DisposeSoundResources(AudioDevice device) 
         {
-            Array.ForEach(this.soundResources, (sr) => sr.DisposeSoundResources(device));
+            foreach (var soundResource in this.soundResources)
+            {
+                soundResource.DisposeSoundResources(device);
+            }
+
             this.soundResources = Array.Empty<ISoundResource>();
         }
 

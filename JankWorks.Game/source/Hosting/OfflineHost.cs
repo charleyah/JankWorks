@@ -3,6 +3,8 @@ using System.Diagnostics;
 
 using System.Threading;
 using System.Threading.Tasks;
+
+using JankWorks.Game.Local;
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Platform;
 
@@ -17,6 +19,7 @@ namespace JankWorks.Game.Hosting
         }
 
         private HostScene scene;
+        private Client client;
 
         private ulong tick;
 
@@ -28,14 +31,14 @@ namespace JankWorks.Game.Hosting
 
         private HostParameters parameters;
 
-        private Task runner;
+        private Thread runner;
 
         public OfflineHost(Application application) : base(application)
         {
             var parms = application.HostParameters;
             this.parameters = parms;
 
-            this.runner = new Task(this.Run, TaskCreationOptions.LongRunning);            
+            this.runner = new Thread(new ThreadStart(this.Run));
         }
 
         public override bool IsRemote => false;
@@ -80,7 +83,6 @@ namespace JankWorks.Game.Hosting
 
                         if(this.localClient.Loaded)
                         {
-                            this.scene.Initialised();
                             this.tick = 0;
                             this.state = HostState.RunningScene;
                             timer.Start();
@@ -92,9 +94,8 @@ namespace JankWorks.Game.Hosting
                         continue;
 
                     case HostState.BeginShutdown:
-                        this.UnloadScene();
-                        this.state = HostState.Shutdown;
                         base.Dispose(false);
+                        this.state = HostState.Shutdown;
                         return;
                     case HostState.Shutdown:                       
                         return;
@@ -110,7 +111,7 @@ namespace JankWorks.Game.Hosting
                     do
                     {
                         var delta = (lag > tickTime) ? tickTime : lag;
-                        this.scene.Tick(this.tick++, delta);
+                        this.scene?.Tick(this.tick++, delta);
                         lag -= tickTime;
                         this.TicksPerSecond = Convert.ToSingle(Math.Round(1000 / delta.TotalMilliseconds, 0));
                     }
@@ -129,25 +130,19 @@ namespace JankWorks.Game.Hosting
             }
         }
 
-        private void UnloadScene()
+        public override void UnloadScene()
         {
             if (this.scene != null)
             {
-                this.scene.PreDispose();
-                this.scene.HostDispose(this);
-                this.scene.Dispose(this.Application);
+                this.scene.SharedDispose(this, this.client);                
             }
         }
 
         private void LoadScene()
         {
-            this.UnloadScene();
-
             this.scene = this.newHostSceneRequest.Scene ?? this.Application.RegisteredScenes[this.newHostSceneRequest.SceneName]();
-            this.scene.PreInitialise(this.newHostSceneRequest.InitState);
-            this.scene.Initialise(this.Application, this.AssetManager);
-            this.scene.HostInitialise(this, this.AssetManager);
-            this.scene.HostInitialised(this.newHostSceneRequest.InitState);
+            this.scene.SharedInitialise(this, this.client);
+            this.scene.SharedInitialised(this.newHostSceneRequest.InitState);
 
             this.newHostSceneRequest = default;
             this.state = HostState.WaitingOnClients;
@@ -164,17 +159,21 @@ namespace JankWorks.Game.Hosting
             this.state = HostState.LoadingScene;
         }
 
-        public override Task RunAsync()
+        public override Task RunAsync(Client client)
         {
+            this.client = client;
             this.localClient.Loaded = false;
             this.localClient.Connected = false;
             this.state = HostState.Constructed;
+
+            var task = new Task(() => this.runner.Join());
             this.runner.Start();
-            return this.runner;
+            return task;
         }
 
-        public override Task RunAsync(int scene, object initState = null)
+        public override Task RunAsync(Client client, int scene, object initState = null)
         {
+            this.client = client;
             this.newHostSceneRequest = new NewHostSceneRequest()
             {
                 SceneName = scene,
@@ -182,35 +181,39 @@ namespace JankWorks.Game.Hosting
             };
             this.localClient.Loaded = false;
             this.state = HostState.LoadingScene;
+            
+            var task = new Task(() => this.runner.Join());
             this.runner.Start();
-            return this.runner;
+            return task;
         }
 
-        public override void Run(int scene, object initState = null)
+        public override void Run(Client client, int scene, object initState = null)
         {
+            this.client = client;
             this.newHostSceneRequest = new NewHostSceneRequest()
             {
                 SceneName = scene,
                 InitState = initState
             };
             this.state = HostState.LoadingScene;
-            this.runner.RunSynchronously();
+            this.Run();
         }
 
         protected override void Dispose(bool finalising)
         {
-            this.UnloadScene();
             this.state = HostState.Shutdown;
             base.Dispose(finalising);
         }
 
         public override Task DisposeAsync()
         {
+            var task = new Task(() => this.runner.Join());
+
             if (this.state != HostState.BeginShutdown)
             {
                 this.state = HostState.BeginShutdown;
             }
-            return this.runner;
+            return task;
         }
     }
 
@@ -227,6 +230,5 @@ namespace JankWorks.Game.Hosting
         LoadingScene,
 
         WaitingOnClients,
-
     }
 }
