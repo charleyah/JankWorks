@@ -12,20 +12,12 @@ namespace JankWorks.Game.Hosting
 {
     public sealed class OfflineHost : ClientHost
     {
-        private struct LocalClientState
-        {
-            public bool Connected;
-            public bool Loaded;
-        }
-
         private HostScene scene;
         private Client client;
 
         private ulong tick;
 
         private volatile HostState state;
-
-        private LocalClientState localClient;
 
         private NewHostSceneRequest newHostSceneRequest;
 
@@ -37,9 +29,6 @@ namespace JankWorks.Game.Hosting
         {
             var parms = application.HostParameters;
             this.parameters = parms;
-
-            this.localClient.Loaded = false;
-            this.localClient.Connected = false;
             this.state = HostState.Constructed;
 
             this.runner = new Thread(new ThreadStart(this.Run));
@@ -47,13 +36,9 @@ namespace JankWorks.Game.Hosting
 
         public override bool IsRemote => false;
 
-        public override bool IsConnected => this.localClient.Connected;
+        public override bool IsConnected => true;
 
         public override bool IsHostLoaded => this.state == HostState.RunningScene;
-
-        public override void Connect() => this.localClient.Connected = true;
-
-        public override void NotifyClientLoaded() => this.localClient.Loaded = true;
 
         public override MetricCounter[] GetMetrics() => this.scene.HostMetricCounters;
 
@@ -74,7 +59,6 @@ namespace JankWorks.Game.Hosting
                 SceneName = scene,
                 InitState = initState
             };
-            this.localClient.Loaded = false;
             this.state = HostState.LoadingScene;
 
             var task = new Task(() => this.runner.Join());
@@ -141,11 +125,15 @@ namespace JankWorks.Game.Hosting
 
                     case HostState.WaitingOnClients:
 
-                        if(this.localClient.Loaded)
+                        if(this.client.State == ClientState.WaitingOnHost)
                         {
                             this.tick = 0;
                             this.state = HostState.RunningScene;
                             timer.Restart();
+                        }
+                        else
+                        {
+                            Thread.Yield();
                         }
                         continue;
 
@@ -215,7 +203,6 @@ namespace JankWorks.Game.Hosting
                 Scene = scene,
                 InitState = initState
             };
-            this.localClient.Loaded = false;
             this.state = HostState.LoadingScene;
         }
 

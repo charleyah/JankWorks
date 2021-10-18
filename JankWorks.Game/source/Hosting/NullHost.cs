@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using JankWorks.Game.Diagnostics;
 
 namespace JankWorks.Game.Hosting
@@ -14,12 +15,8 @@ namespace JankWorks.Game.Hosting
 
         public NullHost(Application app) : base(app, app.GetClientSettings()) { }
 
-        public override void Connect() { }
-
         public override Task DisposeAsync() => Task.CompletedTask;
 
         public override MetricCounter[] GetMetrics() => Array.Empty<MetricCounter>();
-
-        public override void NotifyClientLoaded() { }
     }
 }

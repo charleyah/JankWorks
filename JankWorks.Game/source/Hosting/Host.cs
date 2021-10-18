@@ -40,10 +40,6 @@ namespace JankWorks.Game.Hosting
 
         public abstract MetricCounter[] GetMetrics();
 
-        public abstract void Connect();
-
-        public abstract void NotifyClientLoaded();
-
         public abstract Task DisposeAsync();
     }
 

@@ -34,6 +34,8 @@ namespace JankWorks.Game.Local
 
         public float FramesPerSecond { get; private set; }
 
+        internal ClientState State => this.state;
+
         private Application application;
 
         private Host host;
@@ -354,6 +356,10 @@ namespace JankWorks.Game.Local
                         this.scene.Initialised();
                         this.scene.SubscribeInputs(this.window);
                     }
+                    else
+                    {
+                        Thread.Yield();
+                    }
                    
                     break;
 
@@ -361,7 +367,6 @@ namespace JankWorks.Game.Local
 
                     state = ClientState.WaitingOnHost;
                     this.state = state;
-                    this.host.NotifyClientLoaded();
                     this.newSceneRequest = default;
                     break;
 
