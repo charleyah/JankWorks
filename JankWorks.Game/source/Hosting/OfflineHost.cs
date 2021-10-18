@@ -38,6 +38,10 @@ namespace JankWorks.Game.Hosting
             var parms = application.HostParameters;
             this.parameters = parms;
 
+            this.localClient.Loaded = false;
+            this.localClient.Connected = false;
+            this.state = HostState.Constructed;
+
             this.runner = new Thread(new ThreadStart(this.Run));
         }
 
@@ -52,6 +56,55 @@ namespace JankWorks.Game.Hosting
         public override void NotifyClientLoaded() => this.localClient.Loaded = true;
 
         public override MetricCounter[] GetMetrics() => this.scene.HostMetricCounters;
+
+
+        public override Task RunAsync(Client client)
+        {
+            this.client = client;
+            var task = new Task(() => this.runner.Join());
+            this.runner.Start();
+            return task;
+        }
+
+        public override Task RunAsync(Client client, int scene, object initState = null)
+        {
+            this.client = client;
+            this.newHostSceneRequest = new NewHostSceneRequest()
+            {
+                SceneName = scene,
+                InitState = initState
+            };
+            this.localClient.Loaded = false;
+            this.state = HostState.LoadingScene;
+
+            var task = new Task(() => this.runner.Join());
+            this.runner.Start();
+            return task;
+        }
+
+        public override void Start(Client client)
+        {
+            this.client = client;
+            this.runner.Start();
+        }
+
+        public override void Start(Client client, int scene, object initState = null)
+        {
+            this.runner = new Thread(new ThreadStart(() => this.Run(client, scene, initState)));
+            this.runner.Start();
+        }
+
+        public override void Run(Client client, int scene, object initState = null)
+        {
+            this.client = client;
+            this.newHostSceneRequest = new NewHostSceneRequest()
+            {
+                SceneName = scene,
+                InitState = initState
+            };
+            this.state = HostState.LoadingScene;
+            this.Run();
+        }
 
         private void Run()
         {
@@ -166,46 +219,6 @@ namespace JankWorks.Game.Hosting
             this.state = HostState.LoadingScene;
         }
 
-        public override Task RunAsync(Client client)
-        {
-            this.client = client;
-            this.localClient.Loaded = false;
-            this.localClient.Connected = false;
-            this.state = HostState.Constructed;
-
-            var task = new Task(() => this.runner.Join());
-            this.runner.Start();
-            return task;
-        }
-
-        public override Task RunAsync(Client client, int scene, object initState = null)
-        {
-            this.client = client;
-            this.newHostSceneRequest = new NewHostSceneRequest()
-            {
-                SceneName = scene,
-                InitState = initState
-            };
-            this.localClient.Loaded = false;
-            this.state = HostState.LoadingScene;
-            
-            var task = new Task(() => this.runner.Join());
-            this.runner.Start();
-            return task;
-        }
-
-        public override void Run(Client client, int scene, object initState = null)
-        {
-            this.client = client;
-            this.newHostSceneRequest = new NewHostSceneRequest()
-            {
-                SceneName = scene,
-                InitState = initState
-            };
-            this.state = HostState.LoadingScene;
-            this.Run();
-        }
-
         protected override void Dispose(bool finalising)
         {
             this.state = HostState.Shutdown;
@@ -221,7 +234,7 @@ namespace JankWorks.Game.Hosting
                 this.state = HostState.BeginShutdown;
             }
             return task;
-        }        
+        }
     }
 
     public enum HostState

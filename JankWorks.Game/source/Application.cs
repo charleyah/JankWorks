@@ -161,7 +161,7 @@ namespace JankWorks.Game
             var host = new OfflineHost(application);
             using var client = new Client(application, host);
             
-            host.RunAsync(client);
+            host.Start(client);
             client.Run(scene, state);
         }
 

@@ -55,11 +55,15 @@ namespace JankWorks.Game.Hosting
 
         public abstract void LoadScene(HostScene scene, object initState);
 
+        public abstract void Start(Client client);
+
         public abstract Task RunAsync(Client client);
 
         public abstract Task RunAsync(Client client, int scene, object initState = null);
 
         public abstract void Run(Client client, int scene, object initState = null);
+
+        public abstract void Start(Client client, int scene, object initState = null);
     }
 
     public abstract class LocalHost : ClientHost
