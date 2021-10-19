@@ -13,6 +13,8 @@ namespace JankWorks.Game.Hosting
 
         public abstract void LoadScene(HostScene scene, object initState);
 
+        public abstract void SynchroniseClientUpdate();
+
         public abstract void Start(Client client);
 
         public abstract Task RunAsync(Client client);

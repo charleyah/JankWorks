@@ -77,11 +77,11 @@ namespace JankWorks.Game
 
         protected void RegisterHostObject(object obj) => this.hostObjects.Add(obj);
 
-        public virtual void SharedInitialise(Host host, Client client) { }
+        public virtual void SharedInitialise(Host host, Client client) => this.InternalHostInitialise();
 
-        public virtual void HostInitialise(Host host) { }
+        public virtual void HostInitialise(Host host) => this.InternalHostInitialise();
 
-        internal void InternalHostInitialise(Host host)
+        private void InternalHostInitialise()
         {
             this.BuildHostObjectContainers();
 

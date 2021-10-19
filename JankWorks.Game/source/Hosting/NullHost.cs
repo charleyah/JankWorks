@@ -22,7 +22,9 @@ namespace JankWorks.Game.Hosting
 
         public override void UnloadScene() { }
 
-        public override void LoadScene(HostScene scene, object initState) { }        
+        public override void LoadScene(HostScene scene, object initState) { }
+
+        public override void SynchroniseClientUpdate() { }
 
         public override void Start(Client client) { }
 
@@ -32,6 +34,6 @@ namespace JankWorks.Game.Hosting
 
         public override void Run(Client client, int scene, object initState = null) { }        
 
-        public override void Start(Client client, int scene, object initState = null) { }
+        public override void Start(Client client, int scene, object initState = null) { }        
     }
 }

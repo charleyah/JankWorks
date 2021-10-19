@@ -261,15 +261,21 @@ namespace JankWorks.Game.Local
 
                 if (accumulator >= frameTime)
                 {
-                    while (lag >= updateTime)
+                    if(lag >= updateTime)
                     {
-                        var delta = (lag > updateTime) ? updateTime : lag;
+                        this.host.SynchroniseClientUpdate();
 
-                        this.Update(state, delta);
+                        do
+                        {
+                            var delta = (lag > updateTime) ? updateTime : lag;
 
-                        lag -= updateTime;
+                            this.Update(state, delta);
+
+                            lag -= updateTime;
+                        }
+                        while (lag >= updateTime);
                     }
-
+                    
                     var frame = new Frame(accumulator.TotalMilliseconds / updateTime.TotalMilliseconds);
 
                     this.Render(state, frame, updateTime);
