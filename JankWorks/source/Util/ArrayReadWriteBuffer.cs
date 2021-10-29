@@ -54,13 +54,18 @@ namespace JankWorks.Util
 
         public void CompactWithoutResize()
         {
-            if (this.ReadPosition > 0)
+            if(this.Length == 0)
+            {
+                this.WritePosition = 0;
+            }
+            else if (this.ReadPosition > 0 && this.WritePosition > 0)
             {
                 var span = this.GetSpan();
                 span.CopyTo(this.GetBufferSpan());
                 this.WritePosition -= this.ReadPosition;
-                this.ReadPosition = 0;
             }
+
+            this.ReadPosition = 0;
         }
 
         public int Read(Span<T> destination)
