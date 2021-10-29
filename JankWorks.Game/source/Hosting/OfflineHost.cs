@@ -8,6 +8,9 @@ using JankWorks.Game.Local;
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Platform;
 
+using JankWorks.Game.Hosting.Messaging;
+using JankWorks.Game.Hosting.Messaging.Memory;
+
 namespace JankWorks.Game.Hosting
 {
     public sealed class OfflineHost : ClientHost
@@ -23,6 +26,7 @@ namespace JankWorks.Game.Hosting
 
         private HostParameters parameters;
 
+        private Dispatcher dispatcher;
         private Thread runner;
 
         public OfflineHost(Application application) : base(application, application.GetClientSettings())
@@ -31,7 +35,8 @@ namespace JankWorks.Game.Hosting
             this.parameters = parms;
             this.state = HostState.Constructed;
 
-            this.runner = new Thread(new ThreadStart(this.Run));
+            this.dispatcher = new MemoryDispatcher(application);
+            this.runner = new Thread(new ThreadStart(this.Run));            
         }
 
         public override bool IsRemote => false;
@@ -40,8 +45,9 @@ namespace JankWorks.Game.Hosting
 
         public override bool IsHostLoaded => this.state == HostState.RunningScene;
 
-        public override MetricCounter[] GetMetrics() => this.scene.HostMetricCounters;
+        public override Dispatcher Dispatcher => this.dispatcher;
 
+        public override MetricCounter[] GetMetrics() => this.scene.HostMetricCounters;
 
         public override Task RunAsync(Client client)
         {
@@ -110,7 +116,7 @@ namespace JankWorks.Game.Hosting
             {
                 state = this.state;
 
-                switch(state)
+                switch (state)
                 {
                     case HostState.LoadingScene:
                         timer.Stop();
@@ -119,13 +125,14 @@ namespace JankWorks.Game.Hosting
                     case HostState.UnloadingScene:
                         timer.Stop();
                         this.scene.SharedDispose(this, this.client);
+                        this.dispatcher.ClearChannels();
                         this.scene = null;
                         this.state = HostState.Constructed;
                         continue;
 
                     case HostState.WaitingOnClients:
 
-                        if(this.client.State == ClientState.WaitingOnHost)
+                        if (this.client.State == ClientState.WaitingOnHost)
                         {
                             this.tick = 0;
                             this.state = HostState.RunningScene;
@@ -134,7 +141,7 @@ namespace JankWorks.Game.Hosting
                         else
                         {
                             Thread.Yield();
-                        }    
+                        }
                         continue;
 
                     case HostState.Constructed:
@@ -145,7 +152,7 @@ namespace JankWorks.Game.Hosting
                         base.Dispose(false);
                         this.state = HostState.Shutdown;
                         return;
-                    case HostState.Shutdown:                       
+                    case HostState.Shutdown:
                         return;
                 }
 
@@ -154,21 +161,27 @@ namespace JankWorks.Game.Hosting
                 lag += since;
                 this.Lag = lag;
 
-                if(lag >= tickTime)
+                if (lag >= tickTime)
                 {
+
                     do
                     {
                         var delta = (lag > tickTime) ? tickTime : lag;
-                        this.scene.Tick(this.tick++, delta);
+
+                        lock (this)
+                        {
+                            this.scene.Tick(this.tick++, delta);
+                        }
+
                         lag -= tickTime;
                         this.TicksPerSecond = Convert.ToSingle(Math.Round(1000 / delta.TotalMilliseconds, 0));
                     }
-                    while (lag >= tickTime);                                      
+                    while (lag >= tickTime);
                 }
                 else
                 {
                     var remaining = tickTime - lag;
-                    if(remaining > TimeSpan.Zero)
+                    if (remaining > TimeSpan.Zero)
                     {
                         PlatformApi.Instance.Sleep(remaining);
                     }
@@ -178,7 +191,13 @@ namespace JankWorks.Game.Hosting
             }
         }
 
-        public override void SynchroniseClientUpdate() { }
+        public override void SynchroniseClientUpdate() 
+        {
+            lock(this)
+            {
+                this.dispatcher.Synchronise();
+            }            
+        }
 
         public override void UnloadScene()
         {
@@ -206,6 +225,7 @@ namespace JankWorks.Game.Hosting
                 Scene = scene,
                 InitState = initState
             };
+            Thread.MemoryBarrier();
             this.state = HostState.LoadingScene;
         }
 
@@ -241,6 +261,6 @@ namespace JankWorks.Game.Hosting
 
         UnloadingScene,
 
-        WaitingOnClients,
+        WaitingOnClients
     }
 }

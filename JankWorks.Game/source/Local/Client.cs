@@ -10,6 +10,7 @@ using JankWorks.Interface;
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Configuration;
 using JankWorks.Game.Hosting;
+using JankWorks.Game.Hosting.Messaging;
 
 using JankWorks.Game.Platform;
 
@@ -33,6 +34,8 @@ namespace JankWorks.Game.Local
         public float UpdatesPerSecond { get; private set; }
 
         public float FramesPerSecond { get; private set; }
+
+        public Dispatcher Dispatcher => this.host.Dispatcher;
 
         internal ClientState State => this.state;
 
@@ -262,9 +265,7 @@ namespace JankWorks.Game.Local
                 if (accumulator >= frameTime)
                 {
                     if(lag >= updateTime)
-                    {
-                        this.host.SynchroniseClientUpdate();
-
+                    {                        
                         do
                         {
                             var delta = (lag > updateTime) ? updateTime : lag;
@@ -305,12 +306,14 @@ namespace JankWorks.Game.Local
             this.upsCounter.Count();
 
             this.window.ProcessEvents();
+
             if (state > ClientState.BeginLoadingScene)
             {
                 this.loadingScreen?.Update(delta);
             }
             else
             {
+                this.host.SynchroniseClientUpdate();
                 this.scene.Update(delta);
             }
         }

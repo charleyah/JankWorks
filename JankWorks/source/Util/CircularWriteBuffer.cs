@@ -2,11 +2,11 @@
 
 namespace JankWorks.Util
 {
-    public sealed class CircularArrayBuffer<T> : Buffer<T> where T : unmanaged
+    public sealed class CircularWriteBuffer<T> : IBuffer<T>, IWriteBuffer<T> where T : unmanaged
     {
-        public override ref T this[int index] => ref this.buffer[index];
+        public ref T this[int index] => ref this.buffer[index];
 
-        public override int Position
+        public int WritePosition
         {
             get => this.cursor;
             set
@@ -22,37 +22,37 @@ namespace JankWorks.Util
             }
         }
 
-        public override int Capacity => this.buffer.Length;
+        public int Capacity => this.buffer.Length;
 
         private T[] buffer;
         private int cursor;
        
-        public CircularArrayBuffer(int capacity)
+        public CircularWriteBuffer(int capacity)
         {
             this.buffer = new T[capacity];
             this.cursor = 0;
         }
 
-        public override void Clear() => this.Clear(0, this.buffer.Length);
+        public void Clear() => this.Clear(0, this.buffer.Length);
 
-        public override void Clear(int offset, int length)
+        public void Clear(int offset, int length)
         {
             Array.Clear(this.buffer, offset, length);
             this.cursor = 0;
         }
 
-        public override Span<T> GetBufferSpan() => new Span<T>(this.buffer);
+        public Span<T> GetBufferSpan() => new Span<T>(this.buffer);
 
-        public override Span<T> GetSpan() => new Span<T>(this.buffer, 0, this.cursor);
+        public Span<T> GetSpan() => new Span<T>(this.buffer, 0, this.cursor);
 
-        public override void Write(T value)
+        public void Write(T value)
         {
             var cursor = this.cursor;
             this.buffer[cursor++] = value;
             this.cursor = (cursor >= this.Capacity) ? 0 : cursor;
         }
 
-        public override void Write(ReadOnlySpan<T> values)
+        public void Write(ReadOnlySpan<T> values)
         {
             var cursor = this.cursor;
             var bufferSize = this.buffer.Length;

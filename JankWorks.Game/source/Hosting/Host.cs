@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 using JankWorks.Core;
 
-using JankWorks.Game.Local;
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Configuration;
+using JankWorks.Game.Hosting.Messaging;
 
 namespace JankWorks.Game.Hosting
 {   
@@ -24,6 +24,8 @@ namespace JankWorks.Game.Hosting
 
         public abstract bool IsHostLoaded { get; }
 
+        public abstract Dispatcher Dispatcher { get; }
+
         public float TicksPerSecond { get; protected set; }
 
         public TimeSpan Lag { get; protected set; }
@@ -41,7 +43,5 @@ namespace JankWorks.Game.Hosting
         public abstract MetricCounter[] GetMetrics();
 
         public abstract Task DisposeAsync();
-    }
-
-        
+    }        
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using JankWorks.Game.Hosting.Messaging;
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Local;
 
@@ -13,6 +14,8 @@ namespace JankWorks.Game.Hosting
         public override bool IsConnected => true;
 
         public override bool IsHostLoaded => true;
+
+        public override Dispatcher Dispatcher => throw new NotSupportedException();
 
         public NullHost(Application app) : base(app, app.GetClientSettings()) { }
 
