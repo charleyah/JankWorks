@@ -11,7 +11,7 @@ namespace JankWorks.Game.Hosting.Messaging
             this.Application = application;
         }
 
-        public abstract IMessageChannel<Message> GetMessageChannel<Message>(byte id, IChannel.Direction direction, IChannel.Reliability reliability) where Message : unmanaged;
+        public abstract IMessageChannel<Message> GetMessageChannel<Message>(byte id, ChannelParameters parameters) where Message : unmanaged;
 
         public abstract void Synchronise();
 

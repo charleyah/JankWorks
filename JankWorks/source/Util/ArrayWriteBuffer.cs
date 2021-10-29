@@ -2,7 +2,7 @@
 
 namespace JankWorks.Util
 {
-    public sealed class ArrayWriteBuffer<T> : IDynamicBuffer<T>, IWriteBuffer<T> where T : unmanaged
+    public class ArrayWriteBuffer<T> : IDynamicBuffer<T>, IWriteBuffer<T> where T : unmanaged
     {
         public ref T this[int index] => ref this.buffer[index];
 
@@ -22,9 +22,9 @@ namespace JankWorks.Util
             }
         }
 
-        public int Length => this.WritePosition;
+        public virtual int Length => this.WritePosition;
 
-        public int Capacity => this.buffer.Length;
+        public virtual int Capacity => this.buffer.Length;
 
         internal T[] buffer;
         private int cursor;
@@ -39,15 +39,15 @@ namespace JankWorks.Util
 
         public void Clear() => this.Clear(0, this.buffer.Length);
 
-        public void Clear(int offset, int length)
+        public virtual void Clear(int offset, int length)
         {
             Array.Clear(this.buffer, offset, length);
             this.cursor = 0;
         }
 
-        public void Compact()
+        public virtual void Compact()
         {
-            int length = this.Length;
+            int length = this.WritePosition;
 
             if (this.Capacity > length)
             {
@@ -55,7 +55,7 @@ namespace JankWorks.Util
             }
         }
 
-        public void Reserve(int count)
+        public virtual void Reserve(int count)
         {
             int required = this.cursor + count;
             int size = this.Capacity;
@@ -66,7 +66,7 @@ namespace JankWorks.Util
                 {
                     size = required;
                 }
-                else if (required % size == 0)
+                else if (required > size && required % size == 0)
                 {
                     size = required;
                 }
@@ -78,9 +78,13 @@ namespace JankWorks.Util
             }
         }
 
+        public T[] GetBuffer() => this.buffer;
+
         public Span<T> GetBufferSpan() => new Span<T>(this.buffer);
 
-        public Span<T> GetSpan() => new Span<T>(this.buffer, 0, this.cursor);
+        public virtual Span<T> GetSpan() => this.GetWritten();
+
+        public Span<T> GetWritten() => new Span<T>(this.buffer, 0, this.cursor);
 
         public void Write(T value)
         {
@@ -97,33 +101,6 @@ namespace JankWorks.Util
             values.CopyTo(bufferSpace);
 
             this.cursor += length;
-        }
-        
-        public void Swap(ArrayReadBuffer<T> readbuffer)
-        {
-            var rb = readbuffer.buffer;
-
-            readbuffer.buffer = this.buffer;
-            readbuffer.ReadPosition = 0;
-            readbuffer.Capacity = this.Length;
-
-            this.buffer = rb;
-            this.WritePosition = 0;
-        }
-
-        public void CopyTo(ArrayReadBuffer<T> readbuffer)
-        {
-            readbuffer.Reserve(this.Length);
-            this.GetSpan().CopyTo(readbuffer.buffer);
-            readbuffer.ReadPosition = 0;
-            readbuffer.Capacity = this.Length;
-        }
-
-        public ArrayReadBuffer<T> GetReadBuffer()
-        {
-            var readbuffer = new T[this.Length];
-            this.GetSpan().CopyTo(readbuffer);
-            return new ArrayReadBuffer<T>(readbuffer);
-        }
+        }       
     }
 }

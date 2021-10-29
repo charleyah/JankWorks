@@ -19,13 +19,13 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
             Array.Clear(this.channels, 0, this.channels.Length);
         }
 
-        public override IMessageChannel<Message> GetMessageChannel<Message>(byte id, IChannel.Direction direction, IChannel.Reliability reliability)
+        public override IMessageChannel<Message> GetMessageChannel<Message>(byte id, ChannelParameters parameters)
         {
             ref var channel = ref this.channels[id];
 
             if(channel == null || channel.Disposed)
             {
-                channel = new MemoryMessageChannel<Message>(id, this.Application.Settings, direction);
+                channel = new MemoryMessageChannel<Message>(id, parameters, this.Application.Settings);
             }
 
             try

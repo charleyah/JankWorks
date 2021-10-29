@@ -24,6 +24,8 @@ namespace JankWorks.Util
 
         public int Capacity => this.buffer.Length;
 
+        public int Length => this.WritePosition;
+
         private T[] buffer;
         private int cursor;
        
@@ -43,7 +45,9 @@ namespace JankWorks.Util
 
         public Span<T> GetBufferSpan() => new Span<T>(this.buffer);
 
-        public Span<T> GetSpan() => new Span<T>(this.buffer, 0, this.cursor);
+        public Span<T> GetSpan() => this.GetWritten();
+
+        public Span<T> GetWritten() => new Span<T>(this.buffer, 0, this.cursor);
 
         public void Write(T value)
         {

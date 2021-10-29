@@ -14,42 +14,44 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
 
         public int Queued => this.receiveBuffer.Length;
 
-        private ArrayWriteBuffer<Message> sendBuffer;
-        private ArrayReadBuffer<Message> receiveBuffer;
+        private ArrayReadWriteBuffer<Message> sendBuffer;
+        private ArrayReadWriteBuffer<Message> receiveBuffer;
 
-        public MemoryMessageChannel(byte id, Settings settings, IChannel.Direction direction) : base(id, settings, direction) 
+        public MemoryMessageChannel(byte id, ChannelParameters parameters, Settings settings) : base(id, parameters, settings) 
         {
-            this.sendBuffer = new ArrayWriteBuffer<Message>();
-            this.receiveBuffer = new ArrayReadBuffer<Message>(new Message[this.sendBuffer.Capacity]);
+            this.sendBuffer = new ArrayReadWriteBuffer<Message>();
+            this.receiveBuffer = new ArrayReadWriteBuffer<Message>();
         }
 
-        [Conditional("DEBUG")]
         private void VerifyDirection(bool receive)
         {
-            Thread expectedThread;
+            if(Debugger.IsAttached)
+            {
+                Thread expectedThread;
 
-            if(receive)
-            {
-                expectedThread = this.Direction switch
+                if (receive)
                 {
-                    IChannel.Direction.Down => Threads.ClientThread,
-                    IChannel.Direction.Up => Threads.HostThread,
-                    _ => throw new NotImplementedException()
-                };
-            }
-            else
-            {
-                expectedThread = this.Direction switch
+                    expectedThread = this.Direction switch
+                    {
+                        IChannel.Direction.Down => Threads.ClientThread,
+                        IChannel.Direction.Up => Threads.HostThread,
+                        _ => throw new NotImplementedException()
+                    };
+                }
+                else
                 {
-                    IChannel.Direction.Down => Threads.HostThread,
-                    IChannel.Direction.Up => Threads.ClientThread,
-                    _ => throw new NotImplementedException()
-                };
-            }
-            
-            if (Thread.CurrentThread != expectedThread)
-            {
-                throw new Exceptions.MessageException($"Cannot {(receive ? "receive from a" : "send to a")} {this.Direction} Channel");
+                    expectedThread = this.Direction switch
+                    {
+                        IChannel.Direction.Down => Threads.HostThread,
+                        IChannel.Direction.Up => Threads.ClientThread,
+                        _ => throw new NotImplementedException()
+                    };
+                }
+
+                if (Thread.CurrentThread != expectedThread)
+                {
+                    throw new Exceptions.MessageException($"Cannot {(receive ? "receive from a" : "send to a")} {this.Direction} Channel");
+                }
             }
         }
 
@@ -81,7 +83,17 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
         {
             if(this.sendBuffer.Length > 0)
             {
-                this.sendBuffer.Swap(this.receiveBuffer);                                
+                if(this.Reliability == IChannel.Reliability.Unreliable)
+                {
+                    this.sendBuffer.Swap(this.receiveBuffer);                    
+                }
+                else
+                {
+                    this.receiveBuffer.Write(this.sendBuffer.GetSpan());
+                    this.receiveBuffer.CompactWithoutResize();                    
+                }
+
+                this.sendBuffer.WritePosition = 0;
             }            
         }
     }
