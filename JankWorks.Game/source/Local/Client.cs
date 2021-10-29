@@ -235,7 +235,9 @@ namespace JankWorks.Game.Local
 
         private void Run()
         {
-            Thread.CurrentThread.Name = $"{this.application.Name} Client Thread";
+            var clientThread = Thread.CurrentThread;
+            clientThread.Name = $"{this.application.Name} Client Thread";
+            Threads.ClientThread = clientThread;
 
             var updateTime = TimeSpan.FromMilliseconds((1f / this.parameters.UpdateRate) * 1000);
             var frameTime = TimeSpan.FromMilliseconds((1f / this.Configuration.FrameRate) * 1000);
@@ -402,6 +404,8 @@ namespace JankWorks.Game.Local
 
             this.graphicsDevice.Dispose();
             this.window.Dispose();
+
+            Threads.ClientThread = null;
 
             base.Dispose(finalising);
         }

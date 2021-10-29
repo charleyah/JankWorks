@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
 
 using JankWorks.Util;
+using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Configuration;
 
 namespace JankWorks.Game.Hosting.Messaging.Memory
@@ -14,19 +17,65 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
         private ArrayWriteBuffer<Message> sendBuffer;
         private ArrayReadBuffer<Message> receiveBuffer;
 
-        public MemoryMessageChannel(byte id, Settings settings, IChannel.Reliability reliability) : base(id, settings, reliability) 
+        public MemoryMessageChannel(byte id, Settings settings, IChannel.Direction direction) : base(id, settings, direction) 
         {
             this.sendBuffer = new ArrayWriteBuffer<Message>();
-            this.receiveBuffer = this.sendBuffer.GetReadBuffer();
+            this.receiveBuffer = new ArrayReadBuffer<Message>(new Message[this.sendBuffer.Capacity]);
         }
 
-        public Message? Receive() => this.receiveBuffer.Read();
+        [Conditional("DEBUG")]
+        private void VerifyDirection(bool receive)
+        {
+            Thread expectedThread;
 
-        public int Receive(Span<Message> messages) => this.receiveBuffer.Read(messages);
+            if(receive)
+            {
+                expectedThread = this.Direction switch
+                {
+                    IChannel.Direction.Down => Threads.ClientThread,
+                    IChannel.Direction.Up => Threads.HostThread,
+                    _ => throw new NotImplementedException()
+                };
+            }
+            else
+            {
+                expectedThread = this.Direction switch
+                {
+                    IChannel.Direction.Down => Threads.HostThread,
+                    IChannel.Direction.Up => Threads.ClientThread,
+                    _ => throw new NotImplementedException()
+                };
+            }
+            
+            if (Thread.CurrentThread != expectedThread)
+            {
+                throw new Exceptions.MessageException($"Cannot {(receive ? "receive from a" : "send to a")} {this.Direction} Channel");
+            }
+        }
 
-        public void Send(Message message) => this.sendBuffer.Write(message);
+        public Message? Receive()
+        {
+            this.VerifyDirection(true);
+            return this.receiveBuffer.Read();
+        }
 
-        public void Send(ReadOnlySpan<Message> messages) => this.sendBuffer.Write(messages);
+        public int Receive(Span<Message> messages)
+        {
+            this.VerifyDirection(true);
+            return this.receiveBuffer.Read(messages);
+        }
+
+        public void Send(Message message)
+        {
+            this.VerifyDirection(false);
+            this.sendBuffer.Write(message);
+        }
+
+        public void Send(ReadOnlySpan<Message> messages)
+        {
+            this.VerifyDirection(false);
+            this.sendBuffer.Write(messages);
+        }
 
         public override void Synchronise()
         {

@@ -10,12 +10,12 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
 
         public abstract bool Pending { get; }
         
-        internal IChannel.Reliability Reliability { get; private set; }
+        internal IChannel.Direction Direction { get; private set; }
 
-        public MemoryChannel(byte id, Settings settings, IChannel.Reliability reliability)
+        public MemoryChannel(byte id, Settings settings, IChannel.Direction direction)
         {
             this.Id = id;
-            this.Reliability = reliability;
+            this.Direction = direction;
         }
 
         public abstract void Synchronise();

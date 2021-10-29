@@ -98,7 +98,9 @@ namespace JankWorks.Game.Hosting
 
         private void Run()
         {
-            Thread.CurrentThread.Name = $"{this.Application.Name} Host Thread";
+            var hostThread = Thread.CurrentThread;
+            hostThread.Name = $"{this.Application.Name} Host Thread";
+            Threads.HostThread = hostThread;
 
             var timer = new Stopwatch();
             var tickTime = TimeSpan.FromMilliseconds((1f / this.parameters.TickRate) * 1000);
@@ -232,6 +234,8 @@ namespace JankWorks.Game.Hosting
         protected override void Dispose(bool finalising)
         {
             this.dispatcher.Dispose();
+            Threads.HostThread = null;
+
             this.state = HostState.Shutdown;
             base.Dispose(finalising);
         }

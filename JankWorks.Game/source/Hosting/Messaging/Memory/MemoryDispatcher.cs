@@ -1,5 +1,7 @@
 ﻿using System;
 
+using JankWorks.Game.Hosting.Messaging.Exceptions;
+
 namespace JankWorks.Game.Hosting.Messaging.Memory
 {
     sealed class MemoryDispatcher : Dispatcher
@@ -23,10 +25,17 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
 
             if(channel == null || channel.Disposed)
             {
-                channel = new MemoryMessageChannel<Message>(id, this.Application.Settings, reliability);
+                channel = new MemoryMessageChannel<Message>(id, this.Application.Settings, direction);
             }
 
-            return (IMessageChannel<Message>)channel;
+            try
+            {
+                return (IMessageChannel<Message>)channel;
+            }
+            catch(InvalidCastException ice)
+            {
+                throw new ChannelException("Channel mismatch", ice);
+            }            
         }
 
         public override void Synchronise()
