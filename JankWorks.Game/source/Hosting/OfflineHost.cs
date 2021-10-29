@@ -231,6 +231,7 @@ namespace JankWorks.Game.Hosting
 
         protected override void Dispose(bool finalising)
         {
+            this.dispatcher.Dispose();
             this.state = HostState.Shutdown;
             base.Dispose(finalising);
         }
