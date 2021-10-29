@@ -35,8 +35,6 @@ namespace JankWorks.Game.Local
 
         public float FramesPerSecond { get; private set; }
 
-        public Dispatcher Dispatcher => this.host.Dispatcher;
-
         internal ClientState State => this.state;
 
         private Application application;
