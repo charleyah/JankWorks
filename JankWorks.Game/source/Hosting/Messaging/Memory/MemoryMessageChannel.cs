@@ -17,8 +17,12 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
         private ArrayReadWriteBuffer<Message> sendBuffer;
         private ArrayReadWriteBuffer<Message> receiveBuffer;
 
+        private readonly int maxQueue;
+
         public MemoryMessageChannel(byte id, ChannelParameters parameters, Settings settings) : base(id, parameters, settings) 
         {
+            this.maxQueue = parameters.MaxQueueSize > 0 ? parameters.MaxQueueSize : 1024;
+
             this.sendBuffer = new ArrayReadWriteBuffer<Message>();
             this.receiveBuffer = new ArrayReadWriteBuffer<Message>();
         }
@@ -55,6 +59,14 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
             }
         }
 
+        private void CheckMaxQueue()
+        {
+            if (this.Reliability == IChannel.Reliability.Unreliable && this.sendBuffer.Length >= this.maxQueue)
+            {
+                this.sendBuffer.WritePosition = 0;
+            }
+        }
+
         public Message? Receive()
         {
             this.VerifyDirection(true);
@@ -70,12 +82,14 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
         public void Send(Message message)
         {
             this.VerifyDirection(false);
+            this.CheckMaxQueue();
             this.sendBuffer.Write(message);
         }
 
         public void Send(ReadOnlySpan<Message> messages)
         {
             this.VerifyDirection(false);
+            this.CheckMaxQueue();
             this.sendBuffer.Write(messages);
         }
 
@@ -89,8 +103,8 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
                 }
                 else
                 {
-                    this.receiveBuffer.Write(this.sendBuffer.GetSpan());
-                    this.receiveBuffer.CompactWithoutResize();                    
+                    this.receiveBuffer.CompactWithoutResize();
+                    this.receiveBuffer.Write(this.sendBuffer.GetSpan());                                        
                 }
 
                 this.sendBuffer.WritePosition = 0;

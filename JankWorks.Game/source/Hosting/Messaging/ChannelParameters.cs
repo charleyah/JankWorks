@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace JankWorks.Game.Hosting.Messaging
 {
     public struct ChannelParameters
@@ -8,6 +7,6 @@ namespace JankWorks.Game.Hosting.Messaging
 
         public IChannel.Reliability Reliability { get; set; }
 
-        public uint MaxQueueSize { get; set; }
+        public int MaxQueueSize { get; set; }
     }
 }
