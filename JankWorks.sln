@@ -24,7 +24,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.FreeType", "JankW
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{06F01A5C-BF69-49F6-B87A-1E42A6A4B381}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JankWorks.OpenAL", "JankWorks.OpenAL\JankWorks.OpenAL.csproj", "{4D692140-78AF-498A-B995-E6B70400E86B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.OpenAL", "JankWorks.OpenAL\JankWorks.OpenAL.csproj", "{4D692140-78AF-498A-B995-E6B70400E86B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JankWorks.Game.Network", "JankWorks.Game.Network\JankWorks.Game.Network.csproj", "{903E4766-33F9-4DDF-BF9F-F370C3D72C67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,10 @@ Global
 		{4D692140-78AF-498A-B995-E6B70400E86B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D692140-78AF-498A-B995-E6B70400E86B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D692140-78AF-498A-B995-E6B70400E86B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{903E4766-33F9-4DDF-BF9F-F370C3D72C67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{903E4766-33F9-4DDF-BF9F-F370C3D72C67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{903E4766-33F9-4DDF-BF9F-F370C3D72C67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{903E4766-33F9-4DDF-BF9F-F370C3D72C67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
