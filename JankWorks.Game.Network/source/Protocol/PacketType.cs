@@ -3,7 +3,7 @@ namespace JankWorks.Game.Network.Protocol
 {
     enum PacketType : byte
     {
-        BadPacket = 0,
+        Refused = 0,
 
         Ping,
 
