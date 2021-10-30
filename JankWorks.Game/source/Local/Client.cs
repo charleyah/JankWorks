@@ -10,7 +10,6 @@ using JankWorks.Interface;
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Configuration;
 using JankWorks.Game.Hosting;
-using JankWorks.Game.Hosting.Messaging;
 
 using JankWorks.Game.Platform;
 
@@ -29,13 +28,9 @@ namespace JankWorks.Game.Local
 
         public ClientConfgiuration Configuration { get; private set; }
 
-        public TimeSpan Lag { get; private set; }
+        public ClientMetrics Metrics { get; private set; }
 
-        public float UpdatesPerSecond { get; private set; }
-
-        public float FramesPerSecond { get; private set; }
-
-        internal ClientState State => this.state;
+        public ClientState State => this.state;
 
         private Application application;
 
@@ -62,6 +57,8 @@ namespace JankWorks.Game.Local
 
         public Client(Application application, ClientHost host)
         {
+            this.Metrics = new ClientMetrics();
+
             var second = TimeSpan.FromSeconds(1);
             this.upsCounter = new Counter(second);
             this.fpsCounter = new Counter(second);
@@ -109,8 +106,6 @@ namespace JankWorks.Game.Local
             this.audioDevice = AudioDevice.GetDefault();
         }
 
-        public MetricCounter[] GetMetrics() => this.scene.ClientMetricCounters;
-
         private void LoadScene()
         {
             var changeState = this.newSceneRequest;
@@ -127,7 +122,9 @@ namespace JankWorks.Game.Local
             else
             {
                 this.LoadSceneWithHost(scene, host, initstate);
-            }            
+            }
+
+            this.Metrics.Counters = this.scene.ClientMetricCounters;
 
             System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
@@ -260,7 +257,6 @@ namespace JankWorks.Game.Local
                 TimeSpan since = now - lastrun;
                 accumulator += since;
                 lag += since;
-                this.Lag = lag;
 
                 if (accumulator >= frameTime)
                 {
@@ -302,7 +298,7 @@ namespace JankWorks.Game.Local
 
         private void Update(ClientState state, TimeSpan delta)
         {
-            this.UpdatesPerSecond = this.upsCounter.Frequency;
+            this.Metrics.UpdatesPerSecond = this.upsCounter.Frequency;
             this.upsCounter.Count();
 
             this.window.ProcessEvents();
@@ -320,7 +316,7 @@ namespace JankWorks.Game.Local
 
         private void Render(ClientState state, Frame frame, TimeSpan timeout)
         {
-            this.FramesPerSecond = this.fpsCounter.Frequency;            
+            this.Metrics.FramesPerSecond = this.fpsCounter.Frequency;            
 
             if (state > ClientState.BeginLoadingScene)
             {

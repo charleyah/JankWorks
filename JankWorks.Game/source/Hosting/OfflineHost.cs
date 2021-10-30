@@ -26,18 +26,10 @@ namespace JankWorks.Game.Hosting
 
         private HostParameters parameters;
 
+        private Counter tickCounter;
+        private HostMetrics metrics;
         private Dispatcher dispatcher;
         private Thread runner;
-
-        public OfflineHost(Application application) : base(application, application.GetClientSettings())
-        {
-            var parms = application.HostParameters;
-            this.parameters = parms;
-            this.state = HostState.Constructed;
-
-            this.dispatcher = new MemoryDispatcher(application);
-            this.runner = new Thread(new ThreadStart(this.Run));            
-        }
 
         public override bool IsRemote => false;
 
@@ -46,6 +38,22 @@ namespace JankWorks.Game.Hosting
         public override bool IsHostLoaded => this.state == HostState.RunningScene;
 
         public override Dispatcher Dispatcher => this.dispatcher;
+
+        public override HostMetrics Metrics => this.metrics;
+
+        public OfflineHost(Application application) : base(application, application.GetClientSettings())
+        {
+            var parms = application.HostParameters;
+            this.parameters = parms;
+            this.tickCounter = new Counter(TimeSpan.FromSeconds(1));
+            this.metrics = new HostMetrics();
+            this.state = HostState.Constructed;
+
+            this.dispatcher = new MemoryDispatcher(application);
+            this.runner = new Thread(new ThreadStart(this.Run));            
+        }
+
+       
 
         public override MetricCounter[] GetMetrics() => this.scene.HostMetricCounters;
 
@@ -161,7 +169,6 @@ namespace JankWorks.Game.Hosting
                 var now = timer.Elapsed;
                 var since = now - lastrun;
                 lag += since;
-                this.Lag = lag;
 
                 if (lag >= tickTime)
                 {
@@ -176,7 +183,9 @@ namespace JankWorks.Game.Hosting
                         }
 
                         lag -= tickTime;
-                        this.TicksPerSecond = Convert.ToSingle(Math.Round(1000 / delta.TotalMilliseconds, 0));
+
+                        this.metrics.TicksPerSecond = this.tickCounter.Frequency;
+                        this.tickCounter.Count();
                     }
                     while (lag >= tickTime);
                 }
@@ -195,7 +204,7 @@ namespace JankWorks.Game.Hosting
 
         public override void SynchroniseClientUpdate() 
         {
-            lock(this)
+            lock (this)
             {
                 this.dispatcher.Synchronise();
             }            
@@ -216,7 +225,9 @@ namespace JankWorks.Game.Hosting
             this.scene.SharedInitialise(this, this.client);            
             this.scene.SharedInitialised(this.newHostSceneRequest.InitState);
 
-            this.newHostSceneRequest = default;
+            this.metrics.Counters = this.scene.HostMetricCounters;
+
+            this.newHostSceneRequest = default;            
             this.state = HostState.WaitingOnClients;
         }
 

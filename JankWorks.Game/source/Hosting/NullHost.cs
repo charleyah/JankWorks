@@ -17,6 +17,8 @@ namespace JankWorks.Game.Hosting
 
         public override Dispatcher Dispatcher => throw new NotSupportedException();
 
+        public override HostMetrics Metrics => throw new NotSupportedException();
+
         public NullHost(Application app) : base(app, app.GetClientSettings()) { }
 
         public override Task DisposeAsync() => Task.CompletedTask;

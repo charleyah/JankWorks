@@ -26,9 +26,7 @@ namespace JankWorks.Game.Hosting
 
         public abstract Dispatcher Dispatcher { get; }
 
-        public float TicksPerSecond { get; protected set; }
-
-        public TimeSpan Lag { get; protected set; }
+        public abstract HostMetrics Metrics { get; }
 
         public Settings Settings { get; init; }
 
