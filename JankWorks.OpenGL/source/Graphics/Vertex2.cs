@@ -1,8 +1,5 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
-
-using JankWorks.Graphics;
 
 namespace JankWorks.Drivers.OpenGL.Graphics
 {

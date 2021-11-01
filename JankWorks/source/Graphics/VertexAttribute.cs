@@ -35,6 +35,7 @@ namespace JankWorks.Graphics
     
     public enum VertexAttributeUsage
     {
+        Other = 0,
         Position,
         Colour,
         Normal,

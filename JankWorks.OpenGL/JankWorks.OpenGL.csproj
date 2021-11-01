@@ -14,6 +14,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="source\Graphics\GLShapeRenderer.frag.glsl">
+      <LogicalName>GLShapeRenderer.frag.glsl</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="source\Graphics\GLShapeRenderer.vert.glsl">
+      <LogicalName>GLShapeRenderer.vert.glsl</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="source\Graphics\GLSpriteRenderer.frag.glsl">
       <LogicalName>GLSpriteRenderer.frag.glsl</LogicalName>
     </EmbeddedResource>

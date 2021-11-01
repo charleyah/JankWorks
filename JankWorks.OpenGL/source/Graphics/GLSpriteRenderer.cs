@@ -10,23 +10,7 @@ using static JankWorks.Drivers.OpenGL.Native.Constants;
 namespace JankWorks.Drivers.OpenGL.Graphics
 {
     sealed class GLSpriteRenderer : SpriteRenderer
-    {
-        private struct RendererState
-        {
-            public Matrix4x4 projection;
-            public Matrix4x4 view;
-            public DrawState? drawState;
-            public bool drawing;
-
-            public void Setup()
-            {
-                this.projection = Matrix4x4.Identity;
-                this.view = Matrix4x4.Identity;
-                this.drawState = null;
-                this.drawing = false;
-            }
-        }
-               
+    {  
         private readonly struct Batch
         {
             public readonly GCHandle texture;
@@ -179,30 +163,14 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void BeginDraw()
         {
-            ref var rstate = ref this.state;
-
-            if (rstate.drawing) { throw new InvalidOperationException(); }
-
-            rstate.projection = this.Camera.GetProjection();
-            rstate.view = this.Camera.GetView();
-            rstate.drawState = null;
-
+            this.state.BeginDraw(this.Camera, null);
             this.Clear();
-            rstate.drawing = true;
         }
 
         public override void BeginDraw(DrawState state)
         {
-            ref var rstate = ref this.state;
-
-            if (rstate.drawing) { throw new InvalidOperationException(); }
-
-            rstate.projection = this.Camera.GetProjection();
-            rstate.view = this.Camera.GetView();
-            rstate.drawState = state;
-
+            this.state.BeginDraw(this.Camera, state);
             this.Clear();
-            rstate.drawing = true;
         }
 
         public override void Draw(Texture2D texture, Vector2 position, Vector2 size, Vector2 origin, float rotation, RGBA colour, Bounds textureBounds)
@@ -293,10 +261,9 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void EndDraw(Surface surface)
         {
-            ref var rstate = ref this.state;
-            if (!rstate.drawing) { throw new InvalidOperationException(); }
+            this.state.EndDraw();
 
-            if(this.Order == DrawOrder.Texture)
+            if (this.Order == DrawOrder.Texture)
             {
                 Array.Sort(this.batches, 0, this.batchCount, BatchComparer.Sorter);
                 // Improvement possible, reorder vertex data to remove duplicate texture batches                
@@ -304,15 +271,11 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
             this.Flush();
             this.DrawToSurface(surface);
-            rstate.drawing = false;
         }        
 
         public override bool ReDraw(Surface surface)
         {
-            ref readonly var rstate = ref this.state;
-            if (rstate.drawing) { throw new InvalidOperationException(); }
-
-            var canReDraw = this.batchCount > 0 && rstate.projection.Equals(this.Camera.GetProjection()) && rstate.view.Equals(this.Camera.GetView());
+            var canReDraw = this.batchCount > 0 && this.state.CanReDraw(this.Camera);
 
             if (canReDraw)
             {

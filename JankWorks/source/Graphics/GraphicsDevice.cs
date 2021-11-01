@@ -77,6 +77,7 @@ namespace JankWorks.Graphics
 
         public abstract TextRenderer CreateTextRenderer(Camera camera, Font font);
 
+        public abstract ShapeRenderer CreateShapeRenderer(Camera camera);
 
         public static GraphicsDevice Create(SurfaceSettings settings, IRenderTarget renderTarget)
         {

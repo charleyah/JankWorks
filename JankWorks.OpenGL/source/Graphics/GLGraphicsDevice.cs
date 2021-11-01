@@ -182,7 +182,9 @@ namespace JankWorks.Drivers.OpenGL.Graphics
         public override SpriteRenderer CreateSpriteRenderer(Camera camera, SpriteRenderer.DrawOrder drawOrder) => new GLSpriteRenderer(this, camera, drawOrder);
 
         public override TextRenderer CreateTextRenderer(Camera camera, Font font) => new GLTextRenderer(this, font, camera);
-        
+
+        public override ShapeRenderer CreateShapeRenderer(Camera camera) => new GLShapeRenderer(this, camera);
+
         public override VertexBuffer<T> CreateVertexBuffer<T>() => new GLVertexBuffer<T>();
 
         public override VertexLayout CreateVertexLayout() => new GLVertexLayout();
@@ -231,6 +233,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             program.UnBind();
         }
 
-        protected override void ApplyDrawState(in DrawState drawState) => drawState.Process();    
+        protected override void ApplyDrawState(in DrawState drawState) => drawState.Process();
     }
 }
