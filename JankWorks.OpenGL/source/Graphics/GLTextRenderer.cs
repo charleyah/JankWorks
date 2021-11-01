@@ -97,6 +97,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.program.SetVertexData(this.vertexBuffer, this.layout);
 
             this.fontTexture = device.CreateTexture2D(new Vector2i(1024, 2048), PixelFormat.GrayScale);
+            this.fontTexture.Filter = TextureFilter.Linear;
             this.program.SetUniform("Texture", this.fontTexture, 0);
         }
 
