@@ -147,7 +147,7 @@ namespace JankWorks.Game.Local
                     try
                     {
                         this.graphicsDevice.Activate();
-                        scene.InitialiseGraphicsResources(this.graphicsDevice);
+                        scene.DisposeGraphicsResources(this.graphicsDevice);
                     }
                     finally
                     {
@@ -162,7 +162,7 @@ namespace JankWorks.Game.Local
                     try
                     {
                         this.graphicsDevice.Activate();
-                        scene.InitialiseGraphicsResources(this.graphicsDevice);
+                        scene.DisposeGraphicsResources(this.graphicsDevice);
                     }
                     finally
                     {
@@ -413,7 +413,9 @@ namespace JankWorks.Game.Local
 
             return state;
         }
-        
+
+        public void Close() => this.window.Close();
+
         protected override void Dispose(bool finalising)
         {
             var ls = this.loadingScreen;
