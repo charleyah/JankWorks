@@ -222,13 +222,13 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             return canReDraw;
         }
 
-        public override void Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, float rotation, RGBA colour)
+        public override Bounds Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, float rotation, RGBA colour)
         {
             this.currentDrawColour = colour;
-            this.Draw(text, position, origin, rotation, this.colourpicker);
+            return this.Draw(text, position, origin, rotation, this.colourpicker);
         }
 
-        public override void Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, float rotation, Func<char, int, RGBA> colourpicker)
+        public override Bounds Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, float rotation, Func<char, int, RGBA> colourpicker)
         {
             ref readonly var rstate = ref this.state;
 
@@ -316,6 +316,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                         textSize.Y = textSize.Y + glyphpos.Y;
                     }
 
+                    var bounds = new Bounds(position - (textSize * origin), textSize);
 
                     var radians = MathF.PI / 180f * rotation;
 
@@ -338,8 +339,12 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                     }
 
                     this.vertexCount += vertices.Length;
+
+                    return bounds;
                 }
             }
+
+            return default;
         }
 
         private static int CountDrawableChars(ReadOnlySpan<char> chars)

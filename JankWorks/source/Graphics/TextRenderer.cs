@@ -21,19 +21,19 @@ namespace JankWorks.Graphics
 
         public abstract bool ReDraw(Surface surface);
 
-        public virtual void Draw(ReadOnlySpan<char> text, Vector2 position, RGBA colour)
+        public virtual Bounds Draw(ReadOnlySpan<char> text, Vector2 position, RGBA colour)
         {
-            this.Draw(text, position, Vector2.Zero, 0f, colour);
+            return this.Draw(text, position, Vector2.Zero, 0f, colour);
         }
 
-        public virtual void Draw(ReadOnlySpan<char> text, Vector2 position, Func<char, int, RGBA> colourpicker)
+        public virtual Bounds Draw(ReadOnlySpan<char> text, Vector2 position, Func<char, int, RGBA> colourpicker)
         {
-            this.Draw(text, position, Vector2.Zero, 0f, colourpicker);
+            return this.Draw(text, position, Vector2.Zero, 0f, colourpicker);
         }
 
-        public abstract void Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, float rotation, RGBA colour);
+        public abstract Bounds Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, float rotation, RGBA colour);
 
-        public abstract void Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, float rotation, Func<char, int, RGBA> colourpicker);
+        public abstract Bounds Draw(ReadOnlySpan<char> text, Vector2 position, Vector2 origin, float rotation, Func<char, int, RGBA> colourpicker);
 
         public abstract void EndDraw(Surface surface);
     }

@@ -27,6 +27,15 @@ namespace JankWorks.Graphics
             this.TopLeft = position;
             this.BottomRight = position + size;
         }
+
+        public bool Contains(Vector2 pos)
+        {
+            var tl = this.TopLeft;
+            var br = this.BottomRight;
+
+            return pos.X >= tl.X && pos.X <= br.X && pos.Y >= tl.Y && pos.Y <= br.Y;
+        }
+
         public override int GetHashCode() => this.TopLeft.GetHashCode() ^ this.BottomRight.GetHashCode();
         public override bool Equals(object obj) => obj is Bounds other && this == other;
         public bool Equals(Bounds other) => this == other;
