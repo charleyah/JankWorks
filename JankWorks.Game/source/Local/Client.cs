@@ -144,14 +144,30 @@ namespace JankWorks.Game.Local
                 if(this.host is NullHost)
                 {
                     scene.DisposeSoundResources(this.audioDevice);
-                    scene.DisposeGraphicsResources(this.graphicsDevice);
+                    try
+                    {
+                        this.graphicsDevice.Activate();
+                        scene.InitialiseGraphicsResources(this.graphicsDevice);
+                    }
+                    finally
+                    {
+                        this.graphicsDevice.Deactivate();
+                    }
                     scene.ClientDispose(this);
                 }
                 else
                 {
                     this.host.UnloadScene();
                     scene.DisposeSoundResources(this.audioDevice);
-                    scene.DisposeGraphicsResources(this.graphicsDevice);
+                    try
+                    {
+                        this.graphicsDevice.Activate();
+                        scene.InitialiseGraphicsResources(this.graphicsDevice);
+                    }
+                    finally
+                    {
+                        this.graphicsDevice.Deactivate();
+                    }
                     scene.ClientDisposeAfterShared(this);                    
                 }
 
@@ -166,7 +182,17 @@ namespace JankWorks.Game.Local
             sceneToLoad.PreInitialise(initState);
             sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
             sceneToLoad.ClientInitialise(this);
-            sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+
+            try
+            {
+                this.graphicsDevice.Activate();
+                sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+            }
+            finally
+            {
+                this.graphicsDevice.Deactivate();
+            }
+            
             sceneToLoad.InitialiseSoundResources(this.audioDevice);
             sceneToLoad.ClientInitialised(initState);
 
