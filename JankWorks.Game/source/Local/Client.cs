@@ -328,8 +328,6 @@ namespace JankWorks.Game.Local
         private void Update(ClientState state, TimeSpan delta)
         {
             this.Metrics.UpdatesPerSecond = this.upsCounter.Frequency;
-            this.upsCounter.Count();
-
             this.window.ProcessEvents();
 
             if (state > ClientState.BeginLoadingScene)
@@ -341,6 +339,8 @@ namespace JankWorks.Game.Local
                 this.host.SynchroniseClientUpdate();
                 this.scene.Update(delta);
             }
+
+            this.upsCounter.Count();
         }
 
         private void Render(ClientState state, Frame frame, TimeSpan timeout)
@@ -355,7 +355,6 @@ namespace JankWorks.Game.Local
                     {
                         this.loadingScreen.Render(this.graphicsDevice, frame);
                         this.graphicsDevice.Display();
-                        this.fpsCounter.Count();
                     }
                     finally
                     {
@@ -367,8 +366,9 @@ namespace JankWorks.Game.Local
             {
                 this.scene.Render(this.graphicsDevice, frame);
                 this.graphicsDevice.Display();
-                this.fpsCounter.Count();
             }
+
+            this.fpsCounter.Count();
         }
 
         private ClientState CheckForStateChange()
