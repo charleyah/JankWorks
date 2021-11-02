@@ -241,7 +241,7 @@ namespace JankWorks.Game.Local
         public void Run(int scene, ClientHost host, object initState = null)
         {           
             this.graphicsDevice.Activate();
-
+            this.graphicsDevice.ClearColour = Colour.Black;
             var ls = this.application.RegisterLoadingScreen();
 
             if (ls != null)
@@ -252,6 +252,9 @@ namespace JankWorks.Game.Local
                 this.loadingScreen = ls;
             }
             this.window.Show();
+            this.graphicsDevice.Clear();
+            this.graphicsDevice.Display();
+                
             this.ChangeScene(scene, host, initState);
             this.Run();
         }
