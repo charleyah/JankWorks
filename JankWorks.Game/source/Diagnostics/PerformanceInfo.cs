@@ -139,7 +139,7 @@ namespace JankWorks.Game.Diagnostics
                     var hostMetrics = this.host.Metrics;
 
                     this.PrintCounters("Tickable", hostMetrics.TickMetricCounters, maxcounters);
-                    this.PrintCounters("AsyncUpdatable", hostMetrics.AsyncTickMetricCounters, maxcounters);
+                    this.PrintCounters("AsyncTickable", hostMetrics.AsyncTickMetricCounters, maxcounters);
                 }
 
                 var clientMetrics = this.client.Metrics;
