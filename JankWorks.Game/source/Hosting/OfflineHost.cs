@@ -70,7 +70,7 @@ namespace JankWorks.Game.Hosting
                 InitState = initState
             };
             this.state = HostState.LoadingScene;
-
+            Thread.MemoryBarrier();
             var task = new Task(() => this.runner.Join());
             this.runner.Start();
             return task;
