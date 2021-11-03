@@ -71,8 +71,6 @@ namespace JankWorks.Game.Diagnostics
                 this.textBuffer.Write("TPS: ");
                 this.textBuffer.WriteInt(hostmetrics.TicksPerSecond);
                 this.textBuffer.Write('\n');
-
-                
             }            
         }
 
