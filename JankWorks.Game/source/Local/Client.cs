@@ -30,6 +30,12 @@ namespace JankWorks.Game.Local
 
         public ClientMetrics Metrics { get; private set; }
 
+        public Rectangle Viewport
+        {
+            get => this.graphicsDevice.Viewport;
+            set => this.graphicsDevice.Viewport = value;
+        }
+
         public ClientState State => this.state;
 
         private Application application;
@@ -271,7 +277,7 @@ namespace JankWorks.Game.Local
             var timer = new Stopwatch();
             timer.Start();
 
-            var accumulator = TimeSpan.Zero;
+            var accumulator = TimeSpan.Zero;            
             var lag = TimeSpan.Zero;
             var lastrun = timer.Elapsed;
 
@@ -307,6 +313,7 @@ namespace JankWorks.Game.Local
                     this.Render(state, frame, updateTime);
 
                     accumulator -= frameTime;
+                    accumulator = (accumulator > frameTime) ? frameTime : accumulator;
                 }
                 else
                 {
