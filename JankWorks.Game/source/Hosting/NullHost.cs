@@ -17,13 +17,16 @@ namespace JankWorks.Game.Hosting
 
         public override Dispatcher Dispatcher => throw new NotSupportedException();
 
-        public override HostMetrics Metrics => throw new NotSupportedException();
+        public override HostMetrics Metrics => this.emptyMetrics;
 
-        public NullHost(Application app) : base(app, app.GetClientSettings()) { }
+        private readonly HostMetrics emptyMetrics;
+
+        public NullHost(Application app) : base(app, app.GetClientSettings()) 
+        {
+            this.emptyMetrics = new HostMetrics();
+        }
 
         public override Task DisposeAsync() => Task.CompletedTask;
-
-        public override MetricCounter[] GetMetrics() => Array.Empty<MetricCounter>();
 
         public override void UnloadScene() { }
 

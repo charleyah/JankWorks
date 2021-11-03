@@ -62,7 +62,9 @@ namespace JankWorks.Game
 
         private IAsyncTickable[] asyncTickables;
 
-        internal MetricCounter[] HostMetricCounters { get; private set; }
+        internal MetricCounter[] TickMetricCounters { get; private set; }
+
+        internal MetricCounter[] AsyncTickMetricCounters { get; private set; }
 
         public HostScene()
         {            
@@ -71,7 +73,8 @@ namespace JankWorks.Game
             this.disposables = Array.Empty<IDisposable>();
             this.tickables = Array.Empty<ITickable>();
             this.asyncTickables = Array.Empty<IAsyncTickable>();
-            this.HostMetricCounters = Array.Empty<MetricCounter>();
+            this.TickMetricCounters = Array.Empty<MetricCounter>();
+            this.AsyncTickMetricCounters = Array.Empty<MetricCounter>();
         }                
 
         protected void RegisterHostObject(object obj) => this.hostObjects.Add(obj);
@@ -103,19 +106,19 @@ namespace JankWorks.Game
             this.disposables = (from obj in this.hostObjects where obj is IDisposable select (IDisposable)obj).Reverse().ToArray();
 
             if (this.PerformanceMetricsEnabled)
-            {
+            {                
                 this.tickables = (from obj in this.hostObjects where obj is ITickable select new TickableMetricCounter((ITickable)obj)).ToArray();
                 this.asyncTickables = (from obj in this.hostObjects where obj is IAsyncTickable select new AsyncTickableMetricCounter((IAsyncTickable)obj)).ToArray();
 
-                this.HostMetricCounters =
-                (from tickable in this.tickables select (MetricCounter)tickable)
-                .Concat(from asyncTickable in this.asyncTickables select (MetricCounter)asyncTickable).ToArray();
+                this.TickMetricCounters = (MetricCounter[])this.tickables.Clone();
+                this.AsyncTickMetricCounters = (MetricCounter[])this.asyncTickables.Clone();
             }
             else
             {
                 this.tickables = (from obj in this.hostObjects where obj is ITickable select (ITickable)obj).ToArray();
                 this.asyncTickables = (from obj in this.hostObjects where obj is IAsyncTickable select (IAsyncTickable)obj).ToArray();
-                this.HostMetricCounters = Array.Empty<MetricCounter>();
+                this.TickMetricCounters = Array.Empty<MetricCounter>();
+                this.AsyncTickMetricCounters = Array.Empty<MetricCounter>();
             }            
         }
 
@@ -135,9 +138,10 @@ namespace JankWorks.Game
 
         private void InternalHostDispose(Host host)
         {
-            this.HostMetricCounters = Array.Empty<MetricCounter>();
+            this.TickMetricCounters = Array.Empty<MetricCounter>();
+            this.AsyncTickMetricCounters = Array.Empty<MetricCounter>();
 
-            foreach(var disposable in this.disposables)
+            foreach (var disposable in this.disposables)
             {
                 disposable.Dispose();
             }
@@ -195,11 +199,20 @@ namespace JankWorks.Game
 
         private IAsyncRenderable[] asyncRenderables;
 
-        internal MetricCounter[] ClientMetricCounters { get; private set; }
+        internal MetricCounter[] UpdatableMetricCounters { get; private set; }
+
+        internal MetricCounter[] AsyncUpdatableMetricCounters { get; private set; }
+
+        internal MetricCounter[] RenderableMetricCounters { get; private set; }
+
+        internal MetricCounter[] AsyncRenderableMetricCounters { get; private set; }
 
         protected Scene() : base()
         {
-            this.ClientMetricCounters = Array.Empty<MetricCounter>();
+            this.UpdatableMetricCounters = Array.Empty<MetricCounter>();
+            this.AsyncUpdatableMetricCounters = Array.Empty<MetricCounter>();
+            this.RenderableMetricCounters = Array.Empty<MetricCounter>();
+            this.AsyncRenderableMetricCounters = Array.Empty<MetricCounter>();
 
             this.clientObjects = new List<object>(ApplicationScene.InitialObjectContainerCount);
             this.resources = Array.Empty<IResource>();
@@ -251,11 +264,10 @@ namespace JankWorks.Game
                 this.asyncUpdatables = (from obj in this.clientObjects where obj is IAsyncUpdatable select new AsyncUpdatableMetricCounter((IAsyncUpdatable)obj)).ToArray();
                 this.asyncRenderables = (from obj in this.clientObjects where obj is IAsyncRenderable select new AsyncRenderableMetricCounter((IAsyncRenderable)obj)).ToArray();
 
-                this.ClientMetricCounters =
-                (from updatable in this.updatables select (MetricCounter)updatable)
-                .Concat(from asyncUpdatable in this.asyncUpdatables select (MetricCounter)asyncUpdatable)
-                .Concat(from renderable in this.renderables select (MetricCounter)renderable)
-                .Concat(from asyncRenderable in this.asyncRenderables select (MetricCounter)asyncRenderable).ToArray();
+                this.UpdatableMetricCounters = (MetricCounter[])this.updatables.Clone();
+                this.AsyncUpdatableMetricCounters = (MetricCounter[])this.asyncUpdatables.Clone();
+                this.RenderableMetricCounters = (MetricCounter[])this.renderables.Clone();
+                this.AsyncRenderableMetricCounters = (MetricCounter[])this.asyncRenderables.Clone();
             }
             else
             {
@@ -263,6 +275,11 @@ namespace JankWorks.Game
                 this.renderables = (from obj in this.clientObjects where obj is IRenderable select (IRenderable)obj).ToArray();
                 this.asyncUpdatables = (from obj in this.clientObjects where obj is IAsyncUpdatable select (IAsyncUpdatable)obj).ToArray();
                 this.asyncRenderables = (from obj in this.clientObjects where obj is IAsyncRenderable select (IAsyncRenderable)obj).ToArray();
+
+                this.UpdatableMetricCounters = Array.Empty<MetricCounter>();
+                this.AsyncUpdatableMetricCounters = Array.Empty<MetricCounter>();
+                this.RenderableMetricCounters = Array.Empty<MetricCounter>();
+                this.AsyncRenderableMetricCounters = Array.Empty<MetricCounter>();
             }            
         }
 
@@ -274,6 +291,9 @@ namespace JankWorks.Game
 
         public virtual void ClientDispose(Client client) 
         {
+            this.UpdatableMetricCounters = Array.Empty<MetricCounter>();
+            this.AsyncUpdatableMetricCounters = Array.Empty<MetricCounter>();
+
             foreach (var disposable in this.disposables)
             {
                 disposable.Dispose();
@@ -327,6 +347,9 @@ namespace JankWorks.Game
             this.graphicsResources = Array.Empty<IGraphicsResource>();
             this.renderables = Array.Empty<IRenderable>();
             this.asyncRenderables = Array.Empty<IAsyncRenderable>();
+
+            this.RenderableMetricCounters = Array.Empty<MetricCounter>();
+            this.AsyncRenderableMetricCounters = Array.Empty<MetricCounter>();
         }
 
         public virtual void InitialiseSoundResources(AudioDevice device) 

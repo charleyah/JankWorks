@@ -17,8 +17,4 @@
     <ProjectReference Include="..\JankWorks\JankWorks.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="source\Assets\" />
-  </ItemGroup>
-
 </Project>

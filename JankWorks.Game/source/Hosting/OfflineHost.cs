@@ -52,11 +52,7 @@ namespace JankWorks.Game.Hosting
             this.dispatcher = new MemoryDispatcher(application);
             this.runner = new Thread(new ThreadStart(this.Run));            
         }
-
-       
-
-        public override MetricCounter[] GetMetrics() => this.scene.HostMetricCounters;
-
+      
         public override Task RunAsync(Client client)
         {
             this.client = client;
@@ -225,7 +221,8 @@ namespace JankWorks.Game.Hosting
             this.scene.SharedInitialise(this, this.client);            
             this.scene.SharedInitialised(this.newHostSceneRequest.InitState);
 
-            this.metrics.Counters = this.scene.HostMetricCounters;
+            this.metrics.TickMetricCounters = this.scene.TickMetricCounters;
+            this.metrics.AsyncTickMetricCounters = this.scene.AsyncTickMetricCounters;
 
             this.newHostSceneRequest = default;            
             this.state = HostState.WaitingOnClients;

@@ -38,8 +38,6 @@ namespace JankWorks.Game.Hosting
             this.Settings = settings;
         }
 
-        public abstract MetricCounter[] GetMetrics();
-
         public abstract Task DisposeAsync();
     }        
 }

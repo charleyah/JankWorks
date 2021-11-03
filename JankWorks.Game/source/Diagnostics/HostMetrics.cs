@@ -4,14 +4,17 @@ namespace JankWorks.Game.Diagnostics
 {
     public sealed class HostMetrics
     {
-        public MetricCounter[] Counters { get; set; }
+        public MetricCounter[] TickMetricCounters { get; internal set; }
+
+        public MetricCounter[] AsyncTickMetricCounters { get; internal set; }
 
         public int TicksPerSecond { get; set; }
 
         public HostMetrics()
         {
             this.TicksPerSecond = 0;
-            this.Counters = Array.Empty<MetricCounter>();
+            this.TickMetricCounters = Array.Empty<MetricCounter>();
+            this.AsyncTickMetricCounters = Array.Empty<MetricCounter>();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace JankWorks.Game.Assets
             this.bundles = new Dictionary<string, IAssetBundle>();
             this.disposableBundles = new List<IDisposable>(8);
         }
-
+       
         public IAssetBundle this[string name] => this.GetBundle(name);
 
         public void RegisterBundle(IAssetBundle bundle, string name)
@@ -43,6 +43,8 @@ namespace JankWorks.Game.Assets
                 throw new ApplicationException($"Missing asset bundle {name}");
             }
         }
+
+        public Stream GetAsset(in Asset asset) => this.GetAsset(asset.Bundle, asset.Name);
 
         public Stream GetAsset(string bundle, string asset)
         {
