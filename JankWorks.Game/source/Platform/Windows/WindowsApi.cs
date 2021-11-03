@@ -48,17 +48,23 @@ namespace JankWorks.Game.Platform.Windows
         [DllImport("Winmm.dll")]
         private static extern unsafe MMRESULT timeEndPeriod(uint uPeriod);
 
-        public override void Sleep(TimeSpan time)
+        private readonly TIMECAPS caps;
+
+        public WindowsApi()
         {
             var tc = default(TIMECAPS);
             unsafe
             {
                 timeGetDevCaps(&tc, (uint)sizeof(TIMECAPS));
             }
+            this.caps = tc;
+        }
 
-            timeBeginPeriod(tc.wPeriodMin);
+        public override void Sleep(TimeSpan time)
+        {           
+            timeBeginPeriod(this.caps.wPeriodMin);
             System.Threading.Thread.Sleep(time);
-            timeEndPeriod(tc.wPeriodMin);
+            timeEndPeriod(this.caps.wPeriodMin);
         }
     }
 }
