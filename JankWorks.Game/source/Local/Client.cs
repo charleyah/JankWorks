@@ -235,6 +235,11 @@ namespace JankWorks.Game.Local
                 throw new ArgumentException();
             }
 
+            if(scene < 0 || scene >= this.application.RegisteredScenes.Length)
+            {
+                throw new ArgumentException($"scene {scene} does not exist");
+            }
+
             this.newSceneRequest = new NewSceneRequest()
             {
                 Host = host,
@@ -242,6 +247,7 @@ namespace JankWorks.Game.Local
                 Scene = scene
             };
             this.state = ClientState.BeginLoadingScene;
+
         }
 
         public void Run(int scene, object initState = null) => this.Run(scene, this.host, initState);
