@@ -33,7 +33,6 @@ namespace JankWorks.Game.Local
         public Rectangle Viewport
         {
             get => this.graphicsDevice.Viewport;
-            set => this.graphicsDevice.Viewport = value;
         }
 
         public ClientState State => this.state;
