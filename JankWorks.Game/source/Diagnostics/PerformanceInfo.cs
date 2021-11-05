@@ -37,7 +37,7 @@ namespace JankWorks.Game.Diagnostics
             this.fontAsset = fontAsset;
             this.fontSize = fontSize;
             this.Colour = JankWorks.Graphics.Colour.White;
-            this.Position = new Vector2(4, 2);
+            this.Position = new Vector2(4);
             this.textBuffer = new ArrayWriteBuffer<char>();
         }
 
