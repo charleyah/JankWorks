@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="assets\ibm-plex-mono.regular.ttf">
+      <LogicalName>ibm-plex-mono.regular.ttf</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JankWorks.DotNet\JankWorks.DotNet.csproj" />
+    <ProjectReference Include="..\JankWorks.FreeType\JankWorks.FreeType.csproj" />
+    <ProjectReference Include="..\JankWorks.Game\JankWorks.Game.csproj" />
+    <ProjectReference Include="..\JankWorks.Glfw\JankWorks.Glfw.csproj" />
+    <ProjectReference Include="..\JankWorks.OpenAL\JankWorks.OpenAL.csproj" />
+    <ProjectReference Include="..\JankWorks.OpenGL\JankWorks.OpenGL.csproj" />
+    <ProjectReference Include="..\JankWorks\JankWorks.csproj" />
+  </ItemGroup>
+
+</Project>

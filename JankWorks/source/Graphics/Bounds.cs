@@ -16,6 +16,14 @@ namespace JankWorks.Graphics
 
         public Vector2 BottomRight { get; set; }
 
+        public Vector2 Size
+        {
+            get
+            {
+                return new Vector2(this.BottomRight.X - this.TopLeft.X, this.BottomRight.Y - this.TopLeft.Y);
+            }
+        }
+
         public Bounds(float left, float top, float right, float bottom)
         {
             this.TopLeft = new Vector2(left, top);
@@ -36,6 +44,41 @@ namespace JankWorks.Graphics
             return pos.X >= tl.X && pos.X <= br.X && pos.Y >= tl.Y && pos.Y <= br.Y;
         }
 
+        public bool Intersects(Bounds other)
+        {            
+            Bounds src;
+            Bounds des;
+            
+            if (this.TopLeft.X <= other.TopLeft.X)
+            {
+                src = this;
+                des = other;
+            }
+            else
+            {
+                src = other;
+                des = this;
+            }
+
+            if(src.BottomRight.X >= des.TopLeft.X)
+            {
+                if (this.TopLeft.Y <= other.TopLeft.Y)
+                {
+                    src = this;
+                    des = other;
+                }
+                else
+                {
+                    src = other;
+                    des = this;
+                }
+
+                return src.BottomRight.Y >= des.TopLeft.Y;
+            }
+
+            return false;                
+
+        }
         public override int GetHashCode() => this.TopLeft.GetHashCode() ^ this.BottomRight.GetHashCode();
         public override bool Equals(object obj) => obj is Bounds other && this == other;
         public bool Equals(Bounds other) => this == other;
