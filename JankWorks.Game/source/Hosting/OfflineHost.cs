@@ -151,12 +151,11 @@ namespace JankWorks.Game.Hosting
                         continue;
 
                     case HostState.Constructed:
-                        Thread.Yield();
+                        Thread.Yield();                        
                         continue;
 
                     case HostState.BeginShutdown:
-                        base.Dispose(false);
-                        this.state = HostState.Shutdown;
+                        this.Dispose();
                         return;
                     case HostState.Shutdown:
                         return;
@@ -241,22 +240,50 @@ namespace JankWorks.Game.Hosting
 
         protected override void Dispose(bool finalising)
         {
-            this.dispatcher.Dispose();
-            Threads.HostThread = null;
-
-            this.state = HostState.Shutdown;
+            if(Thread.CurrentThread.ManagedThreadId == this.runner.ManagedThreadId)
+            {
+                this.dispatcher.Dispose();
+                Threads.HostThread = null;
+                this.state = HostState.Shutdown;
+            }
+            else
+            {
+                this.DisposeAsync().Wait();
+            }
+            
             base.Dispose(finalising);
         }
 
         public override Task DisposeAsync()
-        {
-            var task = new Task(() => this.runner.Join());
-
-            if (this.state != HostState.BeginShutdown)
+        {            
+            if (Thread.CurrentThread.ManagedThreadId == this.runner.ManagedThreadId)
             {
-                this.state = HostState.BeginShutdown;
+                // returning a async task of yourself doing something is pretty deep
+                throw new InvalidOperationException();
             }
-            return task;
+
+            return Task.Run(() =>
+            {
+                var currentState = this.state;
+
+                // If the host thread is currently running we need to signal it to unload first
+                if (currentState == HostState.RunningScene || currentState == HostState.WaitingOnClients)
+                {
+                    this.UnloadScene();
+                }
+
+                // host thread will reset state to constructed once its finished unloading
+                while (this.state != HostState.Constructed)
+                {
+                    Thread.Yield();
+                }
+
+                // only signal to shutdown once host thread is finished unloading
+                this.state = HostState.BeginShutdown;
+
+                // important this join only happens once the host thread is actually shutting down
+                this.runner.Join();
+            });                 
         }
     }
 

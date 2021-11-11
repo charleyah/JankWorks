@@ -18,6 +18,8 @@ namespace JankWorks.Game.Hosting
             public object InitState;
         }
 
+        public bool IsLocal => !this.IsRemote;
+
         public abstract bool IsRemote { get; }
 
         public abstract bool IsConnected { get; }

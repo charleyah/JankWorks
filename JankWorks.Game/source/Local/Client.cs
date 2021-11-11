@@ -218,7 +218,17 @@ namespace JankWorks.Game.Local
             host.LoadScene(sceneToLoad, initState);
 
             sceneToLoad.ClientInitialiseAfterShared(this);
-            sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+
+            try
+            {
+                this.graphicsDevice.Activate();
+                sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+            }
+            finally
+            {
+                this.graphicsDevice.Deactivate();
+            }
+
             sceneToLoad.InitialiseSoundResources(this.audioDevice);
             sceneToLoad.ClientInitialised(initState);
 
@@ -239,6 +249,8 @@ namespace JankWorks.Game.Local
             {
                 throw new ArgumentException($"scene {scene} does not exist");
             }
+
+            host.Start(this);
 
             this.newSceneRequest = new NewSceneRequest()
             {
@@ -336,8 +348,8 @@ namespace JankWorks.Game.Local
                 lastrun = now;
             }
 
-            this.UnloadScene();
-            this.host.DisposeAsync();
+            this.UnloadScene();           
+            this.host.Dispose();
         }
 
         private void Update(ClientState state, TimeSpan delta)
