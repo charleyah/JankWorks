@@ -68,7 +68,7 @@ namespace JankWorks.Game.Diagnostics
             {
                 var hostmetrics = this.host.Metrics;
 
-                this.textBuffer.Write("TPS: ");
+                this.textBuffer.Write("TPS ");
                 this.textBuffer.WriteInt(hostmetrics.TicksPerSecond);
                 this.textBuffer.Write('\n');
             }            

@@ -110,6 +110,7 @@ namespace JankWorks.Game.Hosting
             var tickTime = TimeSpan.FromMilliseconds((1f / this.parameters.TickRate) * 1000);
 
             timer.Start();
+            tickCounter.Start();
 
             var lag = TimeSpan.Zero;
             this.tick = 0;
@@ -179,10 +180,12 @@ namespace JankWorks.Game.Hosting
 
                         lag -= tickTime;
 
-                        this.metrics.TicksPerSecond = this.tickCounter.Frequency;
                         this.tickCounter.Count();
                     }
                     while (lag >= tickTime);
+
+
+                    this.metrics.TicksPerSecond = this.tickCounter.Frequency;
                 }
                 else
                 {
