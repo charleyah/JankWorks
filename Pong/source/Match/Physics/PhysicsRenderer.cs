@@ -9,7 +9,7 @@ using JankWorks.Util;
 
 namespace Pong.Match.Physics
 {
-    sealed class PhysicsRenderer : IUpdatable, IRenderable
+    sealed class PhysicsRenderer : IUpdatable, IRenderable, IDispatchable
     {
         private Camera camera;
         private ShapeRenderer renderer;                
@@ -17,9 +17,8 @@ namespace Pong.Match.Physics
 
         private IMessageChannel<PhysicsEvent> events;
 
-        public PhysicsRenderer(IMessageChannel<PhysicsEvent> events)
-        {
-            this.events = events;
+        public PhysicsRenderer()
+        {            
             this.components = new ArrayWriteBuffer<PhysicsComponent>(8);
         }
 
@@ -30,12 +29,27 @@ namespace Pong.Match.Physics
             this.renderer = device.CreateShapeRenderer(this.camera);
         }
 
+        public void InitialiseChannels(Dispatcher dispatcher)
+        {
+            this.events = dispatcher.GetMessageChannel<PhysicsEvent>(PhysicsEvent.Channel, new ChannelParameters()
+            {
+                Direction = IChannel.Direction.Down,
+                MaxQueueSize = 16,
+                Reliability = IChannel.Reliability.Reliable
+            });
+        }
 
-        public void Update(TimeSpan delta)
+        public void UpSynchronise() { }
+
+        public void DownSynchronise() => this.ProcessEvents();
+
+        public void Update(TimeSpan delta) => this.ProcessEvents();
+        
+        private void ProcessEvents()
         {
             PhysicsEvent msg;
-            
-            while(this.events.Pending)
+
+            while (this.events.Pending)
             {
                 msg = this.events.Receive().Value;
                 this.ProcessEvent(in msg);
@@ -66,7 +80,8 @@ namespace Pong.Match.Physics
             for(int i = 0; i < totalComponents.Length; i++)
             {
                 var com = totalComponents[i];
-                var pos = Vector2.Lerp(com.position, com.position + com.velocity, (float)frame.Interpolation);
+
+                var pos = com.velocity != Vector2.Zero ? Vector2.Lerp(com.position, com.position + com.velocity, (float)frame.Interpolation) : com.position;
                 this.renderer.DrawRectangle(com.size, pos, com.origin, 0f, com.colour);
             }
             this.renderer.EndDraw(surface);

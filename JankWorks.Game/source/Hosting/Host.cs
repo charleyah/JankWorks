@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 using JankWorks.Core;
 
@@ -25,6 +24,8 @@ namespace JankWorks.Game.Hosting
         public abstract bool IsConnected { get; }
 
         public abstract bool IsHostLoaded { get; }
+
+        public abstract HostState State { get; }
 
         public abstract Dispatcher Dispatcher { get; }
 

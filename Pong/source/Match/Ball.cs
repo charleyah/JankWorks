@@ -8,7 +8,7 @@ using Pong.Match.Physics;
 
 namespace Pong.Match
 {
-    sealed class Ball : ITickable
+    sealed class Ball
     {
         public int PhysicsComponentId { get; init; }
 
@@ -68,11 +68,6 @@ namespace Pong.Match
                     
 
             com.velocity = new Vector2(-initialVelocityX, velocityY);
-        }
-
-        public void Tick(ulong tick, TimeSpan delta)
-        {
-            
         }
     }
 }

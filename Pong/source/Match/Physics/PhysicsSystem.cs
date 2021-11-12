@@ -7,11 +7,10 @@ using JankWorks.Util;
 
 using JankWorks.Game;
 using JankWorks.Game.Hosting.Messaging;
-using JankWorks.Game.Assets;
 
 namespace Pong.Match.Physics
 {
-    sealed class PhysicsSystem : Disposable, ITickable
+    sealed class PhysicsSystem : Disposable, ITickable, IDispatchable
     {
         public event Action<int> OnCollision
         {
@@ -26,13 +25,30 @@ namespace Pong.Match.Physics
 
         private Bounds area;
                 
-        public PhysicsSystem(IMessageChannel<PhysicsEvent> events, Bounds area)
+        public PhysicsSystem(Bounds area)
         {
             this.OnCollisionHandler = new Event<int>();
             this.area = area;
-            this.events = events;
             this.components = new ArrayWriteBuffer<PhysicsComponent>(8);
         }
+
+        public void InitialiseChannels(Dispatcher dispatcher)
+        {
+            this.events = dispatcher.GetMessageChannel<PhysicsEvent>(PhysicsEvent.Channel, new ChannelParameters()
+            {
+                Direction = IChannel.Direction.Down,
+                MaxQueueSize = 16,
+                Reliability = IChannel.Reliability.Reliable
+            });
+        }
+
+        public void UpSynchronise() { }
+
+        public void DownSynchronise()
+        {
+            this.Broadcast();
+        }
+
 
         public int RequestComponent(PhysicsComponent inital)
         {
@@ -128,6 +144,12 @@ namespace Pong.Match.Physics
             };
 
             this.events.Send(physEvent);
+        }
+
+
+        public void DisposeChannels(Dispatcher dispatcher)
+        {
+            this.events.Dispose();
         }
 
         protected override void Dispose(bool finalising)

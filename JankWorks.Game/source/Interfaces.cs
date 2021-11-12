@@ -7,7 +7,7 @@ using JankWorks.Interface;
 
 using JankWorks.Game.Assets;
 
-using JankWorks.Game.Hosting;
+using JankWorks.Game.Hosting.Messaging;
 
 namespace JankWorks.Game
 {
@@ -17,6 +17,7 @@ namespace JankWorks.Game
 
         void DisposeResources();
     }
+
     public interface IInputListener
     {
         void SubscribeInputs(IInputManager inputManager);
@@ -50,6 +51,15 @@ namespace JankWorks.Game
         void BeginUpdate(TimeSpan delta, Action<IAsyncUpdatable> callback);
 
         void EndUpdate(TimeSpan delta);
+    }
+
+    public interface IDispatchable
+    {
+        void InitialiseChannels(Dispatcher dispatcher);
+
+        void UpSynchronise();
+
+        void DownSynchronise();
     }
 
     public interface ISoundResource
@@ -97,10 +107,15 @@ namespace JankWorks.Game
         }
 
         public override string ToString() => this.Interpolation.ToString();
+
         public override int GetHashCode() => this.Interpolation.GetHashCode();
+
         public override bool Equals(object obj) => obj is Frame other && this == other;
+
         public bool Equals(Frame other) => this == other;
+
         public static bool operator ==(Frame left, Frame right) => left.Interpolation == right.Interpolation;
+
         public static bool operator !=(Frame left, Frame right) => left.Interpolation != right.Interpolation;
     } 
 }

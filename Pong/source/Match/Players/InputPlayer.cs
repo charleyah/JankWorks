@@ -1,9 +1,5 @@
-﻿using System;
-
-using JankWorks.Interface;
-
+﻿using JankWorks.Interface;
 using JankWorks.Game;
-using JankWorks.Game.Hosting.Messaging;
 
 namespace Pong.Match.Players
 {
@@ -15,7 +11,7 @@ namespace Pong.Match.Players
 
         private sbyte movement; // positive is up, negative is down
 
-        public InputPlayer(byte number, IMessageChannel<PlayerEvent> events) : base(number, events) 
+        public InputPlayer(byte number) : base(number) 
         {
             this.movement = 0;
             this.UpKey = Key.W;

@@ -8,7 +8,6 @@ using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Local;
 
 using JankWorks.Game.Hosting;
-using JankWorks.Game.Hosting.Messaging;
 
 using Pong.Match.Players;
 using Pong.Match.Physics;
@@ -35,27 +34,11 @@ namespace Pong.Match
 
         public override void SharedInitialise(Host host, Client client)
         {            
-            var physicsChannel = host.Dispatcher.GetMessageChannel<PhysicsEvent>(PhysicsEvent.Channel, new ChannelParameters()
-            {
-                Direction = IChannel.Direction.Down,
-                MaxQueueSize = 16,
-                Reliability = IChannel.Reliability.Reliable
-            });
-
-            var playerChannel = host.Dispatcher.GetMessageChannel<PlayerEvent>(PlayerEvent.Channel, new ChannelParameters()
-            {
-                Direction = IChannel.Direction.Up,
-                MaxQueueSize = 16,
-                Reliability = IChannel.Reliability.Reliable
-            });
-
-
             if (host.IsLocal)
             {
-                this.physics = new PhysicsSystem(physicsChannel, this.area);
+                this.physics = new PhysicsSystem(this.area);
 
-
-                this.players = new PlayerSystem(playerChannel, this.physics, 2);
+                this.players = new PlayerSystem(this.physics, 2);
                 this.ball = new Ball(this.physics, area, this.players.PlayerSize.X * 0.75f);
 
                 this.players.RegisterPlayer(0);
@@ -79,17 +62,15 @@ namespace Pong.Match
 
             if (this.state.PlayerOne == PlayerType.Local)
             {
-                this.RegisterClientObject(new InputPlayer(0, playerChannel));
+                this.RegisterClientObject(new InputPlayer(0));
             }
             else if (this.state.PlayerTwo == PlayerType.Local)
             {
-                this.RegisterClientObject(new InputPlayer(1, playerChannel));
+                this.RegisterClientObject(new InputPlayer(1));
             }
 
-
-            this.RegisterClientObject(new PhysicsRenderer(physicsChannel));
-
-            
+            this.RegisterClientObject(new PhysicsRenderer());
+           
             var perfinfo = new PerformanceInfo(client, host, new Asset("embedded", "ibm-plex-mono.regular.ttf"), 14);
             perfinfo.MaxDisplayCounters = 8;
             perfinfo.Colour = Pong.UI.Colours.Hover;
@@ -105,14 +86,12 @@ namespace Pong.Match
 
             this.players.SetPlayerPosition(0, new Vector2(0, playerYStart), new Vector2(0, 0.5f));
             this.players.SetPlayerPosition(1, new Vector2(this.area.BottomRight.X - playerSize.X, playerYStart), new Vector2(0, 0.5f));
-
-            this.physics?.Broadcast();
-            this.ball?.StartMoving();
             base.SharedInitialised(state);
         }
 
         public override void Initialised()
-        {                        
+        {
+            this.ball?.StartMoving();
             base.Initialised();
         }
 

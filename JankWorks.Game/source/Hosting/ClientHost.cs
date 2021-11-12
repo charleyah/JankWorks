@@ -11,7 +11,7 @@ namespace JankWorks.Game.Hosting
 
         public abstract void UnloadScene();
 
-        public abstract void LoadScene(HostScene scene, object initState);
+        public abstract void LoadScene(HostScene scene, object initState);       
 
         public abstract void SynchroniseClientUpdate();
 

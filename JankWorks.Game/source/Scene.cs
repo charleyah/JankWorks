@@ -9,6 +9,7 @@ using JankWorks.Graphics;
 
 using JankWorks.Game.Local;
 using JankWorks.Game.Hosting;
+using JankWorks.Game.Hosting.Messaging;
 using JankWorks.Game.Assets;
 using JankWorks.Game.Diagnostics;
 
@@ -56,6 +57,8 @@ namespace JankWorks.Game
 
         private IResource[] resources;
 
+        private IDispatchable[] dispatchables;
+
         private IDisposable[] disposables;
 
         private ITickable[] tickables;
@@ -70,6 +73,7 @@ namespace JankWorks.Game
         {            
             this.hostObjects = new List<object>(ApplicationScene.InitialObjectContainerCount);
             this.resources = Array.Empty<IResource>();
+            this.dispatchables = Array.Empty<IDispatchable>();
             this.disposables = Array.Empty<IDisposable>();
             this.tickables = Array.Empty<ITickable>();
             this.asyncTickables = Array.Empty<IAsyncTickable>();
@@ -98,12 +102,37 @@ namespace JankWorks.Game
             this.sharedSignal.Set();
         }
 
+        public virtual void InitialiseChannels(Dispatcher dispatcher)
+        {
+            for (int index = 0; index < this.dispatchables.Length; index++)
+            {
+                this.dispatchables[index].InitialiseChannels(dispatcher);
+            }
+        }
+
+        internal void SynchroniseHostUpStream()
+        {
+            for (int index = 0; index < this.dispatchables.Length; index++)
+            {
+                this.dispatchables[index].UpSynchronise();
+            }
+        }
+
+        internal void SynchroniseHostDownStream()
+        {
+            for (int index = 0; index < this.dispatchables.Length; index++)
+            {
+                this.dispatchables[index].DownSynchronise();
+            }
+        }
+
         public virtual void HostInitialised(object state) { }
         
         private void BuildHostObjectContainers()
         {
-            this.resources = (from obj in this.hostObjects where obj is IResource select (IResource)obj).Reverse().ToArray();
+            this.resources = (from obj in this.hostObjects where obj is IResource select (IResource)obj).Reverse().ToArray();            
             this.disposables = (from obj in this.hostObjects where obj is IDisposable select (IDisposable)obj).Reverse().ToArray();
+            this.dispatchables = (from obj in this.hostObjects where obj is IDispatchable select (IDispatchable)obj).ToArray();
 
             if (this.PerformanceMetricsEnabled)
             {                
@@ -152,6 +181,7 @@ namespace JankWorks.Game
             }
 
             this.disposables = Array.Empty<IDisposable>();
+            this.dispatchables = Array.Empty<IDispatchable>();
             this.resources = Array.Empty<IResource>();
             this.tickables = Array.Empty<ITickable>();
             this.asyncTickables = Array.Empty<IAsyncTickable>();
@@ -182,6 +212,8 @@ namespace JankWorks.Game
         private List<object> clientObjects;
 
         private IResource[] resources;
+
+        private IDispatchable[] dispatchables;
 
         private IGraphicsResource[] graphicsResources;
 
@@ -216,6 +248,7 @@ namespace JankWorks.Game
 
             this.clientObjects = new List<object>(ApplicationScene.InitialObjectContainerCount);
             this.resources = Array.Empty<IResource>();
+            this.dispatchables = Array.Empty<IDispatchable>();
             this.graphicsResources = Array.Empty<IGraphicsResource>();
             this.soundResources = Array.Empty<ISoundResource>();
             this.disposables = Array.Empty<IDisposable>();
@@ -246,6 +279,32 @@ namespace JankWorks.Game
             }
         }
 
+        public override void InitialiseChannels(Dispatcher dispatcher)
+        {
+            base.InitialiseChannels(dispatcher);
+
+            for (int index = 0; index < this.dispatchables.Length; index++)
+            {
+                this.dispatchables[index].InitialiseChannels(dispatcher);
+            }
+        }
+
+        internal void SynchroniseClientUpStream()
+        {
+            for (int index = 0; index < this.dispatchables.Length; index++)
+            {
+                this.dispatchables[index].UpSynchronise();
+            }
+        }
+
+        internal void SynchroniseClientDownStream()
+        {
+            for (int index = 0; index < this.dispatchables.Length; index++)
+            {
+                this.dispatchables[index].DownSynchronise();
+            }
+        }
+
         public virtual void ClientInitialised(object state) { }
         
         private void BuildClientObjectContainers()
@@ -254,6 +313,8 @@ namespace JankWorks.Game
             this.graphicsResources = (from obj in this.clientObjects where obj is IGraphicsResource select (IGraphicsResource)obj).Reverse().ToArray();
             this.soundResources = (from obj in this.clientObjects where obj is ISoundResource select (ISoundResource)obj).Reverse().ToArray();
             this.disposables = (from obj in this.clientObjects where obj is IDisposable select (IDisposable)obj).Reverse().ToArray();
+
+            this.dispatchables = (from obj in this.clientObjects where obj is IDispatchable select (IDispatchable)obj).ToArray();
 
             this.inputlisteners = (from obj in this.clientObjects where obj is IInputListener select (IInputListener)obj).ToArray();
 
@@ -306,6 +367,7 @@ namespace JankWorks.Game
 
             this.resources = Array.Empty<IResource>();                       
             this.disposables = Array.Empty<IDisposable>();
+            this.dispatchables = Array.Empty<IDispatchable>();
 
             this.inputlisteners = Array.Empty<IInputListener>();
             this.updatables = Array.Empty<IUpdatable>();

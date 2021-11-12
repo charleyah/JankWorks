@@ -218,6 +218,7 @@ namespace JankWorks.Game.Local
             host.LoadScene(sceneToLoad, initState);
 
             sceneToLoad.ClientInitialiseAfterShared(this);
+            sceneToLoad.InitialiseChannels(host.Dispatcher);
 
             try
             {
@@ -232,8 +233,52 @@ namespace JankWorks.Game.Local
             sceneToLoad.InitialiseSoundResources(this.audioDevice);
             sceneToLoad.ClientInitialised(initState);
 
+            try
+            {
+                Threads.VerifyCorrectThread = false;
+                this.SyncData(sceneToLoad, host);
+            }
+            finally
+            {
+                Threads.VerifyCorrectThread = true;
+            }
+            
+           
             this.host = host;
             this.scene = sceneToLoad;
+        }
+
+        private void SyncData(Scene scene, Host host)
+        {
+            while(host.State != HostState.WaitingOnClients)
+            {
+                Thread.Yield();
+            }
+
+            try
+            {
+                this.graphicsDevice.Activate();
+                scene.SynchroniseClientUpStream();
+            }
+            finally
+            {
+                this.graphicsDevice.Deactivate();
+            }
+
+            host.Dispatcher.Synchronise();
+            scene.SynchroniseHostUpStream();
+            scene.SynchroniseHostDownStream();
+            host.Dispatcher.Synchronise();
+
+            try
+            {
+                this.graphicsDevice.Activate();
+                scene.SynchroniseClientDownStream();
+            }
+            finally
+            {
+                this.graphicsDevice.Deactivate();
+            }
         }
 
         public void ChangeScene(int scene, object initsate = null) => this.ChangeScene(scene, this.host, initsate);

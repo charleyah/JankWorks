@@ -8,7 +8,7 @@ using Pong.Match.Physics;
 
 namespace Pong.Match.Players
 {
-    class PlayerSystem : ITickable
+    class PlayerSystem : ITickable, IDispatchable
     {
         public Vector2 PlayerSize { get; set; }
 
@@ -19,14 +19,27 @@ namespace Pong.Match.Players
 
         private PlayerEntity[] players;
        
-        public PlayerSystem(IMessageChannel<PlayerEvent> events, PhysicsSystem physics, byte playerCount)
+        public PlayerSystem(PhysicsSystem physics, byte playerCount)
         {
-            this.events = events;
             this.physics = physics;
             this.players = new PlayerEntity[playerCount];
             this.PlayerVelocity = 8f;
             this.PlayerSize = new Vector2(50, 100);
         }
+
+        public void InitialiseChannels(Dispatcher dispatcher)
+        {
+            this.events = dispatcher.GetMessageChannel<PlayerEvent>(PlayerEvent.Channel, new ChannelParameters()
+            {
+                Direction = IChannel.Direction.Up,
+                MaxQueueSize = 16,
+                Reliability = IChannel.Reliability.Reliable
+            });
+        }
+
+        public void UpSynchronise() { }        
+
+        public void DownSynchronise() { }
 
         public void RegisterPlayer(byte number)
         {

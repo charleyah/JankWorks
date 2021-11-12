@@ -29,7 +29,7 @@ namespace JankWorks.Game.Hosting.Messaging.Memory
 
         private void VerifyDirection(bool receive)
         {
-            if(Debugger.IsAttached)
+            if(Debugger.IsAttached && Threads.VerifyCorrectThread)
             {
                 Thread expectedThread;
 

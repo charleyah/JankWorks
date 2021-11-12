@@ -10,7 +10,7 @@ namespace Pong.Match
 
         public MatchState()
         {
-            this.PlayerOne = PlayerType.Bot;
+            this.PlayerOne = PlayerType.Local;
             this.PlayerTwo = PlayerType.Bot;
         }
     }

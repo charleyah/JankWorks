@@ -9,7 +9,9 @@ namespace JankWorks.Game.Hosting
 {
     public sealed class NullHost : ClientHost
     {
-        public override bool IsRemote => true;
+        public override HostState State => throw new NotSupportedException();
+
+        public override bool IsRemote => true;        
 
         public override bool IsConnected => true;
 
@@ -18,6 +20,7 @@ namespace JankWorks.Game.Hosting
         public override Dispatcher Dispatcher => throw new NotSupportedException();
 
         public override HostMetrics Metrics => this.emptyMetrics;
+        
 
         private readonly HostMetrics emptyMetrics;
 
@@ -42,6 +45,6 @@ namespace JankWorks.Game.Hosting
 
         public override void Run(Client client, int scene, object initState = null) { }        
 
-        public override void Start(Client client, int scene, object initState = null) { }        
+        public override void Start(Client client, int scene, object initState = null) { }
     }
 }

@@ -35,11 +35,15 @@ namespace JankWorks.Game.Hosting
 
         public override bool IsConnected => true;
 
+        public override HostState State => this.state;
+
         public override bool IsHostLoaded => this.state == HostState.RunningScene;
 
         public override Dispatcher Dispatcher => this.dispatcher;
 
         public override HostMetrics Metrics => this.metrics;
+
+
 
         public OfflineHost(Application application) : base(application, application.GetClientSettings())
         {
