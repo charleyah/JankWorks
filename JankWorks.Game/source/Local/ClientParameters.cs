@@ -13,7 +13,7 @@ namespace JankWorks.Game.Local
 
         public static ClientParameters Default => new ClientParameters()
         {
-            UpdateRate = 30,
+            UpdateRate = 60,
             ClearColour = Colour.Black,
             ShowCursor = true
         };

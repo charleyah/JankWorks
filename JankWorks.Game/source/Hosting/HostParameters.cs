@@ -7,7 +7,7 @@ namespace JankWorks.Game.Hosting
 
         public static HostParameters Default => new HostParameters()
         {
-            TickRate = 30
+            TickRate = 60
         };
     }
 }
