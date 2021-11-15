@@ -122,7 +122,7 @@ namespace Tests.RendererTest
 
         public override void Draw(GraphicsDevice graphics)
         {
-            if(!this.spriteRenderer.ReDraw(graphics))
+            if(this.screamer != null || !this.spriteRenderer.ReDraw(graphics))
             {
                 this.spriteRenderer.BeginDraw();
 
