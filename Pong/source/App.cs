@@ -8,7 +8,6 @@ using JankWorks.Game.Local;
 
 using Pong.MainMenu;
 using Pong.Match;
-using JankWorks.Game.Hosting;
 
 namespace Pong
 {
@@ -42,26 +41,6 @@ namespace Pong
                 () => new MenuScene(),
                 () => new MatchScene()
             };
-        }
-
-        public override ClientParameters ClientParameters
-        {
-            get
-            {
-                var p = base.ClientParameters;
-                p.UpdateRate = 60;
-                return p;
-            }
-        }
-
-        public override HostParameters HostParameters
-        {
-            get
-            {
-                var p = base.HostParameters;
-                p.TickRate = 60;
-                return p;
-            }
         }
 
         public override ApplicationConfiguration DefaultApplicationConfiguration
