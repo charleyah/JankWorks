@@ -80,9 +80,7 @@ namespace Pong.Match.Physics
             for(int i = 0; i < totalComponents.Length; i++)
             {
                 var com = totalComponents[i];
-
-                var pos = com.velocity != Vector2.Zero ? Vector2.Lerp(com.position, com.position + com.velocity, (float)frame.Interpolation) : com.position;
-                this.renderer.DrawRectangle(com.size, pos, com.origin, 0f, com.colour);
+                this.renderer.DrawRectangle(com.size, com.position, com.origin, 0f, com.colour);
             }
             this.renderer.EndDraw(surface);
         }
