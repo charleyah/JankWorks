@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace JankWorks.Game.Platform.Windows
 {
@@ -61,10 +62,15 @@ namespace JankWorks.Game.Platform.Windows
         }
 
         public override void Sleep(TimeSpan time)
-        {           
-            timeBeginPeriod(this.caps.wPeriodMin);
-            System.Threading.Thread.Sleep(time);
-            timeEndPeriod(this.caps.wPeriodMin);
+        {
+            var min = this.caps.wPeriodMin;
+
+            if(time.TotalMilliseconds > min)
+            {
+                timeBeginPeriod(min);
+                Thread.Sleep(time);
+                timeEndPeriod(min);
+            }            
         }
     }
 }
