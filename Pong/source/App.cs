@@ -60,7 +60,7 @@ namespace Pong
                 var conf = base.DefaultClientConfiguration;
                 conf.DisplayMode = new DisplayMode(1024, 768, 32, conf.DisplayMode.RefreshRate);
                 conf.WindowStyle = WindowStyle.Windowed;
-                conf.Vsync = true;
+                conf.Vsync = false;
                 conf.FrameRate = conf.DisplayMode.RefreshRate;
                 return conf;                     
             }
