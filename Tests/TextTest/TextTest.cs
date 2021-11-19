@@ -64,7 +64,7 @@ namespace Tests.TextTest
 
             this.txtrenderer.Draw("Cursor -->", this.cursorpos, new Vector2(1, 0.5f), cursortextRotation, new RGBA(255, 100, 100, 100));
             this.kerningTextBounds = this.txtrenderer.Draw("Kerning!?! Whats That...", new Vector2(100, 100), Vector2.Zero, 0f, this.kerningTextColour);
-            this.txtrenderer.Draw("Rainbow!", this.center, new Vector2(0.5f), 0f, (c, i) =>
+            this.txtrenderer.Draw("Rainbow!", this.center, new Vector2(0.5f), 0f, static (c, i)  =>
             {
                 var n = i % 6;
                 return n switch
