@@ -8,11 +8,9 @@ namespace JankWorks.Graphics
         public abstract Matrix4x4 GetProjection();
 
         public abstract Matrix4x4 GetView();
-
-        public abstract Vector3 TranslateScreenCoordinate(Vector2 pos);
     }
 
-    public sealed class OrthoCamera : Camera
+    public class OrthoCamera : Camera
     {
         public Vector2 Position 
         {
@@ -56,16 +54,13 @@ namespace JankWorks.Graphics
 
         public override Matrix4x4 GetView() => this.view;
         
-
-
-        public override Vector3 TranslateScreenCoordinate(Vector2 pos)
+        public Vector2 TranslateScreenCoordinate(Vector2 pos)
         {
             Matrix4x4 mat = Matrix4x4.Identity;
-
             mat = mat * Matrix4x4.CreateScale(new Vector3(this.size / this.viewport, 0));
             mat = mat * Matrix4x4.CreateTranslation(-new Vector3(this.position, 0));
 
-            return new Vector3(Vector2.Transform(pos, mat), 0);
+            return Vector2.Transform(pos, mat);
         }
-    }
+    }  
 }

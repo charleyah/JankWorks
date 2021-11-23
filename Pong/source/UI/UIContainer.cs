@@ -13,7 +13,7 @@ namespace Pong.UI
 {
     class UIContainer : IInputListener, IRenderable, IUpdatable
     {
-        public Camera Camera { get; set; }
+        public OrthoCamera Camera { get; set; }
 
         public bool Interactive { get; set; }
 

@@ -8,7 +8,7 @@ namespace Tests.TextTest
 {
     class TextTest : Test
     {
-        private Camera camera;
+        private OrthoCamera camera;
         private Font font;
         private TextRenderer txtrenderer;
 

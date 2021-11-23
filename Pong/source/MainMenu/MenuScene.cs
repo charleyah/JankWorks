@@ -16,7 +16,7 @@ namespace Pong.MainMenu
     {
         private PerformanceInfo perfinfo;
         private UIContainer container;
-        private Camera camera;
+        private OrthoCamera camera;
 
         private Fader fader;
         private Text title;
