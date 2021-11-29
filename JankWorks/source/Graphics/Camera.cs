@@ -29,6 +29,8 @@ namespace JankWorks.Graphics
         private Matrix4x4 view;
         private readonly Matrix4x4 projection;
 
+        public OrthoCamera(Surface surface) : this(surface.Viewport.Size) { }
+
         public OrthoCamera(Vector2i viewport) : this((Vector2)viewport, (Vector2)viewport) { }
 
         public OrthoCamera(Vector2i viewport, Vector2 size) : this((Vector2)viewport, size) { }
@@ -62,5 +64,51 @@ namespace JankWorks.Graphics
 
             return Vector2.Transform(pos, mat);
         }
-    }  
+    }
+
+    public class PerspectiveCamera : Camera
+    {
+        public float VerticalFieldOfView
+        {
+            get => this.fov;
+            set
+            {
+                this.fov = value;
+                this.UpdateProjection();
+            }
+        }
+
+        public Vector3 Position { get; set; }
+
+        public Vector3 Target { get; set; }
+
+        public Vector3 Up { get; set; }
+
+        private float fov;
+        private Matrix4x4 projection;
+
+        private readonly Vector2 size;
+
+        public PerspectiveCamera(Surface surface)
+        {
+            var size = (Vector2)surface.Viewport.Size;
+            this.VerticalFieldOfView = 45;
+            this.size = size;
+
+            this.Position = Vector3.Zero;
+            this.Up = Vector3.UnitY;
+            this.Target = Vector3.Zero;
+
+            this.UpdateProjection();
+        }
+
+        private void UpdateProjection()
+        {
+            this.projection = Matrix4x4.CreatePerspectiveFieldOfView(MathF.PI / 180f * this.VerticalFieldOfView, size.X / size.Y, 0.1f, 100.0f);
+        }
+
+        public override Matrix4x4 GetProjection() => this.projection;
+
+        public override Matrix4x4 GetView() => Matrix4x4.CreateLookAt(this.Position, this.Target, this.Up);
+    }
 }
