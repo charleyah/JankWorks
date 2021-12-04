@@ -139,15 +139,15 @@ namespace JankWorks.Game.Diagnostics
                     var hostMetrics = this.host.Metrics;
 
                     this.PrintCounters("Tickable", hostMetrics.TickMetricCounters, maxcounters);
-                    this.PrintCounters("AsyncTickable", hostMetrics.AsyncTickMetricCounters, maxcounters);
+                    this.PrintCounters("ParallelTickable", hostMetrics.ParallelTickMetricCounters, maxcounters);
                 }
 
                 var clientMetrics = this.client.Metrics;
 
                 this.PrintCounters("Updatable", clientMetrics.UpdatableMetricCounters, maxcounters);
-                this.PrintCounters("AsyncUpdatable", clientMetrics.AsyncUpdatableMetricCounters, maxcounters);
+                this.PrintCounters("ParallelUpdatable", clientMetrics.ParallelUpdatableMetricCounters, maxcounters);
                 this.PrintCounters("Renderable", clientMetrics.RenderableMetricCounters, maxcounters);
-                this.PrintCounters("AsyncRenderable", clientMetrics.AsyncRenderableMetricCounters, maxcounters);
+                this.PrintCounters("ParallelRenderable", clientMetrics.ParallelRenderableMetricCounters, maxcounters);
             }            
         }
 

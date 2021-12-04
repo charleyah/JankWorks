@@ -228,7 +228,7 @@ namespace JankWorks.Game.Hosting
             this.scene.SharedInitialised(this.newHostSceneRequest.InitState);
 
             this.metrics.TickMetricCounters = this.scene.TickMetricCounters;
-            this.metrics.AsyncTickMetricCounters = this.scene.AsyncTickMetricCounters;
+            this.metrics.ParallelTickMetricCounters = this.scene.ParallelTickMetricCounters;
 
             this.newHostSceneRequest = default;            
             this.state = HostState.WaitingOnClients;

@@ -30,13 +30,13 @@ namespace JankWorks.Game
         void Tick(ulong tick, TimeSpan delta);
     }
 
-    public interface IAsyncTickable
+    public interface IParallelTickable
     {
-        void BeginTick(ulong tick, TimeSpan delta) => this.BeginTick(tick, delta, null);
+        void ForkTick(ulong tick, TimeSpan delta) => this.ForkTick(tick, delta, null);
 
-        void BeginTick(ulong tick, TimeSpan delta, Action<IAsyncTickable> callback);
+        void ForkTick(ulong tick, TimeSpan delta, Action<IParallelTickable> callback);
 
-        void EndTick(ulong tick, TimeSpan delta);
+        void JoinTick(ulong tick, TimeSpan delta);
     }
 
     public interface IUpdatable
@@ -44,13 +44,13 @@ namespace JankWorks.Game
         void Update(TimeSpan delta);
     }
 
-    public interface IAsyncUpdatable
+    public interface IParallelUpdatable
     {
-        void BeginUpdate(TimeSpan delta) => this.BeginUpdate(delta, null);
+        void ForkUpdate(TimeSpan delta) => this.ForkUpdate(delta, null);
 
-        void BeginUpdate(TimeSpan delta, Action<IAsyncUpdatable> callback);
+        void ForkUpdate(TimeSpan delta, Action<IParallelUpdatable> callback);
 
-        void EndUpdate(TimeSpan delta);
+        void JoinUpdate(TimeSpan delta);
     }
 
     public interface IDispatchable
@@ -86,13 +86,13 @@ namespace JankWorks.Game
         void Render(Surface surface, Frame frame);
     }
 
-    public interface IAsyncRenderable : IGraphicsResource
+    public interface IParallelRenderable : IGraphicsResource
     {
-        void BeginRender(Surface surface, Frame frame) => this.BeginRender(surface, frame, null);
+        void ForkRender(Surface surface, Frame frame) => this.ForkRender(surface, frame, null);
 
-        void BeginRender(Surface surface, Frame frame, Action<IAsyncRenderable> callback);
+        void ForkRender(Surface surface, Frame frame, Action<IParallelRenderable> callback);
 
-        void EndRender(Surface surface, Frame frame);
+        void JoinRender(Surface surface, Frame frame);
     }
 
     public readonly struct Frame : IEquatable<Frame>

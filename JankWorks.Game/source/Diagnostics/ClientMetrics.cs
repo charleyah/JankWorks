@@ -6,11 +6,11 @@ namespace JankWorks.Game.Diagnostics
     {
         public MetricCounter[] UpdatableMetricCounters { get; internal set; }
 
-        public MetricCounter[] AsyncUpdatableMetricCounters { get; internal set; }
+        public MetricCounter[] ParallelUpdatableMetricCounters { get; internal set; }
 
         public MetricCounter[] RenderableMetricCounters { get; internal set; }
 
-        public MetricCounter[] AsyncRenderableMetricCounters { get; internal set; }
+        public MetricCounter[] ParallelRenderableMetricCounters { get; internal set; }
 
         public int FramesPerSecond { get; set; }
 
@@ -22,9 +22,9 @@ namespace JankWorks.Game.Diagnostics
             this.UpdatesPerSecond = 0;
 
             this.UpdatableMetricCounters = Array.Empty<MetricCounter>();
-            this.AsyncUpdatableMetricCounters = Array.Empty<MetricCounter>();
+            this.ParallelUpdatableMetricCounters = Array.Empty<MetricCounter>();
             this.RenderableMetricCounters = Array.Empty<MetricCounter>();
-            this.AsyncRenderableMetricCounters = Array.Empty<MetricCounter>();
+            this.ParallelRenderableMetricCounters = Array.Empty<MetricCounter>();
         }
     }
 }

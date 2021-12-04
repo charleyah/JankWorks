@@ -6,7 +6,7 @@ namespace JankWorks.Game.Diagnostics
     {
         public MetricCounter[] TickMetricCounters { get; internal set; }
 
-        public MetricCounter[] AsyncTickMetricCounters { get; internal set; }
+        public MetricCounter[] ParallelTickMetricCounters { get; internal set; }
 
         public int TicksPerSecond { get; set; }
 
@@ -14,7 +14,7 @@ namespace JankWorks.Game.Diagnostics
         {
             this.TicksPerSecond = 0;
             this.TickMetricCounters = Array.Empty<MetricCounter>();
-            this.AsyncTickMetricCounters = Array.Empty<MetricCounter>();
+            this.ParallelTickMetricCounters = Array.Empty<MetricCounter>();
         }
     }
 }

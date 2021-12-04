@@ -87,12 +87,12 @@ namespace JankWorks.Game.Diagnostics
     }
 
 
-    internal abstract class AsyncMetricCounter : MetricCounter
+    internal abstract class ParallelMetricCounter : MetricCounter
     {
         protected Action<object> callbackHandler;
         private TimeSpan lastElpased;
 
-        protected AsyncMetricCounter()
+        protected ParallelMetricCounter()
         {
             this.callbackHandler = (o) => this.End();
         }
@@ -103,89 +103,89 @@ namespace JankWorks.Game.Diagnostics
     }
 
 
-    internal sealed class AsyncTickableMetricCounter : AsyncMetricCounter, IAsyncTickable
+    internal sealed class ParallelTickableMetricCounter : ParallelMetricCounter, IParallelTickable
     {
         public override string Name => this.tickable.GetType().Name;
 
-        private IAsyncTickable tickable;
+        private IParallelTickable tickable;
 
-        public AsyncTickableMetricCounter(IAsyncTickable tickable)
+        public ParallelTickableMetricCounter(IParallelTickable tickable)
         {
             this.tickable = tickable;
         }
 
-        public void BeginTick(ulong tick, TimeSpan delta)
+        public void ForkTick(ulong tick, TimeSpan delta)
         {
-            this.BeginTick(tick, delta, this.callbackHandler);
+            this.ForkTick(tick, delta, this.callbackHandler);
         }
 
-        public void BeginTick(ulong tick, TimeSpan delta, Action<IAsyncTickable> callback)
+        public void ForkTick(ulong tick, TimeSpan delta, Action<IParallelTickable> callback)
         {
             this.Start();
-            this.tickable.BeginTick(tick, delta, callback);
+            this.tickable.ForkTick(tick, delta, callback);
         }
 
-        public void EndTick(ulong tick, TimeSpan delta)
+        public void JoinTick(ulong tick, TimeSpan delta)
         {
-            this.tickable.EndTick(tick, delta);
+            this.tickable.JoinTick(tick, delta);
             this.UpdateElpased();
         }
     }
 
-    internal sealed class AsyncUpdatableMetricCounter : AsyncMetricCounter, IAsyncUpdatable
+    internal sealed class ParallelUpdatableMetricCounter : ParallelMetricCounter, IParallelUpdatable
     {
         public override string Name => this.updatable.GetType().Name;
 
-        private IAsyncUpdatable updatable;
+        private IParallelUpdatable updatable;
 
-        public AsyncUpdatableMetricCounter(IAsyncUpdatable updatable)
+        public ParallelUpdatableMetricCounter(IParallelUpdatable updatable)
         {
             this.updatable = updatable;
         }
 
-        public void BeginUpdate(TimeSpan delta)
+        public void ForkUpdate(TimeSpan delta)
         {
-            this.BeginUpdate(delta, this.callbackHandler);
+            this.ForkUpdate(delta, this.callbackHandler);
         }
 
-        public void BeginUpdate(TimeSpan delta, Action<IAsyncUpdatable> callback)
+        public void ForkUpdate(TimeSpan delta, Action<IParallelUpdatable> callback)
         {
             this.Start();
-            this.updatable.BeginUpdate(delta, callback);
+            this.updatable.ForkUpdate(delta, callback);
         }
 
-        public void EndUpdate(TimeSpan delta)
+        public void JoinUpdate(TimeSpan delta)
         {
-            this.updatable.EndUpdate(delta);
+            this.updatable.JoinUpdate(delta);
             this.UpdateElpased();
         }
     }
 
-    internal sealed class AsyncRenderableMetricCounter : AsyncMetricCounter, IAsyncRenderable
+    internal sealed class ParallelRenderableMetricCounter : ParallelMetricCounter, IParallelRenderable
     {
         public override string Name => this.renderable.GetType().Name;
 
-        private IAsyncRenderable renderable;
+        private IParallelRenderable renderable;
 
-        public AsyncRenderableMetricCounter(IAsyncRenderable renderable)
+        public ParallelRenderableMetricCounter(IParallelRenderable renderable)
         {
             this.renderable = renderable;
         }
 
-        public void BeginRender(Surface surface, Frame frame)
+        public void ForkRender(Surface surface, Frame frame)
         {
-            this.BeginRender(surface, frame, this.callbackHandler);
+            this.ForkRender(surface, frame, this.callbackHandler);
         }
 
-        public void BeginRender(Surface surface, Frame frame, Action<IAsyncRenderable> callback)
+        public void ForkRender(Surface surface, Frame frame, Action<IParallelRenderable> callback)
         {
             this.Start();
-            this.renderable.BeginRender(surface, frame, callback);
+            this.renderable.ForkRender(surface, frame, callback);
         }
 
-        public void EndRender(Surface surface, Frame frame)
+        public void JoinRender(Surface surface, Frame frame)
         {
-            this.renderable.EndRender(surface, frame);
+            this.renderable.JoinRender(surface, frame);
             this.UpdateElpased();
         }
 

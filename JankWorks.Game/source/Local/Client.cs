@@ -130,9 +130,9 @@ namespace JankWorks.Game.Local
             }
 
             this.Metrics.UpdatableMetricCounters = this.scene.UpdatableMetricCounters;
-            this.Metrics.AsyncUpdatableMetricCounters = this.scene.AsyncUpdatableMetricCounters;
+            this.Metrics.ParallelUpdatableMetricCounters = this.scene.ParallelUpdatableMetricCounters;
             this.Metrics.RenderableMetricCounters = this.scene.RenderableMetricCounters;
-            this.Metrics.AsyncRenderableMetricCounters = this.scene.AsyncRenderableMetricCounters;
+            this.Metrics.ParallelRenderableMetricCounters = this.scene.ParallelRenderableMetricCounters;
 
             System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);

@@ -63,11 +63,11 @@ namespace JankWorks.Game
 
         private ITickable[] tickables;
 
-        private IAsyncTickable[] asyncTickables;
+        private IParallelTickable[] parallelTickables;
 
         internal MetricCounter[] TickMetricCounters { get; private set; }
 
-        internal MetricCounter[] AsyncTickMetricCounters { get; private set; }
+        internal MetricCounter[] ParallelTickMetricCounters { get; private set; }
 
         public HostScene()
         {            
@@ -76,9 +76,9 @@ namespace JankWorks.Game
             this.dispatchables = Array.Empty<IDispatchable>();
             this.disposables = Array.Empty<IDisposable>();
             this.tickables = Array.Empty<ITickable>();
-            this.asyncTickables = Array.Empty<IAsyncTickable>();
+            this.parallelTickables = Array.Empty<IParallelTickable>();
             this.TickMetricCounters = Array.Empty<MetricCounter>();
-            this.AsyncTickMetricCounters = Array.Empty<MetricCounter>();
+            this.ParallelTickMetricCounters = Array.Empty<MetricCounter>();
         }                
 
         protected void RegisterHostObject(object obj) => this.hostObjects.Add(obj);
@@ -137,17 +137,17 @@ namespace JankWorks.Game
             if (this.PerformanceMetricsEnabled)
             {                
                 this.tickables = (from obj in this.hostObjects where obj is ITickable select new TickableMetricCounter((ITickable)obj)).ToArray();
-                this.asyncTickables = (from obj in this.hostObjects where obj is IAsyncTickable select new AsyncTickableMetricCounter((IAsyncTickable)obj)).ToArray();
+                this.parallelTickables = (from obj in this.hostObjects where obj is IParallelTickable select new ParallelTickableMetricCounter((IParallelTickable)obj)).ToArray();
 
                 this.TickMetricCounters = (MetricCounter[])this.tickables.Clone();
-                this.AsyncTickMetricCounters = (MetricCounter[])this.asyncTickables.Clone();
+                this.ParallelTickMetricCounters = (MetricCounter[])this.parallelTickables.Clone();
             }
             else
             {
                 this.tickables = (from obj in this.hostObjects where obj is ITickable select (ITickable)obj).ToArray();
-                this.asyncTickables = (from obj in this.hostObjects where obj is IAsyncTickable select (IAsyncTickable)obj).ToArray();
+                this.parallelTickables = (from obj in this.hostObjects where obj is IParallelTickable select (IParallelTickable)obj).ToArray();
                 this.TickMetricCounters = Array.Empty<MetricCounter>();
-                this.AsyncTickMetricCounters = Array.Empty<MetricCounter>();
+                this.ParallelTickMetricCounters = Array.Empty<MetricCounter>();
             }            
         }
 
@@ -168,7 +168,7 @@ namespace JankWorks.Game
         private void InternalHostDispose(Host host)
         {
             this.TickMetricCounters = Array.Empty<MetricCounter>();
-            this.AsyncTickMetricCounters = Array.Empty<MetricCounter>();
+            this.ParallelTickMetricCounters = Array.Empty<MetricCounter>();
 
             foreach (var disposable in this.disposables)
             {
@@ -184,15 +184,15 @@ namespace JankWorks.Game
             this.dispatchables = Array.Empty<IDispatchable>();
             this.resources = Array.Empty<IResource>();
             this.tickables = Array.Empty<ITickable>();
-            this.asyncTickables = Array.Empty<IAsyncTickable>();
+            this.parallelTickables = Array.Empty<IParallelTickable>();
             this.hostObjects.Clear();
         }
 
         public virtual void Tick(ulong tick, TimeSpan delta)
         {
-            for(int index = 0; index < this.asyncTickables.Length; index++)
+            for(int index = 0; index < this.parallelTickables.Length; index++)
             {
-                this.asyncTickables[index].BeginTick(tick, delta);
+                this.parallelTickables[index].ForkTick(tick, delta);
             }
 
             for (int index = 0; index < this.tickables.Length; index++)
@@ -200,9 +200,9 @@ namespace JankWorks.Game
                 this.tickables[index].Tick(tick, delta);
             }
 
-            for (int index = 0; index < this.asyncTickables.Length; index++)
+            for (int index = 0; index < this.parallelTickables.Length; index++)
             {
-                this.asyncTickables[index].EndTick(tick, delta);
+                this.parallelTickables[index].JoinTick(tick, delta);
             }
         }
     }
@@ -225,26 +225,26 @@ namespace JankWorks.Game
 
         private IUpdatable[] updatables;
 
-        private IAsyncUpdatable[] asyncUpdatables;
+        private IParallelUpdatable[] parallelUpdatables;
 
         private IRenderable[] renderables;
 
-        private IAsyncRenderable[] asyncRenderables;
+        private IParallelRenderable[] parallelRenderables;
 
         internal MetricCounter[] UpdatableMetricCounters { get; private set; }
 
-        internal MetricCounter[] AsyncUpdatableMetricCounters { get; private set; }
+        internal MetricCounter[] ParallelUpdatableMetricCounters { get; private set; }
 
         internal MetricCounter[] RenderableMetricCounters { get; private set; }
 
-        internal MetricCounter[] AsyncRenderableMetricCounters { get; private set; }
+        internal MetricCounter[] ParallelRenderableMetricCounters { get; private set; }
 
         protected Scene() : base()
         {
             this.UpdatableMetricCounters = Array.Empty<MetricCounter>();
-            this.AsyncUpdatableMetricCounters = Array.Empty<MetricCounter>();
+            this.ParallelUpdatableMetricCounters = Array.Empty<MetricCounter>();
             this.RenderableMetricCounters = Array.Empty<MetricCounter>();
-            this.AsyncRenderableMetricCounters = Array.Empty<MetricCounter>();
+            this.ParallelRenderableMetricCounters = Array.Empty<MetricCounter>();
 
             this.clientObjects = new List<object>(ApplicationScene.InitialObjectContainerCount);
             this.resources = Array.Empty<IResource>();
@@ -255,10 +255,10 @@ namespace JankWorks.Game
 
             this.inputlisteners = Array.Empty<IInputListener>();
             this.updatables = Array.Empty<IUpdatable>();
-            this.asyncUpdatables = Array.Empty<IAsyncUpdatable>();
+            this.parallelUpdatables = Array.Empty<IParallelUpdatable>();
 
             this.renderables = Array.Empty<IRenderable>();
-            this.asyncRenderables = Array.Empty<IAsyncRenderable>();
+            this.parallelRenderables = Array.Empty<IParallelRenderable>();
         }
 
         protected void RegisterClientObject(object obj) => this.clientObjects.Add(obj);
@@ -322,25 +322,25 @@ namespace JankWorks.Game
             {
                 this.updatables = (from obj in this.clientObjects where obj is IUpdatable select new UpdatableMetricCounter((IUpdatable)obj)).ToArray();               
                 this.renderables = (from obj in this.clientObjects where obj is IRenderable select new RenderableMetricCounter((IRenderable)obj)).ToArray();
-                this.asyncUpdatables = (from obj in this.clientObjects where obj is IAsyncUpdatable select new AsyncUpdatableMetricCounter((IAsyncUpdatable)obj)).ToArray();
-                this.asyncRenderables = (from obj in this.clientObjects where obj is IAsyncRenderable select new AsyncRenderableMetricCounter((IAsyncRenderable)obj)).ToArray();
+                this.parallelUpdatables = (from obj in this.clientObjects where obj is IParallelUpdatable select new ParallelUpdatableMetricCounter((IParallelUpdatable)obj)).ToArray();
+                this.parallelRenderables = (from obj in this.clientObjects where obj is IParallelRenderable select new ParallelRenderableMetricCounter((IParallelRenderable)obj)).ToArray();
 
                 this.UpdatableMetricCounters = (MetricCounter[])this.updatables.Clone();
-                this.AsyncUpdatableMetricCounters = (MetricCounter[])this.asyncUpdatables.Clone();
+                this.ParallelUpdatableMetricCounters = (MetricCounter[])this.parallelUpdatables.Clone();
                 this.RenderableMetricCounters = (MetricCounter[])this.renderables.Clone();
-                this.AsyncRenderableMetricCounters = (MetricCounter[])this.asyncRenderables.Clone();
+                this.ParallelRenderableMetricCounters = (MetricCounter[])this.parallelRenderables.Clone();
             }
             else
             {
                 this.updatables = (from obj in this.clientObjects where obj is IUpdatable select (IUpdatable)obj).ToArray();               
                 this.renderables = (from obj in this.clientObjects where obj is IRenderable select (IRenderable)obj).ToArray();
-                this.asyncUpdatables = (from obj in this.clientObjects where obj is IAsyncUpdatable select (IAsyncUpdatable)obj).ToArray();
-                this.asyncRenderables = (from obj in this.clientObjects where obj is IAsyncRenderable select (IAsyncRenderable)obj).ToArray();
+                this.parallelUpdatables = (from obj in this.clientObjects where obj is IParallelUpdatable select (IParallelUpdatable)obj).ToArray();
+                this.parallelRenderables = (from obj in this.clientObjects where obj is IParallelRenderable select (IParallelRenderable)obj).ToArray();
 
                 this.UpdatableMetricCounters = Array.Empty<MetricCounter>();
-                this.AsyncUpdatableMetricCounters = Array.Empty<MetricCounter>();
+                this.ParallelUpdatableMetricCounters = Array.Empty<MetricCounter>();
                 this.RenderableMetricCounters = Array.Empty<MetricCounter>();
-                this.AsyncRenderableMetricCounters = Array.Empty<MetricCounter>();
+                this.ParallelRenderableMetricCounters = Array.Empty<MetricCounter>();
             }            
         }
 
@@ -353,7 +353,7 @@ namespace JankWorks.Game
         public virtual void ClientDispose(Client client) 
         {
             this.UpdatableMetricCounters = Array.Empty<MetricCounter>();
-            this.AsyncUpdatableMetricCounters = Array.Empty<MetricCounter>();
+            this.ParallelUpdatableMetricCounters = Array.Empty<MetricCounter>();
 
             foreach (var disposable in this.disposables)
             {
@@ -371,7 +371,7 @@ namespace JankWorks.Game
 
             this.inputlisteners = Array.Empty<IInputListener>();
             this.updatables = Array.Empty<IUpdatable>();
-            this.asyncUpdatables = Array.Empty<IAsyncUpdatable>();
+            this.parallelUpdatables = Array.Empty<IParallelUpdatable>();
             this.clientObjects.Clear();
         }
 
@@ -408,10 +408,10 @@ namespace JankWorks.Game
 
             this.graphicsResources = Array.Empty<IGraphicsResource>();
             this.renderables = Array.Empty<IRenderable>();
-            this.asyncRenderables = Array.Empty<IAsyncRenderable>();
+            this.parallelRenderables = Array.Empty<IParallelRenderable>();
 
             this.RenderableMetricCounters = Array.Empty<MetricCounter>();
-            this.AsyncRenderableMetricCounters = Array.Empty<MetricCounter>();
+            this.ParallelRenderableMetricCounters = Array.Empty<MetricCounter>();
         }
 
         public virtual void InitialiseSoundResources(AudioDevice device) 
@@ -434,9 +434,9 @@ namespace JankWorks.Game
 
         public virtual void Update(TimeSpan delta) 
         {
-            for (int index = 0; index < this.asyncUpdatables.Length; index++)
+            for (int index = 0; index < this.parallelUpdatables.Length; index++)
             {
-                this.asyncUpdatables[index].BeginUpdate(delta);
+                this.parallelUpdatables[index].ForkUpdate(delta);
             }
 
             for (int index = 0; index < this.updatables.Length; index++)
@@ -444,17 +444,17 @@ namespace JankWorks.Game
                 this.updatables[index].Update(delta);
             }
 
-            for (int index = 0; index < this.asyncUpdatables.Length; index++)
+            for (int index = 0; index < this.parallelUpdatables.Length; index++)
             {
-                this.asyncUpdatables[index].EndUpdate(delta);
+                this.parallelUpdatables[index].JoinUpdate(delta);
             }
         }
 
         public virtual void Render(Surface surface, Frame frame) 
         {
-            for(int index = 0; index < this.asyncRenderables.Length; index++)
+            for(int index = 0; index < this.parallelRenderables.Length; index++)
             {
-                this.asyncRenderables[index].BeginRender(surface, frame);
+                this.parallelRenderables[index].ForkRender(surface, frame);
             }
 
             for (int index = 0; index < this.renderables.Length; index++)
@@ -462,9 +462,9 @@ namespace JankWorks.Game
                 this.renderables[index].Render(surface, frame);
             }
 
-            for (int index = 0; index < this.asyncRenderables.Length; index++)
+            for (int index = 0; index < this.parallelRenderables.Length; index++)
             {
-                this.asyncRenderables[index].EndRender(surface, frame);
+                this.parallelRenderables[index].JoinRender(surface, frame);
             }
         }
     }
