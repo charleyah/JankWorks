@@ -11,6 +11,11 @@ using JankWorks.Game.Hosting.Messaging;
 
 namespace JankWorks.Game
 {
+    public interface INameable
+    {
+        string GetName() => this.GetType().Name;
+    }
+
     public interface IResource
     {
         void InitialiseResources(AssetManager assets);
@@ -25,12 +30,12 @@ namespace JankWorks.Game
         void UnsubscribeInputs(IInputManager inputManager);
     }
 
-    public interface ITickable
+    public interface ITickable : INameable
     {
         void Tick(ulong tick, TimeSpan delta);
     }
 
-    public interface IParallelTickable
+    public interface IParallelTickable : INameable
     {
         void ForkTick(ulong tick, TimeSpan delta) => this.ForkTick(tick, delta, null);
 
@@ -39,12 +44,12 @@ namespace JankWorks.Game
         void JoinTick(ulong tick, TimeSpan delta);
     }
 
-    public interface IUpdatable
+    public interface IUpdatable : INameable
     {
         void Update(TimeSpan delta);
     }
 
-    public interface IParallelUpdatable
+    public interface IParallelUpdatable : INameable
     {
         void ForkUpdate(TimeSpan delta) => this.ForkUpdate(delta, null);
 
@@ -76,17 +81,12 @@ namespace JankWorks.Game
         void DisposeGraphicsResources(GraphicsDevice device);
     }
 
-    public interface IDrawable : IGraphicsResource
-    {
-        void Draw(Surface surface);
-    }
-
-    public interface IRenderable : IGraphicsResource
+    public interface IRenderable : IGraphicsResource, INameable
     {
         void Render(Surface surface, Frame frame);
     }
 
-    public interface IParallelRenderable : IGraphicsResource
+    public interface IParallelRenderable : IGraphicsResource, INameable
     {
         void ForkRender(Surface surface, Frame frame) => this.ForkRender(surface, frame, null);
 

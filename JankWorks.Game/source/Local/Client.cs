@@ -10,8 +10,8 @@ using JankWorks.Interface;
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Configuration;
 using JankWorks.Game.Hosting;
-
 using JankWorks.Game.Platform;
+using JankWorks.Game.Threading;
 
 namespace JankWorks.Game.Local
 {
@@ -43,6 +43,8 @@ namespace JankWorks.Game.Local
 
         private Window window;
 
+        private ScopedSynchronizationContext inputContext;
+
         private GraphicsDevice graphicsDevice;
 
         private AudioDevice audioDevice;
@@ -62,6 +64,7 @@ namespace JankWorks.Game.Local
 
         public Client(Application application, ClientHost host)
         {
+            this.inputContext = new ScopedSynchronizationContext(false);
             this.Metrics = new ClientMetrics();
 
             var second = TimeSpan.FromSeconds(1);
@@ -147,39 +150,58 @@ namespace JankWorks.Game.Local
             {
                 scene.UnsubscribeInputs(this.window);
 
+                this.inputContext = new ScopedSynchronizationContext(false);
+
+                using var sync = new ScopedSynchronizationContext(true);
+
                 scene.PreDispose();
+                sync.Join();
                 
                 if(this.host is NullHost)
                 {
                     scene.DisposeSoundResources(this.audioDevice);
+                    sync.Join();
+
                     try
                     {
                         this.graphicsDevice.Activate();
                         scene.DisposeGraphicsResources(this.graphicsDevice);
+                        sync.Join();
                     }
                     finally
                     {
                         this.graphicsDevice.Deactivate();
                     }
+
                     scene.ClientDispose(this);
+                    sync.Join();
                 }
                 else
                 {
+                    SynchronizationContext.SetSynchronizationContext(null);
                     this.host.UnloadScene();
+                    SynchronizationContext.SetSynchronizationContext(sync);
+
                     scene.DisposeSoundResources(this.audioDevice);
+                    sync.Join();
+
                     try
                     {
                         this.graphicsDevice.Activate();
                         scene.DisposeGraphicsResources(this.graphicsDevice);
+                        sync.Join();
                     }
                     finally
                     {
                         this.graphicsDevice.Deactivate();
                     }
-                    scene.ClientDisposeAfterShared(this);                    
+
+                    scene.ClientDisposeAfterShared(this);
+                    sync.Join();
                 }
 
                 scene.Dispose(this.application);
+                sync.Join();
             }
         }
 
@@ -187,14 +209,22 @@ namespace JankWorks.Game.Local
         {            
             var sceneToLoad = this.application.RegisteredScenes[scene]();
 
+            using var sync = new ScopedSynchronizationContext(true);            
+
             sceneToLoad.PreInitialise(initState);
+            sync.Join();
+
             sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
+            sync.Join();
+
             sceneToLoad.ClientInitialise(this);
+            sync.Join();
 
             try
             {
                 this.graphicsDevice.Activate();
                 sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+                sync.Join();
             }
             finally
             {
@@ -202,7 +232,10 @@ namespace JankWorks.Game.Local
             }
             
             sceneToLoad.InitialiseSoundResources(this.audioDevice);
+            sync.Join();
+
             sceneToLoad.ClientInitialised(initState);
+            sync.Join();
 
             this.host = host;
             this.scene = sceneToLoad;
@@ -211,27 +244,42 @@ namespace JankWorks.Game.Local
         private void LoadSceneWithHost(int scene, ClientHost host, object initState)
         {
             var sceneToLoad = this.application.RegisteredScenes[scene]();
-            
-            sceneToLoad.PreInitialise(initState);
-            sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
 
-            host.LoadScene(sceneToLoad, initState);
-
-            sceneToLoad.ClientInitialiseAfterShared(this);
-            sceneToLoad.InitialiseChannels(host.Dispatcher);
-
-            try
+            using (var sync = new ScopedSynchronizationContext(true))
             {
-                this.graphicsDevice.Activate();
-                sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
-            }
-            finally
-            {
-                this.graphicsDevice.Deactivate();
-            }
+                sceneToLoad.PreInitialise(initState);
+                sync.Join();
 
-            sceneToLoad.InitialiseSoundResources(this.audioDevice);
-            sceneToLoad.ClientInitialised(initState);
+                sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
+                sync.Join();
+
+                SynchronizationContext.SetSynchronizationContext(null);
+                host.LoadScene(sceneToLoad, initState);
+                SynchronizationContext.SetSynchronizationContext(sync);
+
+                sceneToLoad.ClientInitialiseAfterShared(this);
+                sync.Join();
+
+                sceneToLoad.InitialiseChannels(host.Dispatcher);
+                sync.Join();
+
+                try
+                {
+                    this.graphicsDevice.Activate();
+                    sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+                    sync.Join();
+                }
+                finally
+                {
+                    this.graphicsDevice.Deactivate();
+                }
+
+                sceneToLoad.InitialiseSoundResources(this.audioDevice);
+                sync.Join();
+
+                sceneToLoad.ClientInitialised(initState);
+                sync.Join();
+            }
 
             try
             {
@@ -400,8 +448,18 @@ namespace JankWorks.Game.Local
         private void Update(ClientState state, TimeSpan delta)
         {
             this.Metrics.UpdatesPerSecond = this.upsCounter.Frequency;
-            this.window.ProcessEvents();
-
+            
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(this.inputContext);
+                this.window.ProcessEvents();
+                this.inputContext.Yield();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(null);
+            }
+                       
             if (state > ClientState.BeginLoadingScene)
             {
                 this.loadingScreen?.Update(delta);

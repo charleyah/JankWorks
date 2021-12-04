@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using JankWorks.Game.Local;
 using JankWorks.Game.Diagnostics;
 using JankWorks.Game.Platform;
+using JankWorks.Game.Threading;
 
 using JankWorks.Game.Hosting.Messaging;
 using JankWorks.Game.Hosting.Messaging.Memory;
@@ -42,7 +43,6 @@ namespace JankWorks.Game.Hosting
         public override Dispatcher Dispatcher => this.dispatcher;
 
         public override HostMetrics Metrics => this.metrics;
-
 
 
         public OfflineHost(Application application) : base(application, application.GetClientSettings())
@@ -135,7 +135,12 @@ namespace JankWorks.Game.Hosting
                         continue;
                     case HostState.UnloadingScene:
                         timer.Stop();
-                        this.scene.SharedDispose(this, this.client);
+
+                        using (var sync = new ScopedSynchronizationContext(true))
+                        {
+                            this.scene.SharedDispose(this, this.client);
+                        }
+                            
                         this.dispatcher.ClearChannels();
                         this.scene = null;
                         this.state = HostState.Constructed;
@@ -172,7 +177,6 @@ namespace JankWorks.Game.Hosting
 
                 if (lag >= tickTime)
                 {
-
                     do
                     {
                         var delta = (lag > tickTime) ? tickTime : lag;
@@ -223,9 +227,15 @@ namespace JankWorks.Game.Hosting
         private void LoadScene()
         {
             this.scene = this.newHostSceneRequest.Scene;
+            
+            using(var sync = new ScopedSynchronizationContext(true))
+            {
+                this.scene.SharedInitialise(this, this.client);
+                sync.Join();
 
-            this.scene.SharedInitialise(this, this.client);            
-            this.scene.SharedInitialised(this.newHostSceneRequest.InitState);
+                this.scene.SharedInitialised(this.newHostSceneRequest.InitState);
+                sync.Join();
+            }
 
             this.metrics.TickMetricCounters = this.scene.TickMetricCounters;
             this.metrics.ParallelTickMetricCounters = this.scene.ParallelTickMetricCounters;

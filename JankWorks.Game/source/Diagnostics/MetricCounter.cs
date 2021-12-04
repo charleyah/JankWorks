@@ -21,7 +21,7 @@ namespace JankWorks.Game.Diagnostics
 
     internal sealed class TickableMetricCounter : MetricCounter, ITickable
     {
-        public override string Name => this.tickable.GetType().Name;
+        public override string Name => this.tickable.GetName();
 
         private ITickable tickable;
 
@@ -40,7 +40,7 @@ namespace JankWorks.Game.Diagnostics
 
     internal sealed class UpdatableMetricCounter : MetricCounter, IUpdatable
     {
-        public override string Name => this.updatable.GetType().Name;
+        public override string Name => this.updatable.GetName();
 
         private IUpdatable updatable;
 
@@ -59,7 +59,7 @@ namespace JankWorks.Game.Diagnostics
 
     internal sealed class RenderableMetricCounter : MetricCounter, IRenderable
     {
-        public override string Name => this.renderable.GetType().Name;
+        public override string Name => this.renderable.GetName();
 
         private IRenderable renderable;
 
@@ -105,7 +105,7 @@ namespace JankWorks.Game.Diagnostics
 
     internal sealed class ParallelTickableMetricCounter : ParallelMetricCounter, IParallelTickable
     {
-        public override string Name => this.tickable.GetType().Name;
+        public override string Name => this.tickable.GetName();
 
         private IParallelTickable tickable;
 
@@ -134,7 +134,7 @@ namespace JankWorks.Game.Diagnostics
 
     internal sealed class ParallelUpdatableMetricCounter : ParallelMetricCounter, IParallelUpdatable
     {
-        public override string Name => this.updatable.GetType().Name;
+        public override string Name => this.updatable.GetName();
 
         private IParallelUpdatable updatable;
 
@@ -163,7 +163,7 @@ namespace JankWorks.Game.Diagnostics
 
     internal sealed class ParallelRenderableMetricCounter : ParallelMetricCounter, IParallelRenderable
     {
-        public override string Name => this.renderable.GetType().Name;
+        public override string Name => this.renderable.GetName();
 
         private IParallelRenderable renderable;
 
