@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Triangle", "Triangle\Triangle.csproj", "{69A42AD0-F66B-4B5C-BB0F-8F9B1E514432}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Triangle", "Examples\Triangle\Triangle.csproj", "{69A42AD0-F66B-4B5C-BB0F-8F9B1E514432}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.Game", "JankWorks.Game\JankWorks.Game.csproj", "{1D8E818A-4D69-498B-AA95-978178283A66}"
 EndProject
@@ -28,9 +28,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.OpenAL", "JankWor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.Game.Network", "JankWorks.Game.Network\JankWorks.Game.Network.csproj", "{903E4766-33F9-4DDF-BF9F-F370C3D72C67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pong", "Pong\Pong.csproj", "{194B4A24-74CB-430B-9409-A5A3230965A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pong", "Examples\Pong\Pong.csproj", "{194B4A24-74CB-430B-9409-A5A3230965A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagePreviewer", "ImagePreviewer\ImagePreviewer.csproj", "{0D3E1E63-335B-48CA-8494-3EE74A2F783D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImagePreviewer", "Examples\ImagePreviewer\ImagePreviewer.csproj", "{0D3E1E63-335B-48CA-8494-3EE74A2F783D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{B23F146D-0486-4AC9-8860-5CAE22F1D989}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +91,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{69A42AD0-F66B-4B5C-BB0F-8F9B1E514432} = {B23F146D-0486-4AC9-8860-5CAE22F1D989}
+		{194B4A24-74CB-430B-9409-A5A3230965A6} = {B23F146D-0486-4AC9-8860-5CAE22F1D989}
+		{0D3E1E63-335B-48CA-8494-3EE74A2F783D} = {B23F146D-0486-4AC9-8860-5CAE22F1D989}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {919C15E1-0C7C-45B5-9484-1F0A3CECB100}
