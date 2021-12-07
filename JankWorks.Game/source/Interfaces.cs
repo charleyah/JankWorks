@@ -31,7 +31,7 @@ namespace JankWorks.Game
     }
 
     /// <summary>
-    /// Interface for client-side objects that listen for user inputs.
+    /// Interface for client-side game objects that listen for user inputs.
     /// </summary>
     public interface IInputListener
     {
