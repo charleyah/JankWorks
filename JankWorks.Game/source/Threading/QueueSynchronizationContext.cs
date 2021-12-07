@@ -31,14 +31,13 @@ namespace JankWorks.Game.Threading
             }
         }
 
-        public virtual void Join()
+        public virtual void Join() => SpinWait.SpinUntil(this.Waiter);
+        
+
+        private bool Waiter()
         {
-            do
-            {
-                this.Yield();
-                Thread.Yield();
-            }
-            while (this.Pending);
+            this.Yield();
+            return this.operationsInProgress == 0 && this.awaitingTasks.IsEmpty;
         }
     }
 }
