@@ -17,12 +17,6 @@ namespace ImagePreviewer
         private SpriteRenderer renderer;
         private Texture2D texture;
 
-        private bool processingImage;
-
-        public ImageRenderer()
-        {
-            this.processingImage = false;
-        }
 
         public void InitialiseGraphicsResources(GraphicsDevice device, AssetManager assets)
         {
@@ -37,33 +31,25 @@ namespace ImagePreviewer
         }
 
         public async void Update(TimeSpan delta)
-        {
-            if(!this.processingImage)
+        {                
+            Console.WriteLine("Enter a url to an image to display...");
+            var loc = await Task.Run(Console.ReadLine);
+
+            try
             {
-                this.processingImage = true;
-                Console.WriteLine("Enter a url to an image to display...");
-                var loc = await Task.Run(Console.ReadLine);
+                var uri = new Uri(loc);
+                Console.WriteLine("...");
 
-                try
-                {
-                    var uri = new Uri(loc);
-                    Console.WriteLine("...");
+                var image = await GetImage(uri);
 
-                    var image = await GetImage(uri);
-
-                    image.CopyTo(texture);
-                    this.renderer.Clear();
-                }
-                catch(Exception e)
-                {
-                    Console.WriteLine($"Error getting image \n { e }");
-                    Console.WriteLine();               
-                }
-                finally
-                {
-                    this.processingImage = false;
-                }                
+                image.CopyTo(texture);
+                this.renderer.Clear();
             }
+            catch(Exception e)
+            {
+                Console.WriteLine($"Error getting image \n { e }");
+                Console.WriteLine();               
+            }                      
         }
 
         private async Task<Image> GetImage(Uri url)

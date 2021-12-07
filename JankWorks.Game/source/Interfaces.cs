@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 using JankWorks.Audio;
 using JankWorks.Graphics;
 using JankWorks.Interface;
@@ -32,6 +31,8 @@ namespace JankWorks.Game
 
     public interface ITickable : INameable
     {
+        IntervalBehavior TickInterval => IntervalBehavior.Asynchronous;
+
         void Tick(ulong tick, TimeSpan delta);
     }
 
@@ -46,6 +47,8 @@ namespace JankWorks.Game
 
     public interface IUpdatable : INameable
     {
+        IntervalBehavior UpdateInterval => IntervalBehavior.Asynchronous;
+
         void Update(TimeSpan delta);
     }
 
@@ -83,6 +86,8 @@ namespace JankWorks.Game
 
     public interface IRenderable : IGraphicsResource, INameable
     {
+        IntervalBehavior RenderInterval => IntervalBehavior.NoAsync;
+
         void Render(Surface surface, Frame frame);
     }
 
@@ -93,6 +98,33 @@ namespace JankWorks.Game
         void ForkRender(Surface surface, Frame frame, Action<IParallelRenderable> callback);
 
         void JoinRender(Surface surface, Frame frame);
+    }
+
+
+    /// <summary>
+    /// Defines how to a interval methods (update, tick and render) are handled.
+    /// </summary>
+    public enum IntervalBehavior
+    {
+        /// <summary>
+        /// Method is invoked every interval and does not support async method invocation. Used to indicate no SynchronizationContext is required
+        /// </summary>
+        NoAsync,
+
+        /// <summary>
+        /// Method is invoked every interval. If the method is async it can be invoked multiple times while awaiting tasks
+        /// </summary>
+        Overlapped,
+
+        /// <summary>
+        /// Method is invoked every interval. If the method is async it will block until all awaited tasks are completed
+        /// </summary>
+        Synchronous,
+
+        /// <summary>
+        /// Method is invoked or resumes awaited tasks on interval.
+        /// </summary>
+        Asynchronous
     }
 
     public readonly struct Frame : IEquatable<Frame>

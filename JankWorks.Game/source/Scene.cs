@@ -51,13 +51,11 @@ namespace JankWorks.Game
         {
             this.Assets.Dispose();
         }
-
-        protected record GameObject(object Instance, bool RequiresSynchronizationContext);
     }
 
     public abstract class HostScene : ApplicationScene, ITickable
     {
-        private List<GameObject> hostObjects;
+        private List<object> hostObjects;
 
         private IResource[] resources;
 
@@ -75,7 +73,7 @@ namespace JankWorks.Game
 
         public HostScene()
         {            
-            this.hostObjects = new List<GameObject>(ApplicationScene.InitialObjectContainerCount);
+            this.hostObjects = new List<object>(ApplicationScene.InitialObjectContainerCount);
             this.resources = Array.Empty<IResource>();
             this.dispatchables = Array.Empty<IDispatchable>();
             this.disposables = Array.Empty<IDisposable>();
@@ -85,12 +83,7 @@ namespace JankWorks.Game
             this.ParallelTickMetricCounters = Array.Empty<MetricCounter>();
         }
 
-        protected void RegisterHostObject(object obj) => this.RegisterHostObject(obj, true);
-
-        protected void RegisterHostObject(object obj, bool requiresSynchronizationContext)
-        {            
-            this.hostObjects.Add(new GameObject(obj, requiresSynchronizationContext && obj is ITickable));
-        }
+        protected void RegisterHostObject(object obj) => this.hostObjects.Add(obj);
 
         public virtual void SharedInitialise(Host host, Client client) => this.InternalHostInitialise();
 
@@ -139,18 +132,19 @@ namespace JankWorks.Game
         
         private void BuildHostObjectContainers()
         {
-            this.resources = (from obj in this.hostObjects where obj.Instance is IResource select (IResource)obj.Instance).Reverse().ToArray();            
-            this.disposables = (from obj in this.hostObjects where obj.Instance is IDisposable select (IDisposable)obj.Instance).Reverse().ToArray();
-            this.dispatchables = (from obj in this.hostObjects where obj.Instance is IDispatchable select (IDispatchable)obj.Instance).ToArray();
+            this.resources = (from obj in this.hostObjects where obj is IResource select (IResource)obj).Reverse().ToArray();            
+            this.disposables = (from obj in this.hostObjects where obj is IDisposable select (IDisposable)obj).Reverse().ToArray();
+            this.dispatchables = (from obj in this.hostObjects where obj is IDispatchable select (IDispatchable)obj).ToArray();
 
             if (this.PerformanceMetricsEnabled)
             {                
                 this.tickables = 
                 (from obj in this.hostObjects 
-                where obj.Instance is ITickable 
-                select new TickableMetricCounter(obj.RequiresSynchronizationContext ? new TickableSynchronizationContext((ITickable)obj.Instance) : (ITickable)obj.Instance)).ToArray();
+                 let tickable = obj as ITickable
+                 where obj is ITickable 
+                 select new TickableMetricCounter(tickable.TickInterval != IntervalBehavior.NoAsync ? new TickableSynchronizationContext(tickable) : tickable)).ToArray();
 
-                this.parallelTickables = (from obj in this.hostObjects where obj.Instance is IParallelTickable select new ParallelTickableMetricCounter((IParallelTickable)obj)).ToArray();
+                this.parallelTickables = (from obj in this.hostObjects where obj is IParallelTickable select new ParallelTickableMetricCounter((IParallelTickable)obj)).ToArray();
 
                 this.TickMetricCounters = (MetricCounter[])this.tickables.Clone();
                 this.ParallelTickMetricCounters = (MetricCounter[])this.parallelTickables.Clone();
@@ -158,11 +152,13 @@ namespace JankWorks.Game
             else
             {
                 this.tickables = 
-                (from obj in this.hostObjects 
-                where obj.Instance is ITickable 
-                select obj.RequiresSynchronizationContext ? new TickableSynchronizationContext((ITickable)obj.Instance) : (ITickable)obj.Instance).ToArray();
+                (from obj in this.hostObjects
+                 let tickable = obj as ITickable
+                 where obj is ITickable 
+                 select tickable.TickInterval != IntervalBehavior.NoAsync ? new TickableSynchronizationContext(tickable) : tickable).ToArray();
 
-                this.parallelTickables = (from obj in this.hostObjects where obj.Instance is IParallelTickable select (IParallelTickable)obj.Instance).ToArray();
+                this.parallelTickables = (from obj in this.hostObjects where obj is IParallelTickable select (IParallelTickable)obj).ToArray();
+
                 this.TickMetricCounters = Array.Empty<MetricCounter>();
                 this.ParallelTickMetricCounters = Array.Empty<MetricCounter>();
             }
@@ -228,7 +224,7 @@ namespace JankWorks.Game
 
     public abstract class Scene : HostScene
     {
-        private List<GameObject> clientObjects;
+        private List<object> clientObjects;
 
         private IResource[] resources;
 
@@ -265,7 +261,7 @@ namespace JankWorks.Game
             this.RenderableMetricCounters = Array.Empty<MetricCounter>();
             this.ParallelRenderableMetricCounters = Array.Empty<MetricCounter>();
 
-            this.clientObjects = new List<GameObject>(ApplicationScene.InitialObjectContainerCount);
+            this.clientObjects = new List<object>(ApplicationScene.InitialObjectContainerCount);
             this.resources = Array.Empty<IResource>();
             this.dispatchables = Array.Empty<IDispatchable>();
             this.graphicsResources = Array.Empty<IGraphicsResource>();
@@ -280,12 +276,7 @@ namespace JankWorks.Game
             this.parallelRenderables = Array.Empty<IParallelRenderable>();
         }
 
-        protected void RegisterClientObject(object obj) => this.RegisterClientObject(obj, true);
-
-        protected void RegisterClientObject(object obj, bool requiresSynchronizationContext)
-        {
-            this.clientObjects.Add(new GameObject(obj, requiresSynchronizationContext && (obj is IUpdatable || obj is IRenderable)));
-        }
+        protected void RegisterClientObject(object obj) => this.clientObjects.Add(obj);
 
         internal void ClientInitialiseAfterShared(Client client)
         {
@@ -333,29 +324,31 @@ namespace JankWorks.Game
         
         private void BuildClientObjectContainers()
         {
-            this.resources = (from obj in this.clientObjects where obj.Instance is IResource select (IResource)obj.Instance).Reverse().ToArray();
-            this.graphicsResources = (from obj in this.clientObjects where obj.Instance is IGraphicsResource select (IGraphicsResource)obj.Instance).Reverse().ToArray();
-            this.soundResources = (from obj in this.clientObjects where obj.Instance is ISoundResource select (ISoundResource)obj.Instance).Reverse().ToArray();
-            this.disposables = (from obj in this.clientObjects where obj.Instance is IDisposable select (IDisposable)obj.Instance).Reverse().ToArray();
+            this.resources = (from obj in this.clientObjects where obj is IResource select (IResource)obj).Reverse().ToArray();
+            this.graphicsResources = (from obj in this.clientObjects where obj is IGraphicsResource select (IGraphicsResource)obj).Reverse().ToArray();
+            this.soundResources = (from obj in this.clientObjects where obj is ISoundResource select (ISoundResource)obj).Reverse().ToArray();
+            this.disposables = (from obj in this.clientObjects where obj is IDisposable select (IDisposable)obj).Reverse().ToArray();
 
-            this.dispatchables = (from obj in this.clientObjects where obj.Instance is IDispatchable select (IDispatchable)obj.Instance).ToArray();
+            this.dispatchables = (from obj in this.clientObjects where obj is IDispatchable select (IDispatchable)obj).ToArray();
 
-            this.inputlisteners = (from obj in this.clientObjects where obj.Instance is IInputListener select (IInputListener)obj.Instance).ToArray();
+            this.inputlisteners = (from obj in this.clientObjects where obj is IInputListener select (IInputListener)obj).ToArray();
 
             if (this.PerformanceMetricsEnabled)
             {
                 this.updatables = 
-                (from obj in this.clientObjects 
-                 where obj.Instance is IUpdatable 
-                 select new UpdatableMetricCounter(obj.RequiresSynchronizationContext ? new UpdatableSynchronizationContext((IUpdatable)obj.Instance) : (IUpdatable)obj.Instance)).ToArray();
+                (from obj in this.clientObjects
+                 let updatable = obj as IUpdatable
+                 where obj is IUpdatable 
+                 select new UpdatableMetricCounter(updatable.UpdateInterval != IntervalBehavior.NoAsync ? new UpdatableSynchronizationContext(updatable) : updatable)).ToArray();
 
                 this.renderables = 
-                (from obj in this.clientObjects 
-                 where obj.Instance is IRenderable 
-                 select new RenderableMetricCounter(obj.RequiresSynchronizationContext ? new RenderableSynchronizationContext((IRenderable)obj.Instance) : (IRenderable)obj.Instance)).ToArray();
+                (from obj in this.clientObjects
+                 let renderable = obj as IRenderable
+                 where obj is IRenderable 
+                 select new RenderableMetricCounter(renderable.RenderInterval != IntervalBehavior.NoAsync ? new RenderableSynchronizationContext(renderable) : renderable)).ToArray();
 
-                this.parallelUpdatables = (from obj in this.clientObjects where obj.Instance is IParallelUpdatable select new ParallelUpdatableMetricCounter((IParallelUpdatable)obj.Instance)).ToArray();
-                this.parallelRenderables = (from obj in this.clientObjects where obj.Instance is IParallelRenderable select new ParallelRenderableMetricCounter((IParallelRenderable)obj.Instance)).ToArray();
+                this.parallelUpdatables = (from obj in this.clientObjects where obj is IParallelUpdatable select new ParallelUpdatableMetricCounter((IParallelUpdatable)obj)).ToArray();
+                this.parallelRenderables = (from obj in this.clientObjects where obj is IParallelRenderable select new ParallelRenderableMetricCounter((IParallelRenderable)obj)).ToArray();
 
                 this.UpdatableMetricCounters = (MetricCounter[])this.updatables.Clone();
                 this.ParallelUpdatableMetricCounters = (MetricCounter[])this.parallelUpdatables.Clone();
@@ -365,17 +358,19 @@ namespace JankWorks.Game
             else
             {
                 this.updatables = 
-                (from obj in this.clientObjects 
-                 where obj.Instance is IUpdatable 
-                 select obj.RequiresSynchronizationContext ? new UpdatableSynchronizationContext((IUpdatable)obj.Instance) : (IUpdatable)obj.Instance).ToArray();
+                (from obj in this.clientObjects
+                 let updatable = obj as IUpdatable
+                 where obj is IUpdatable 
+                 select updatable.UpdateInterval != IntervalBehavior.NoAsync ? new UpdatableSynchronizationContext(updatable) : updatable).ToArray();
 
                 this.renderables = 
-                (from obj in this.clientObjects 
-                 where obj.Instance is IRenderable 
-                 select obj.RequiresSynchronizationContext ? new RenderableSynchronizationContext((IRenderable)obj.Instance) : (IRenderable)obj.Instance).ToArray();
+                (from obj in this.clientObjects
+                 let renderable = obj as IRenderable
+                 where obj is IRenderable
+                 select renderable.RenderInterval != IntervalBehavior.NoAsync ? new RenderableSynchronizationContext(renderable) : renderable).ToArray();
 
-                this.parallelUpdatables = (from obj in this.clientObjects where obj.Instance is IParallelUpdatable select (IParallelUpdatable)obj.Instance).ToArray();
-                this.parallelRenderables = (from obj in this.clientObjects where obj.Instance is IParallelRenderable select (IParallelRenderable)obj.Instance).ToArray();
+                this.parallelUpdatables = (from obj in this.clientObjects where obj is IParallelUpdatable select (IParallelUpdatable)obj).ToArray();
+                this.parallelRenderables = (from obj in this.clientObjects where obj is IParallelRenderable select (IParallelRenderable)obj).ToArray();
 
                 this.UpdatableMetricCounters = Array.Empty<MetricCounter>();
                 this.ParallelUpdatableMetricCounters = Array.Empty<MetricCounter>();
