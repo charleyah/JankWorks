@@ -6,7 +6,7 @@ namespace JankWorks.Game.Threading
     sealed class TickableSynchronizationContext : QueueSynchronizationContext, ITickable
     {
         private readonly ITickable tickable;
-        private readonly IntervalBehavior interval;
+        private readonly IntervalBehaviour interval;
 
         public TickableSynchronizationContext(ITickable tickable)
         {
@@ -24,7 +24,7 @@ namespace JankWorks.Game.Threading
 
                 switch (this.interval)
                 {
-                    case IntervalBehavior.Asynchronous:
+                    case IntervalBehaviour.Asynchronous:
 
                         if (this.Pending)
                         {
@@ -37,12 +37,12 @@ namespace JankWorks.Game.Threading
 
                         break;
 
-                    case IntervalBehavior.Synchronous:
+                    case IntervalBehaviour.Synchronous:
                         this.tickable.Tick(tick, delta);
                         this.Join();
                         break;
 
-                    case IntervalBehavior.Overlapped:
+                    case IntervalBehaviour.Overlapped:
                         this.Yield();
                         this.tickable.Tick(tick, delta);
                         break;

@@ -45,7 +45,7 @@ namespace JankWorks.Game
     /// </summary>
     public interface ITickable : INameable
     {
-        IntervalBehavior TickInterval => IntervalBehavior.Asynchronous;
+        IntervalBehaviour TickInterval => IntervalBehaviour.Asynchronous;
 
         void Tick(ulong tick, TimeSpan delta);
     }
@@ -67,7 +67,7 @@ namespace JankWorks.Game
     /// </summary>
     public interface IUpdatable : INameable
     {
-        IntervalBehavior UpdateInterval => IntervalBehavior.Asynchronous;
+        IntervalBehaviour UpdateInterval => IntervalBehaviour.Asynchronous;
 
         void Update(TimeSpan delta);
     }
@@ -121,7 +121,7 @@ namespace JankWorks.Game
     /// </summary>
     public interface IRenderable : IGraphicsResource, INameable
     {
-        IntervalBehavior RenderInterval => IntervalBehavior.NoAsync;
+        IntervalBehaviour RenderInterval => IntervalBehaviour.NoAsync;
 
         void Render(Surface surface, Frame frame);
     }
@@ -142,7 +142,7 @@ namespace JankWorks.Game
     /// <summary>
     /// Defines how interval methods (update, tick and render) are invoked.
     /// </summary>
-    public enum IntervalBehavior
+    public enum IntervalBehaviour
     {
         /// <summary>
         /// Method is invoked every interval and does not support async method invocation. Used to indicate no SynchronizationContext is required.

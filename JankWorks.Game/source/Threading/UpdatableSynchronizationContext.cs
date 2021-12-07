@@ -6,7 +6,7 @@ namespace JankWorks.Game.Threading
     sealed class UpdatableSynchronizationContext : QueueSynchronizationContext, IUpdatable
     {
         private readonly IUpdatable updatable;
-        private readonly IntervalBehavior interval;
+        private readonly IntervalBehaviour interval;
 
         public UpdatableSynchronizationContext(IUpdatable updatable)
         {
@@ -24,7 +24,7 @@ namespace JankWorks.Game.Threading
 
                 switch(this.interval)
                 {
-                    case IntervalBehavior.Asynchronous:
+                    case IntervalBehaviour.Asynchronous:
 
                         if(this.Pending)
                         {
@@ -37,12 +37,12 @@ namespace JankWorks.Game.Threading
 
                         break;
 
-                    case IntervalBehavior.Synchronous:
+                    case IntervalBehaviour.Synchronous:
                         this.updatable.Update(delta);
                         this.Join();
                         break;
 
-                    case IntervalBehavior.Overlapped:
+                    case IntervalBehaviour.Overlapped:
                         this.Yield();
                         this.updatable.Update(delta);                        
                         break;

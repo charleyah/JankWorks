@@ -10,7 +10,7 @@ namespace JankWorks.Game.Threading
     sealed class RenderableSynchronizationContext : QueueSynchronizationContext, IRenderable
     {
         private readonly IRenderable renderable;
-        private readonly IntervalBehavior interval;
+        private readonly IntervalBehaviour interval;
 
         public RenderableSynchronizationContext(IRenderable renderable)
         {
@@ -33,7 +33,7 @@ namespace JankWorks.Game.Threading
 
                 switch (this.interval)
                 {
-                    case IntervalBehavior.Asynchronous:
+                    case IntervalBehaviour.Asynchronous:
 
                         if (this.Pending)
                         {
@@ -46,12 +46,12 @@ namespace JankWorks.Game.Threading
 
                         break;
 
-                    case IntervalBehavior.Synchronous:
+                    case IntervalBehaviour.Synchronous:
                         this.renderable.Render(surface, frame);
                         this.Join();
                         break;
 
-                    case IntervalBehavior.Overlapped:
+                    case IntervalBehaviour.Overlapped:
                         this.Yield();
                         this.renderable.Render(surface, frame);
                         break;

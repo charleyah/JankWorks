@@ -142,7 +142,7 @@ namespace JankWorks.Game
                 (from obj in this.hostObjects 
                  let tickable = obj as ITickable
                  where obj is ITickable 
-                 select new TickableMetricCounter(tickable.TickInterval != IntervalBehavior.NoAsync ? new TickableSynchronizationContext(tickable) : tickable)).ToArray();
+                 select new TickableMetricCounter(tickable.TickInterval != IntervalBehaviour.NoAsync ? new TickableSynchronizationContext(tickable) : tickable)).ToArray();
 
                 this.parallelTickables = (from obj in this.hostObjects where obj is IParallelTickable select new ParallelTickableMetricCounter((IParallelTickable)obj)).ToArray();
 
@@ -155,7 +155,7 @@ namespace JankWorks.Game
                 (from obj in this.hostObjects
                  let tickable = obj as ITickable
                  where obj is ITickable 
-                 select tickable.TickInterval != IntervalBehavior.NoAsync ? new TickableSynchronizationContext(tickable) : tickable).ToArray();
+                 select tickable.TickInterval != IntervalBehaviour.NoAsync ? new TickableSynchronizationContext(tickable) : tickable).ToArray();
 
                 this.parallelTickables = (from obj in this.hostObjects where obj is IParallelTickable select (IParallelTickable)obj).ToArray();
 
@@ -339,13 +339,13 @@ namespace JankWorks.Game
                 (from obj in this.clientObjects
                  let updatable = obj as IUpdatable
                  where obj is IUpdatable 
-                 select new UpdatableMetricCounter(updatable.UpdateInterval != IntervalBehavior.NoAsync ? new UpdatableSynchronizationContext(updatable) : updatable)).ToArray();
+                 select new UpdatableMetricCounter(updatable.UpdateInterval != IntervalBehaviour.NoAsync ? new UpdatableSynchronizationContext(updatable) : updatable)).ToArray();
 
                 this.renderables = 
                 (from obj in this.clientObjects
                  let renderable = obj as IRenderable
                  where obj is IRenderable 
-                 select new RenderableMetricCounter(renderable.RenderInterval != IntervalBehavior.NoAsync ? new RenderableSynchronizationContext(renderable) : renderable)).ToArray();
+                 select new RenderableMetricCounter(renderable.RenderInterval != IntervalBehaviour.NoAsync ? new RenderableSynchronizationContext(renderable) : renderable)).ToArray();
 
                 this.parallelUpdatables = (from obj in this.clientObjects where obj is IParallelUpdatable select new ParallelUpdatableMetricCounter((IParallelUpdatable)obj)).ToArray();
                 this.parallelRenderables = (from obj in this.clientObjects where obj is IParallelRenderable select new ParallelRenderableMetricCounter((IParallelRenderable)obj)).ToArray();
@@ -361,13 +361,13 @@ namespace JankWorks.Game
                 (from obj in this.clientObjects
                  let updatable = obj as IUpdatable
                  where obj is IUpdatable 
-                 select updatable.UpdateInterval != IntervalBehavior.NoAsync ? new UpdatableSynchronizationContext(updatable) : updatable).ToArray();
+                 select updatable.UpdateInterval != IntervalBehaviour.NoAsync ? new UpdatableSynchronizationContext(updatable) : updatable).ToArray();
 
                 this.renderables = 
                 (from obj in this.clientObjects
                  let renderable = obj as IRenderable
                  where obj is IRenderable
-                 select renderable.RenderInterval != IntervalBehavior.NoAsync ? new RenderableSynchronizationContext(renderable) : renderable).ToArray();
+                 select renderable.RenderInterval != IntervalBehaviour.NoAsync ? new RenderableSynchronizationContext(renderable) : renderable).ToArray();
 
                 this.parallelUpdatables = (from obj in this.clientObjects where obj is IParallelUpdatable select (IParallelUpdatable)obj).ToArray();
                 this.parallelRenderables = (from obj in this.clientObjects where obj is IParallelRenderable select (IParallelRenderable)obj).ToArray();
