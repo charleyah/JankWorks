@@ -8,13 +8,21 @@ using JankWorks.Game.Assets;
 
 using JankWorks.Game.Hosting.Messaging;
 
+// This file defines all the interfaces an arbitrary game object can implement
+
 namespace JankWorks.Game
 {
+    /// <summary>
+    /// Interface for providing a name for a game object. Used in performance metrics and debugging.
+    /// </summary>
     public interface INameable
     {
         string GetName() => this.GetType().Name;
     }
 
+    /// <summary>
+    /// Interface for any game object that reads/loads game assets
+    /// </summary>
     public interface IResource
     {
         void InitialiseResources(AssetManager assets);
@@ -22,6 +30,9 @@ namespace JankWorks.Game
         void DisposeResources();
     }
 
+    /// <summary>
+    /// Interface for client-side objects that listen for user inputs.
+    /// </summary>
     public interface IInputListener
     {
         void SubscribeInputs(IInputManager inputManager);
@@ -29,6 +40,9 @@ namespace JankWorks.Game
         void UnsubscribeInputs(IInputManager inputManager);
     }
 
+    /// <summary>
+    /// Interface for tickable host-side game objects.
+    /// </summary>
     public interface ITickable : INameable
     {
         IntervalBehavior TickInterval => IntervalBehavior.Asynchronous;
@@ -36,6 +50,9 @@ namespace JankWorks.Game
         void Tick(ulong tick, TimeSpan delta);
     }
 
+    /// <summary>
+    /// Interface for tickable host-side game objects that are ticked in parallel.
+    /// </summary>
     public interface IParallelTickable : INameable
     {
         void ForkTick(ulong tick, TimeSpan delta) => this.ForkTick(tick, delta, null);
@@ -45,6 +62,9 @@ namespace JankWorks.Game
         void JoinTick(ulong tick, TimeSpan delta);
     }
 
+    /// <summary>
+    /// Interface for updatable client-side game objects.
+    /// </summary>
     public interface IUpdatable : INameable
     {
         IntervalBehavior UpdateInterval => IntervalBehavior.Asynchronous;
@@ -52,6 +72,9 @@ namespace JankWorks.Game
         void Update(TimeSpan delta);
     }
 
+    /// <summary>
+    /// Interface for updatable client-side game objects that are updated in parallel.
+    /// </summary>
     public interface IParallelUpdatable : INameable
     {
         void ForkUpdate(TimeSpan delta) => this.ForkUpdate(delta, null);
@@ -61,6 +84,9 @@ namespace JankWorks.Game
         void JoinUpdate(TimeSpan delta);
     }
 
+    /// <summary>
+    /// Interface for game objects that communicate between client and host.
+    /// </summary>
     public interface IDispatchable
     {
         void InitialiseChannels(Dispatcher dispatcher);
@@ -70,6 +96,9 @@ namespace JankWorks.Game
         void DownSynchronise();
     }
 
+    /// <summary>
+    /// Interface for client-side game objects that emit sounds.
+    /// </summary>
     public interface ISoundResource
     {
         void InitialiseSoundResources(AudioDevice device, AssetManager assets);
@@ -77,6 +106,9 @@ namespace JankWorks.Game
         void DisposeSoundResources(AudioDevice device);
     }
 
+    /// <summary>
+    /// Interface for client-side game objects that utilise graphics.
+    /// </summary>
     public interface IGraphicsResource
     {
         void InitialiseGraphicsResources(GraphicsDevice device, AssetManager assets);
@@ -84,6 +116,9 @@ namespace JankWorks.Game
         void DisposeGraphicsResources(GraphicsDevice device);
     }
 
+    /// <summary>
+    /// Interface for client-side game objects that are rendered.
+    /// </summary>
     public interface IRenderable : IGraphicsResource, INameable
     {
         IntervalBehavior RenderInterval => IntervalBehavior.NoAsync;
@@ -91,6 +126,9 @@ namespace JankWorks.Game
         void Render(Surface surface, Frame frame);
     }
 
+    /// <summary>
+    /// Interface for client-side game objects that are rendered in parallel.
+    /// </summary>
     public interface IParallelRenderable : IGraphicsResource, INameable
     {
         void ForkRender(Surface surface, Frame frame) => this.ForkRender(surface, frame, null);
@@ -102,22 +140,22 @@ namespace JankWorks.Game
 
 
     /// <summary>
-    /// Defines how to a interval methods (update, tick and render) are handled.
+    /// Defines how interval methods (update, tick and render) are invoked.
     /// </summary>
     public enum IntervalBehavior
     {
         /// <summary>
-        /// Method is invoked every interval and does not support async method invocation. Used to indicate no SynchronizationContext is required
+        /// Method is invoked every interval and does not support async method invocation. Used to indicate no SynchronizationContext is required.
         /// </summary>
         NoAsync,
 
         /// <summary>
-        /// Method is invoked every interval. If the method is async it can be invoked multiple times while awaiting tasks
+        /// Method is invoked every interval. If the method is async it can be invoked multiple times while awaiting tasks.
         /// </summary>
         Overlapped,
 
         /// <summary>
-        /// Method is invoked every interval. If the method is async it will block until all awaited tasks are completed
+        /// Method is invoked every interval. If the method is async it will block until all awaited tasks are completed.
         /// </summary>
         Synchronous,
 
@@ -127,6 +165,9 @@ namespace JankWorks.Game
         Asynchronous
     }
 
+    /// <summary>
+    /// Provides infomation about a given frame to render
+    /// </summary>
     public readonly struct Frame : IEquatable<Frame>
     {
         public static readonly Frame Complete = new Frame(1d);
