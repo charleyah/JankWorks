@@ -452,8 +452,8 @@ namespace JankWorks.Game.Local
             try
             {
                 SynchronizationContext.SetSynchronizationContext(this.inputContext);
-                this.window.ProcessEvents();
                 this.inputContext.Yield();
+                this.window.ProcessEvents();                
             }
             finally
             {
