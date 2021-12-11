@@ -26,22 +26,11 @@ namespace JankWorks.Game
 
         public ApplicationConfiguration Configuration { get; private set; }
 
-        protected Application()
+        protected Application() {/* Moved init to its own method as it depends on sub class implementation */}
+
+        internal void Setup()
         {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), this.Name);
-            this.DataFolder = new DirectoryInfo(path);
-            if(!this.DataFolder.Exists)
-            {
-                this.DataFolder.Create();
-            }
-
-            path = Path.Combine(path, "saves");
-            this.SaveFolder = new DirectoryInfo(path);
-
-            if(!this.SaveFolder.Exists)
-            {
-                this.SaveFolder.Create();
-            }
+            this.CreateDataFolder();
 
             this.RegisteredScenes = this.RegisterScenes();
 
@@ -52,6 +41,31 @@ namespace JankWorks.Game
             var conf = this.DefaultApplicationConfiguration;
             conf.Load(this.Settings);
             this.Configuration = conf;
+        }
+
+        protected bool CreateDataFolder()
+        {
+            var requiresDataFolder = this.ApplicationParameters.RequiresDataFolder;
+
+            if (requiresDataFolder)
+            {
+                var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), this.Name);
+                this.DataFolder = new DirectoryInfo(path);
+                if (!this.DataFolder.Exists)
+                {
+                    this.DataFolder.Create();
+                }
+
+                path = Path.Combine(path, "saves");
+                this.SaveFolder = new DirectoryInfo(path);
+
+                if (!this.SaveFolder.Exists)
+                {
+                    this.SaveFolder.Create();
+                }
+            }
+
+            return requiresDataFolder;
         }
 
         public abstract string Name { get; }
@@ -151,6 +165,7 @@ namespace JankWorks.Game
 
         public static void RunWithoutHost(Application application, int scene, object state = null)
         {
+            application.Setup();
             var host = new NullHost(application);
             using var client = new Client(application, host);
 
@@ -159,6 +174,7 @@ namespace JankWorks.Game
 
         public static void Run(Application application, int scene, object state = null)
         {
+            application.Setup();
             var host = new OfflineHost(application);
             using var client = new Client(application, host);
             
@@ -168,6 +184,7 @@ namespace JankWorks.Game
 
         public static void Run(Application application, ClientHost host, int scene, object state = null)
         {
+            application.Setup();
             using var client = new Client(application, host);           
             client.Run(scene, state);
         }
@@ -181,14 +198,17 @@ namespace JankWorks.Game
 
         public SettingsMode HostSettingsMode { get; set; }
 
+        internal bool RequiresDataFolder => this.AppSettingsMode == SettingsMode.Persisted || 
+                                            this.ClientSettingsMode == SettingsMode.Persisted || 
+                                            this.HostSettingsMode == SettingsMode.Persisted;
+
         public static ApplicationParameters Default => new ApplicationParameters()
         {
-            AppSettingsMode = SettingsMode.Persisted,
-            ClientSettingsMode = SettingsMode.Persisted,
-            HostSettingsMode = SettingsMode.Persisted
+            AppSettingsMode = SettingsMode.NoSettings,
+            ClientSettingsMode = SettingsMode.NoSettings,
+            HostSettingsMode = SettingsMode.NoSettings
         };
-        
-        [Flags]
+
         public enum SettingsMode
         {
             NoSettings = 0,
