@@ -168,14 +168,12 @@ namespace JankWorks.Game
 
         public virtual void SharedDispose(Host host, Client client)
         {
-            try
-            {
-                this.InternalHostDispose(host);
-            }
-            finally
-            {
-                this.sharedSignal.Set();
-            }                       
+            this.InternalHostDispose(host);
+        }
+
+        internal void SharedDisposed()
+        {
+            this.sharedSignal.Set();
         }
 
         public virtual void HostDispose(Host host) => this.InternalHostDispose(host);

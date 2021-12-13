@@ -209,33 +209,33 @@ namespace JankWorks.Game.Local
         {            
             var sceneToLoad = this.application.RegisteredScenes[scene]();
 
-            using var sync = new ScopedSynchronizationContext(true);            
-
-            sceneToLoad.PreInitialise(initState);
-            sync.Join();
-
-            sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
-            sync.Join();
-
-            sceneToLoad.ClientInitialise(this);
-            sync.Join();
-
-            try
+            using (var sync = new ScopedSynchronizationContext(true))
             {
-                this.graphicsDevice.Activate();
-                sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+                sceneToLoad.PreInitialise(initState);
+                sync.Join();
+
+                sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
+                sync.Join();
+
+                sceneToLoad.ClientInitialise(this);
+                sync.Join();
+
+                try
+                {
+                    this.graphicsDevice.Activate();
+                    sceneToLoad.InitialiseGraphicsResources(this.graphicsDevice);
+                    sync.Join();
+                }
+                finally
+                {
+                    this.graphicsDevice.Deactivate();
+                }
+
+                sceneToLoad.InitialiseSoundResources(this.audioDevice);
                 sync.Join();
             }
-            finally
-            {
-                this.graphicsDevice.Deactivate();
-            }
-            
-            sceneToLoad.InitialiseSoundResources(this.audioDevice);
-            sync.Join();
-
+           
             sceneToLoad.ClientInitialised(initState);
-            sync.Join();
 
             this.host = host;
             this.scene = sceneToLoad;
@@ -276,10 +276,9 @@ namespace JankWorks.Game.Local
 
                 sceneToLoad.InitialiseSoundResources(this.audioDevice);
                 sync.Join();
-
-                sceneToLoad.ClientInitialised(initState);
-                sync.Join();
             }
+
+            sceneToLoad.ClientInitialised(initState);
 
             try
             {
