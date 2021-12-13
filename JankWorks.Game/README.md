@@ -108,7 +108,7 @@ Majority of scene initialisation and disposal methods support `async`. The metho
 
 ### Game Object Methods
 
-Methods provided by interfaces for game objects likewise also support `async` with parallel processing, data sync and input subscription methods be exempt.
+Methods provided by interfaces for game objects likewise also support `async`. The exceptions to this rule are parallel processing, data sync and input subscription methods.
 
 | Method                        | Interface             | Support Async |
 | ----------------------------- | --------------------- | ------------- |
