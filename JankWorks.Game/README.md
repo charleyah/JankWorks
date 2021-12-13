@@ -4,7 +4,7 @@ JankWorks Game is a framework intended to be a basis for developing a video game
 
 ## Usage & Status
 
-As a Framework, JankWorks is still in development and only tested on Windows so your mileage may vary. Its intended to be a framework like old XNA with a more abstracted client-server architecture in mind. This is achieved through creating game objects that either run on a client or host and utilise a message-passing API to communicate between them. At time of writing, applications can run without a host or with a "offline" host running its own dedicated thread. A network host is currently in development.
+As a Framework, JankWorks is still in development and only tested on Windows so your mileage may vary. The framework provides a structure around creating game objects that either run on a client or a host and utilise a message-passing API to communicate between them. At time of writing, applications can run without a host or with a "offline" host running its own dedicated thread. A network host is currently in development.
 
 ## Terminology
 
