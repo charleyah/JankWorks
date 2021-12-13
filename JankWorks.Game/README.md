@@ -134,7 +134,7 @@ Methods provided by interfaces for game objects likewise also support `async`. T
 | `ForkRender`                  | `IParallelRenderable` | No            |
 | `JoinRender`                  | `IParallelRenderable` | No            |
 
-`*` - while methods `SubscribeInputs` and `UnsubscribeInputs` don't support `async`, any method they subscribe to listen for user input do support `async`. For example a method subscribed to a key is press can be modified with `async`.
+`*` - while methods `SubscribeInputs` and `UnsubscribeInputs` don't support `async`, any method they subscribe to listen for user input do support `async`. For example a method subscribed to a key press can be modified with `async`.
 
 `**` - By default the `Render` method does not support `async` but can be configured to do so. See *Async & Interval Behaviour*.
 
