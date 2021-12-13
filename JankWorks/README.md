@@ -19,5 +19,5 @@ Audio is an API for playing positional audio and has one driver. See JankWorks.O
 In addition to the abstract APIs, JankWorks also contains namespaces for supporting library code. 
 
 - `Core`		contains public common elements across all 3 modules.
-- `Util`		contains supporting code not directly part of the API.
+- `Util`		contains supporting code not directly part of the API but are used privately in implementations.
 - `Platform`	contains supporting code that is target platform specific.
