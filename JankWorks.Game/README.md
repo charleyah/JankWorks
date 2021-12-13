@@ -140,15 +140,19 @@ Methods provided by interfaces for game objects likewise also support `async` wi
 
 ### Async & Interval Behaviour
 
-JankWorks Game Framework has explicit support for `async await` for two main reasons... retain order of execution and support APIs with shared contextual state. Its because of this, usage of `ConfigureAwait(false)` is discouraged as the framework does utilise `SynchronisationContext`. Where graphics are concerned, libraries such as OpenGL have a thread context and thus any `await` statement need to resume or yield on the thread with that context. Only use `ConfigureAwait(false)` where you are confident yielding back to either the UI client thread or host thread isn't required.
+JankWorks Game Framework has explicit support for `async await` for two main reasons... retain order of execution and supporting APIs with shared contextual state. Its because of this, usage of `ConfigureAwait(false)` is discouraged as the framework will utilise `SynchronisationContext` where it deems necessary. For example, where graphics are concerned libraries such as OpenGL have a context associated with a thread and thus any `await` statement need to resume or yield back to the thread with that context. 
 
-**Initialisation & Disposal**
+**Execution Order Guarantee**
 
-All initialisation and disposal methods for example require a order of execution and so the framework assures `async` methods don't break that order of execution. Even though scene loading and disposing is done on a dedicated thread removing any concern for blocking the main UI thread, the `async` support is there as a nicety more than anything else.
+Guaranteeing the execution order of certain procedures is the other main requirement by the framework. For example, all initialisation and disposal methods require to be executed in a certain order and so the framework assures `async` methods don't break that order or overlap execution. Even though scene loading and disposing is done on a dedicated thread removing any concern for blocking the main UI thread, the `async` support is there as a nicety more than anything else.
+
+The other important order of execution the framework guarantees is any `await` statements in`Tick`, `Update` and `Render` methods will yield back and resume execution in the order the game objects are processed, avoiding any unexpected out of order processing.
+
+Please only use `ConfigureAwait(false)` on tasks where you are confident yielding back to the framework isn't required. 
 
 **Interval Behaviour**
 
-Game objects with `Tick`, `Update` or `Render` methods have some special rules and guarantees regarding asynchronous execution. These methods are considered *Interval Methods* and their respective interface has a default property used to determine how the framework should handle asynchronous execution. The configurable Interval behaviour is as follows:
+Game objects with `Tick`, `Update` or `Render` methods have some special rules regarding asynchronous execution. These methods are considered *Interval Methods* and their respective interface has a default property used to determine how the framework should handle asynchronous execution. The configurable Interval behaviour is as follows:
 
 - `Asynchronous` -  Method is invoked or resumes awaited tasks on interval. Default for `Update` and `Tick`
 - `Synchronous` -  Method is invoked every interval. If the method is async it will block until all awaited tasks are completed.
@@ -184,6 +188,4 @@ class FooBarThinker : ITickable
     }
 }
 ```
-
-Finally, the framework guarantees that any `await` statements in`Tick`, `Update` and `Render` will yield back and resume execution in the order the game objects are processed, avoiding any out of order processing.
 
