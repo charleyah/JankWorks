@@ -294,10 +294,7 @@ namespace JankWorks.Game.Local
 
         private void SyncData(Scene scene, Host host)
         {
-            while(host.State != HostState.WaitingOnClients || host.State != HostState.RunningScene)
-            {
-                Thread.Yield();
-            }
+            SpinWait.SpinUntil(() => host.State == HostState.WaitingOnClients || host.State == HostState.RunningScene);
 
             try
             {
