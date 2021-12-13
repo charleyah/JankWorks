@@ -314,9 +314,13 @@ namespace JankWorks.Game.Local
             }
 
             host.Dispatcher.Synchronise();
-            scene.SynchroniseHostUpStream();
-            scene.SynchroniseHostDownStream();
-            host.Dispatcher.Synchronise();
+
+            if (host.IsLocal)
+            {
+                scene.SynchroniseHostUpStream();
+                scene.SynchroniseHostDownStream();
+                host.Dispatcher.Synchronise();
+            }
 
             try
             {
