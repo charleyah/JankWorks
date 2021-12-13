@@ -151,12 +151,11 @@ namespace JankWorks.Game.Local
                 scene.UnsubscribeInputs(this.window);
 
                 this.inputContext = new ScopedSynchronizationContext(false);
+                
+                scene.PreDispose();
 
                 using var sync = new ScopedSynchronizationContext(true);
-
-                scene.PreDispose();
-                sync.Join();
-                
+                               
                 if(this.host is NullHost)
                 {
                     scene.DisposeSoundResources(this.audioDevice);
@@ -209,11 +208,10 @@ namespace JankWorks.Game.Local
         {            
             var sceneToLoad = this.application.RegisteredScenes[scene]();
 
-            using (var sync = new ScopedSynchronizationContext(true))
-            {
-                sceneToLoad.PreInitialise(initState);
-                sync.Join();
+            sceneToLoad.PreInitialise(initState);
 
+            using (var sync = new ScopedSynchronizationContext(true))
+            {                             
                 sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
                 sync.Join();
 
@@ -245,11 +243,10 @@ namespace JankWorks.Game.Local
         {
             var sceneToLoad = this.application.RegisteredScenes[scene]();
 
+            sceneToLoad.PreInitialise(initState);
+
             using (var sync = new ScopedSynchronizationContext(true))
             {
-                sceneToLoad.PreInitialise(initState);
-                sync.Join();
-
                 sceneToLoad.Initialise(this.application, this.application.RegisterAssetManager());
                 sync.Join();
 
