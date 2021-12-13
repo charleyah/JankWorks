@@ -8,7 +8,7 @@ Interface is an API for windowing and handling user input. It has 2 drivers for 
 
 ## JankWorks.Graphics
 
-Graphics is an API for utilising hardware accelerated graphics designed around graphics shader pipeline. Graphics has separate 3 drivers; one for image loading, one for font loading and lastly a driver for graphics rendering. See JankWorks.OpenGL, JankWorks.DotNet and JankWorks.FreeType for examples of implementing drivers.
+Graphics is an API for utilising hardware accelerated graphics designed around [graphics shader pipeline](https://en.wikipedia.org/wiki/Graphics_pipeline). Graphics has separate 3 drivers; one for image loading, one for font loading and lastly a driver for graphics rendering. See JankWorks.OpenGL, JankWorks.DotNet and JankWorks.FreeType for examples of implementing drivers.
 
 ## JankWorks.Audio
 
