@@ -4,7 +4,7 @@ JankWorks is an API and framework intending to be suitable for developing games 
 
 ## JankWorks API
 
-The [JankWorks project](JankWorks) is a API providing the basic application requirements including windowing, user input, positional audio and hardware accelerated graphics. The API is mostly abstract and supports different implementations provided by "Drivers".
+The [JankWorks](JankWorks) project is a API providing the basic application requirements including windowing, user input, positional audio and hardware accelerated graphics. The API is mostly abstract and supports different implementations provided by "Drivers".
 
 ## JankWorks Game Framework
 
