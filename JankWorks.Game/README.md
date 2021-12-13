@@ -2,6 +2,8 @@
 
 JankWorks Game is a framework intended to be a basis for developing a video game application similar to other frameworks such as XNA/MonoGame. The framework is built upon the JankWorks API and provide structure with client-server architecture in mind. See [Pong project](../Examples/Pong) as an example of using JankWorks Game Framework.
 
+[TOC]
+
 ## Usage & Status
 
 As a Framework, JankWorks is still in development and only tested on Windows so your mileage may vary. Its intended to be a framework like old XNA with a more abstracted client-server architecture in mind. This is achieved through creating game objects that either run on a client or host and utilise a message-passing API to communicate between them. At time of writing, applications can run without a host or with a "offline" host running its own dedicated thread. A network host is currently in development.
@@ -43,8 +45,6 @@ Where game objects should be constructed and registered in a scene class depends
 Scene initialisation will be broken down into different scenarios depending on what host is being used if any. The tables below are in order in which methods are executed. They also specify if calls to `RegisterClientObject` and `RegisterHostObject` are allowed.
 
 **Scene Initialisation With Client And No Host**
-
-The simplest setup is a scene with not host and any game logic is ran on the client. 
 
 | Method                        | Side        | Register Client Objects | Register Host Objects |
 | ----------------------------- | ----------- | ----------------------- | --------------------- |
