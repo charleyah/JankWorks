@@ -140,7 +140,7 @@ Methods provided by interfaces for game objects likewise also support `async` wi
 
 ### Async & Interval Behaviour
 
-JankWorks Game Framework has explicit support for `async await` for two main reasons... retain order of execution and supporting APIs with shared contextual state. Its because of this, usage of `ConfigureAwait(false)` is discouraged as the framework will utilise `SynchronisationContext` where it deems necessary. For example, where graphics are concerned libraries such as OpenGL have a context associated with a thread and thus any `await` statement need to resume or yield back to the thread with that context. 
+JankWorks Game Framework has explicit support for `async await` for two main reasons... retain order of execution and supporting APIs with shared contextual state. Its because of this, usage of `ConfigureAwait(false)` is discouraged as the framework will utilise `SynchronisationContext` where it deems necessary. For example, where graphics are concerned libraries such as OpenGL have a context associated with a thread and thus any `await` statement involved in graphical resources need to resume or yield back to the thread with that context. 
 
 **Execution Order Guarantee**
 
