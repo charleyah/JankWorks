@@ -110,10 +110,10 @@ namespace Pong.MainMenu
             base.InitialiseGraphicsResources(device);
         }
 
-        public override void ClientInitialised(object state)
+        public override void Initialised()
         {
             this.container.Activate();
-            base.ClientInitialised(state);
+            base.Initialised();
         }
 
         public override void Render(Surface surface, Frame frame)
