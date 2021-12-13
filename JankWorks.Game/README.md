@@ -1,6 +1,6 @@
 # JankWorks.Game
 
-JankWorks Game is a framework intended to be a basis for developing a video game application similar to other frameworks such as XNA/MonoGame. The framework is built upon the JankWorks API and provide structure with client-server architecture in mind. See Pong project as an example of using JankWorks Game Framework.
+JankWorks Game is a framework intended to be a basis for developing a video game application similar to other frameworks such as XNA/MonoGame. The framework is built upon the JankWorks API and provide structure with client-server architecture in mind. See [Pong project](../Examples/Pong) as an example of using JankWorks Game Framework.
 
 ## Usage & Status
 
