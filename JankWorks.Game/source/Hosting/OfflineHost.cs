@@ -138,7 +138,11 @@ namespace JankWorks.Game.Hosting
 
                         using (var sync = new ScopedSynchronizationContext(true))
                         {
+                            this.scene.HostDispose(this);
+                            sync.Join();
+
                             this.scene.SharedDispose(this, this.client);
+                            sync.Join();
                         }
 
                         this.scene.SharedDisposed();
@@ -232,10 +236,21 @@ namespace JankWorks.Game.Hosting
             
             using(var sync = new ScopedSynchronizationContext(true))
             {
+                this.scene.HostInitialise(this);
+                sync.Join();
+
                 this.scene.SharedInitialise(this, this.client);
+                sync.Join();
+
+                this.scene.InternalHostInitialise();
+                sync.Join();
             }
 
-            this.scene.SharedInitialised(this.newHostSceneRequest.InitState);
+            var initState = this.newHostSceneRequest.InitState;
+
+            this.scene.HostInitialised(initState);
+
+            this.scene.SharedInitialised(initState);
 
             this.metrics.TickMetricCounters = this.scene.TickMetricCounters;
             this.metrics.ParallelTickMetricCounters = this.scene.ParallelTickMetricCounters;

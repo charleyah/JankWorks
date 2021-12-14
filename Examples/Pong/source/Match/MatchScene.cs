@@ -32,34 +32,35 @@ namespace Pong.Match
             base.PreInitialise(state);
         }
 
-        public override void SharedInitialise(Host host, Client client)
-        {            
-            if (host.IsLocal)
+        public override void HostInitialise(Host host)
+        {
+            this.physics = new PhysicsSystem(this.area);
+
+            this.players = new PlayerSystem(this.physics, 2);
+            this.ball = new Ball(this.physics, area, this.players.PlayerSize.X * 0.75f);
+
+            this.players.RegisterPlayer(0);
+            this.players.RegisterPlayer(1);
+
+            if (this.state.PlayerOne == PlayerType.Bot)
             {
-                this.physics = new PhysicsSystem(this.area);
-
-                this.players = new PlayerSystem(this.physics, 2);
-                this.ball = new Ball(this.physics, area, this.players.PlayerSize.X * 0.75f);
-
-                this.players.RegisterPlayer(0);
-                this.players.RegisterPlayer(1);
-                
-                if(this.state.PlayerOne == PlayerType.Bot)
-                {
-                    this.RegisterHostObject(new BotPlayer(0, this.physics, this.players, this.ball, this.area));
-                }
-
-                if(this.state.PlayerTwo == PlayerType.Bot)
-                {
-                    this.RegisterHostObject(new BotPlayer(1, this.physics, this.players, this.ball, this.area));
-                }
-
-                this.RegisterHostObject(this.players);
-                this.RegisterHostObject(this.physics);
-                this.RegisterHostObject(this.ball);
+                this.RegisterHostObject(new BotPlayer(0, this.physics, this.players, this.ball, this.area));
             }
 
+            if (this.state.PlayerTwo == PlayerType.Bot)
+            {
+                this.RegisterHostObject(new BotPlayer(1, this.physics, this.players, this.ball, this.area));
+            }
 
+            this.RegisterHostObject(this.players);
+            this.RegisterHostObject(this.ball);
+            this.RegisterHostObject(this.physics);
+
+            base.HostInitialise(host);
+        }
+
+        public override void SharedInitialise(Host host, Client client)
+        {            
             if (this.state.PlayerOne == PlayerType.Local)
             {
                 this.RegisterClientObject(new InputPlayer(0));
