@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.IO;
 using System.Numerics;
 
 using JankWorks.Audio;
 
+using JankWorks.Drivers.OpenAL.Audio.Decoders;
 using JankWorks.Drivers.OpenAL.Native;
+
 using static JankWorks.Drivers.OpenAL.Native.Functions;
 
 namespace JankWorks.Drivers.OpenAL.Audio
@@ -128,54 +129,38 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
         public override Sound LoadSound(Stream stream, AudioFormat format)
         {
-            if(format == AudioFormat.Wav)
+            var decoder = Decoder.GetDecoder(format);
+            var sound = new ALSound();
+
+            try
             {
-                var sound = new ALSound();
-                ALAudioDevice.LoadWav(stream, sound.buffer);
-                return sound;
+                decoder.Load(stream, sound.buffer);
             }
-            else
+            catch
             {
-                throw new NotSupportedException();
+                sound.Dispose();
+                throw;
             }
+
+            return sound;           
         }
 
-        internal static void LoadWav(Stream stream, ALBuffer buffer)
+        public override Sound LoadSound(ReadOnlySpan<byte> data, AudioFormat format)
         {
-            var header = WavHeader.Read(stream);
+            var decoder = Decoder.GetDecoder(format);
+            var sound = new ALSound();
 
-            if (header.AudioFormat != 1)
+            try
             {
-                throw new NotSupportedException("ALAudioDevice only supports 16-bit pcm wav format");
+                decoder.Load(data, sound.buffer);
+            }
+            catch
+            {
+                sound.Dispose();
+                throw;
             }
 
-            int dataLength = (int)header.SubChunk2Size;
-
-            if(stream is UnmanagedMemoryStream ums)
-            {
-                ReadOnlySpan<byte> umsData;
-                unsafe
-                {
-                    umsData = new ReadOnlySpan<byte>(ums.PositionPointer, dataLength);
-                }
-                buffer.Write(umsData, (short)header.NumChannels, (short)header.BitsPerSample, (int)header.SampleRate);
-            }
-            else
-            {
-                MemoryStream ms;
-
-                if(stream is MemoryStream sms)
-                {
-                    ms = sms;
-                }
-                else
-                {
-                    ms = new MemoryStream(dataLength);
-                    stream.Read(ms.GetBuffer(), 0, dataLength);
-                }
-
-                buffer.Write(ms.GetBuffer(), (short)header.NumChannels, (short)header.BitsPerSample, (int)header.SampleRate);
-            }            
+            return sound;
         }
 
         protected override void Dispose(bool finalising)
@@ -184,81 +169,6 @@ namespace JankWorks.Drivers.OpenAL.Audio
             alcCloseDevice(this.device);
 
             base.Dispose(finalising);
-        }
-    }
-
-
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    unsafe struct RiffHeader
-    {
-        public const int IDSize = 4;
-
-        public fixed byte ChunkId[RiffHeader.IDSize];
-        public uint ChunkSize;
-        public fixed byte Format[RiffHeader.IDSize];
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    unsafe struct WavHeader
-    {
-        public RiffHeader RiffHeader;
-        public fixed byte SubChunk1ID[RiffHeader.IDSize];
-        public uint SubChunk1Size;
-        public ushort AudioFormat;
-        public ushort NumChannels;
-        public uint SampleRate;
-        public uint ByteRate;
-        public ushort BlockAlign;
-        public ushort BitsPerSample;
-        public fixed byte SubChunk2ID[RiffHeader.IDSize];
-        public uint SubChunk2Size;
-
-        public static WavHeader Read(Stream stream)
-        {
-            var header = default(WavHeader);
-
-            unsafe
-            {
-                var hspan = new Span<byte>(&header, sizeof(WavHeader));
-                stream.Read(hspan);
-
-                Span<byte> expectedId = stackalloc byte[RiffHeader.IDSize];
-
-                Span<byte> actualId = new Span<byte>(header.RiffHeader.ChunkId, RiffHeader.IDSize);
-                WriteRiff(expectedId);
-                if (!expectedId.SequenceEqual(actualId))
-                {
-                    throw new InvalidDataException("Invalid RIFF header");
-                }
-
-                actualId = new Span<byte>(header.RiffHeader.Format, RiffHeader.IDSize);
-                WriteWave(expectedId);
-                if (!expectedId.SequenceEqual(actualId))
-                {
-                    throw new InvalidDataException("Invalid WAVE header");
-                }
-            }
-
-            return header;
-
-            void WriteRiff(Span<byte> data)
-            {
-                // RIFF in Ascii
-                data[0] = 82;
-                data[1] = 73;
-                data[2] = 70;
-                data[3] = 70;
-            }
-
-            void WriteWave(Span<byte> data)
-            {
-                // WAVE in Ascii
-                data[0] = 87;
-                data[1] = 65;
-                data[2] = 86;
-                data[3] = 69;
-            }
         }
     }
 }

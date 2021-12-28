@@ -11,6 +11,8 @@ namespace JankWorks.Audio
 
         public abstract Sound LoadSound(Stream stream, AudioFormat format);
 
+        public abstract Sound LoadSound(ReadOnlySpan<byte> data, AudioFormat format);
+
         public virtual Sound CreateSound(Stream pcmStream, short channels, short samples, int frequency)
         {
             if(pcmStream is UnmanagedMemoryStream ums)
@@ -46,10 +48,9 @@ namespace JankWorks.Audio
         public abstract Emitter CreateEmitter(Sound sound);
     }
 
-
     public enum AudioFormat
     {
         Wav,
-        Ogg
+        OggVorbis
     }
 }
