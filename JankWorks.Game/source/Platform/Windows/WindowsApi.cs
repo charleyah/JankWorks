@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -40,13 +41,13 @@ namespace JankWorks.Game.Platform.Windows
 
     internal sealed class WindowsApi : PlatformApi
     {
-        [DllImport("Winmm.dll")]
+        [DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
         private static extern unsafe MMRESULT timeGetDevCaps(TIMECAPS* ptc, uint cbtc);
 
-        [DllImport("Winmm.dll")]
+        [DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
         private static extern unsafe MMRESULT timeBeginPeriod(uint uPeriod);
 
-        [DllImport("Winmm.dll")]
+        [DllImport("Winmm.dll"), SuppressUnmanagedCodeSecurity]
         private static extern unsafe MMRESULT timeEndPeriod(uint uPeriod);
 
         private readonly TIMECAPS caps;
