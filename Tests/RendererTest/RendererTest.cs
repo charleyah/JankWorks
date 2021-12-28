@@ -16,7 +16,9 @@ namespace Tests.RendererTest
 
         private Listener listener;
         private Sound scream;
+        private Sound placement;
         private Emitter screamer;
+        private Emitter placementEmitter;
 
         private Smile? screamySmile;
         private Smile cursorSmile;
@@ -40,13 +42,19 @@ namespace Tests.RendererTest
             this.listener = audio;
             this.listener.Orientation = Orientation.Ortho;
             this.scream = audio.LoadSound(GetEmbeddedStream("RendererTest.scream.wav"), AudioFormat.Wav);
+            this.placement = audio.LoadSound(GetEmbeddedStream("RendererTest.retrojump.ogg"), AudioFormat.OggVorbis);
 
             this.screamer = audio.CreateEmitter(this.scream);
             this.screamer.Loop = true;
             this.screamer.MaxDistance = 400;
             this.screamer.MinDistance = 100f;
             this.screamer.DistanceScale = 0.2f;
-            this.screamer.Volume = 1f;
+            this.screamer.Volume = 0.6f;
+
+            this.placementEmitter = audio.CreateEmitter(this.placement);
+            this.placementEmitter.Loop = false;
+            this.placementEmitter.Position = null;
+            this.placementEmitter.Volume = 1f;
 
             this.camera = new OrthoCamera(this.viewportSize);
 
@@ -102,7 +110,8 @@ namespace Tests.RendererTest
                 Smile smile = this.cursorSmile;
                 smile.colour = shade;
 
-                this.smiles.Add(smile);                
+                this.smiles.Add(smile);
+                this.placementEmitter.Play();
             }
             else if(e.Button == MouseButton.Right)
             {
@@ -166,6 +175,8 @@ namespace Tests.RendererTest
             this.spriteRenderer.Dispose();
             this.smiley.Dispose();
             this.screamer.Dispose();
+            this.placementEmitter.Dispose();
+            this.placement.Dispose();
             this.scream.Dispose();
             graphics.DefaultDrawState = DrawState.Default;
             audio.Orientation = default;           

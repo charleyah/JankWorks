@@ -16,11 +16,12 @@ namespace JankWorks.Drivers.OpenAL.Audio.Decoders
             return format switch
             {
                 AudioFormat.Wav => Decoder.Wav,
-                AudioFormat.OggVorbis => throw new NotSupportedException(),
+                AudioFormat.OggVorbis => Decoder.OggVorbis,
                 _ => throw new NotImplementedException()
             };
         }
 
         public static readonly Decoder Wav = new WavDecoder();
+        public static readonly Decoder OggVorbis = new OggVorbisDecoder();
     }
 }

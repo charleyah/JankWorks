@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="RendererTest\retrojump.ogg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="RendererTest\retrojump.ogg" />
     <EmbeddedResource Include="RendererTest\scream.wav" />
     <EmbeddedResource Include="RendererTest\smiley.png" />
     <EmbeddedResource Include="SpriteTest\frag.glsl" />
