@@ -48,7 +48,7 @@ namespace JankWorks.Game.Threading
                         break;
 
                     default:
-                        throw new NotSupportedException();
+                        throw new NotImplementedException();
                 }
             }
             finally
