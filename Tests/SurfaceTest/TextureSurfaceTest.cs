@@ -20,71 +20,10 @@ namespace Tests.SurfaceTest
         private IndexBuffer surfaceIndexes;
         private Shader surfaceProgram;
 
-#if Include_Sound
-        private Sound sound;
-        private Emitter speaker;
-
-
-        private void OnKey(KeyEvent e)
-        {
-            switch (e.Key)
-            {               
-                case Key.E:
-                    if(this.speaker.State == PlayState.Paused)
-                    {
-                        this.speaker.Resume();
-                    }
-                    else if(this.speaker.State == PlayState.Playing)
-                    {
-                        this.speaker.Pause();
-                    }                   
-                    break;
-                case Key.W:
-                    this.speaker.Play();
-                    break;
-                case Key.Q:
-                    this.speaker.Stop();
-                    break;
-            }
-        }
-
-        private void OnMouseMoved(Vector2 vec)
-        {
-            this.speaker.Position = new Vector3(vec, 0);
-            Console.WriteLine(vec);
-        }
-#endif
-
         public override void Setup(GraphicsDevice graphics, AudioDevice audio, Window window)
         {
             this.SetupTriangle(graphics);
             this.SetupSurface(graphics);
-
-#if Include_Sound
-            
-            audio.Position = new Vector3(512, 384, 0);
-            audio.Orientation = new Orientation()
-            {
-                Direction = Vector3.UnitZ,
-                Up = -Vector3.UnitY
-            };
-
-            var soundpath = "Money.wav";
-            using var soundfile = new FileStream(soundpath, FileMode.Open, FileAccess.Read);
-            this.sound = audio.LoadSound(soundfile, AudioFormat.Wav);
-            this.speaker = audio.CreateEmitter(this.sound);
-
-            var dis = this.speaker.Direction;
-
-            this.speaker.MinDistance = 100f;
-            this.speaker.DistanceScale = 1f;
-            this.speaker.MaxDistance = 300f;
-
-
-            this.speaker.Play();
-            window.OnKeyReleased += this.OnKey;
-            window.OnMouseMoved += this.OnMouseMoved;
-#endif
         }
 
         private void SetupTriangle(GraphicsDevice graphics)
@@ -201,13 +140,6 @@ namespace Tests.SurfaceTest
 
         public override void Dispose(GraphicsDevice device, AudioDevice audio, Window window)
         {
-#if Include_Sound
-            window.OnKeyReleased -= this.OnKey;
-            window.OnMouseMoved -= this.OnMouseMoved;
-            audio.Position = Vector3.Zero;
-            speaker.Dispose();
-            sound.Dispose();
-#endif
             surface.Dispose();
             surfaceProgram.Dispose();
             surfaceIndexes.Dispose();

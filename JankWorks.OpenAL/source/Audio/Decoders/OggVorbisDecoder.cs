@@ -20,9 +20,17 @@ namespace JankWorks.Drivers.OpenAL.Audio.Decoders
 
             for (int i = 0; i < totalSamples; i++)
             {
-                var temp = (int)(32767f * samples[i]);
-                temp = Math.Min(temp, short.MaxValue);
-                temp = Math.Max(temp, short.MinValue);
+                var temp = (int)(short.MaxValue * samples[i]);
+
+                if(temp > short.MaxValue)
+                {
+                    temp = short.MaxValue;
+                }
+                else if(temp < short.MinValue)
+                {
+                    temp = short.MinValue;
+                }
+
                 samplesIn16Bit[i] = (short)temp;
             }
 
