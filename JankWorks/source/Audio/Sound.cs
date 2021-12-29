@@ -10,6 +10,6 @@ namespace JankWorks.Audio
 
         public virtual short Samples { get; protected set; }
 
-        public abstract void Write(ReadOnlySpan<byte> pcm, short channels, short samples, int frequency);
+        public abstract void Write(ReadOnlySpan<byte> pcm, short channels, short sampleSize, int frequency);
     }
 }

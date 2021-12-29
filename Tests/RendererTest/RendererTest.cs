@@ -17,8 +17,8 @@ namespace Tests.RendererTest
         private Listener listener;
         private Sound scream;
         private Sound placement;
-        private Emitter screamer;
-        private Emitter placementEmitter;
+        private Speaker screamer;
+        private Speaker placementEmitter;
 
         private Smile? screamySmile;
         private Smile cursorSmile;
@@ -44,14 +44,14 @@ namespace Tests.RendererTest
             this.scream = audio.LoadSound(GetEmbeddedStream("RendererTest.scream.wav"), AudioFormat.Wav);
             this.placement = audio.LoadSound(GetEmbeddedStream("RendererTest.retrojump.ogg"), AudioFormat.OggVorbis);
 
-            this.screamer = audio.CreateEmitter(this.scream);
+            this.screamer = audio.CreateSpeaker(this.scream);
             this.screamer.Loop = true;
             this.screamer.MaxDistance = 400;
             this.screamer.MinDistance = 100f;
             this.screamer.DistanceScale = 0.2f;
             this.screamer.Volume = 0.6f;
 
-            this.placementEmitter = audio.CreateEmitter(this.placement);
+            this.placementEmitter = audio.CreateSpeaker(this.placement);
             this.placementEmitter.Loop = false;
             this.placementEmitter.Position = null;
             this.placementEmitter.Volume = 1f;

@@ -13,11 +13,11 @@ namespace JankWorks.Drivers.OpenAL.Audio
             this.buffer.Create();
         }
 
-        public override void Write(ReadOnlySpan<byte> pcm, short channels, short samples, int frequency)
+        public override void Write(ReadOnlySpan<byte> pcm, short channels, short sampleSize, int frequency)
         {
-            this.buffer.Write(pcm, channels, samples, frequency);
+            this.buffer.Write(pcm, channels, sampleSize, frequency);
             this.Channels = channels;
-            this.Samples = samples;
+            this.Samples = sampleSize;
         }
        
         protected override void Dispose(bool finalising)

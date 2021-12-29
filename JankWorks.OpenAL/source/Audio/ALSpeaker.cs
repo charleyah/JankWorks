@@ -8,7 +8,7 @@ using static JankWorks.Drivers.OpenAL.Native.Functions;
 
 namespace JankWorks.Drivers.OpenAL.Audio
 {
-    sealed class ALEmitter : Emitter
+    sealed class ALSpeaker : Speaker
     {
         public override float Volume 
         { 
@@ -186,9 +186,9 @@ namespace JankWorks.Drivers.OpenAL.Audio
         private Vector3? position;
         private Sound sound;
         
-        public ALEmitter(Sound sound) : this(sound, null) { }
+        public ALSpeaker(Sound sound) : this(sound, null) { }
 
-        public ALEmitter(Sound sound, Vector3? position)
+        public ALSpeaker(Sound sound, Vector3? position)
         {
             uint handle = 0;
 

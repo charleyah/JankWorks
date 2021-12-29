@@ -118,12 +118,12 @@ namespace JankWorks.Drivers.OpenAL.Audio
             }
         }
 
-        public override Emitter CreateEmitter(Sound sound) => new ALEmitter(sound);
+        public override Speaker CreateSpeaker(Sound sound) => new ALSpeaker(sound);
 
-        public override Sound CreateSound(ReadOnlySpan<byte> pcm, short channels, short samples, int frequency)
+        public override Sound CreateSound(ReadOnlySpan<byte> pcm, short channels, short sampleSize, int frequency)
         {
             var sound = new ALSound();
-            sound.Write(pcm, channels, samples, frequency);
+            sound.Write(pcm, channels, sampleSize, frequency);
             return sound;
         }
 

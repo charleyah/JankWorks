@@ -4,7 +4,7 @@ using JankWorks.Core;
 
 namespace JankWorks.Audio
 {
-    public abstract class Emitter : Disposable, IPlayable
+    public abstract class Speaker : Disposable, IPlayable
     {
         public abstract Sound Sound { get; set; }
 

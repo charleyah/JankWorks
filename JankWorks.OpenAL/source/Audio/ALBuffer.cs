@@ -35,13 +35,13 @@ namespace JankWorks.Drivers.OpenAL.Audio
             this.handle = handle;
         }
 
-        public void Write(ReadOnlySpan<byte> pcm, short channels, short samples, int frequency)
+        public void Write(ReadOnlySpan<byte> pcm, short channels, short sampleSize, int frequency)
         {
             unsafe
             {
                 fixed (byte* data = pcm)
                 {
-                    alBufferData(this.handle, GetFormat(channels, samples), data, pcm.Length, frequency);
+                    alBufferData(this.handle, GetFormat(channels, sampleSize), data, pcm.Length, frequency);
                 }
             }
 
@@ -52,9 +52,9 @@ namespace JankWorks.Drivers.OpenAL.Audio
                 throw new AudioException($"ALBuffer.Write {error}");
             }
 
-            ALFormat GetFormat(short channels, short samples)
+            ALFormat GetFormat(short channels, short sampleSize)
             {
-                if (samples >= 16)
+                if (sampleSize >= 16)
                 {
                     return channels > 1 ? ALFormat.Stereo16 : ALFormat.Mono16;
                 }

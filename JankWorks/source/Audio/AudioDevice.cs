@@ -13,7 +13,7 @@ namespace JankWorks.Audio
 
         public abstract Sound LoadSound(ReadOnlySpan<byte> data, AudioFormat format);
 
-        public virtual Sound CreateSound(Stream pcmStream, short channels, short samples, int frequency)
+        public virtual Sound CreateSound(Stream pcmStream, short channels, short sampleSize, int frequency)
         {
             if(pcmStream is UnmanagedMemoryStream ums)
             {
@@ -23,7 +23,7 @@ namespace JankWorks.Audio
                     pcmdata = new ReadOnlySpan<byte>(ums.PositionPointer, (int)ums.Length);
                 }
 
-                return this.CreateSound(pcmdata, channels, samples, frequency);
+                return this.CreateSound(pcmdata, channels, sampleSize, frequency);
             }
             else
             {
@@ -39,13 +39,13 @@ namespace JankWorks.Audio
                     pcmStream.CopyTo(ms);
                 }
 
-                return this.CreateSound(ms.GetBuffer(), channels, samples, frequency);
+                return this.CreateSound(ms.GetBuffer(), channels, sampleSize, frequency);
             }
         }
 
-        public abstract Sound CreateSound(ReadOnlySpan<byte> pcm, short channels, short samples, int frequency);
+        public abstract Sound CreateSound(ReadOnlySpan<byte> pcm, short channels, short sampleSize, int frequency);
         
-        public abstract Emitter CreateEmitter(Sound sound);
+        public abstract Speaker CreateSpeaker(Sound sound);
     }
 
     public enum AudioFormat
