@@ -157,7 +157,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
             {
                 int soundHandle = 0;
 
-                if(value is ALSound alsound)
+                if(value != null && value is ALSound alsound)
                 {
                     soundHandle = (int)alsound.buffer.handle;
                 }                
