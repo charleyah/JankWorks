@@ -9,6 +9,8 @@ namespace JankWorks.Audio
     {        
         public static AudioDevice GetDefault() => DriverConfiguration.Drivers.audioApi.GetDefaultAudioDevice();
 
+        public abstract Music LoadMusic(Stream stream, AudioFormat format);
+
         public abstract Sound LoadSound(Stream stream, AudioFormat format);
 
         public abstract Sound LoadSound(ReadOnlySpan<byte> data, AudioFormat format);

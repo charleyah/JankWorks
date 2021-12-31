@@ -163,6 +163,11 @@ namespace JankWorks.Drivers.OpenAL.Audio
             return sound;
         }
 
+        public override Music LoadMusic(Stream stream, AudioFormat format)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void Dispose(bool finalising)
         {
             alcDestroyContext(this.context);
