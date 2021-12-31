@@ -189,7 +189,7 @@ Its important to only mark the interval method with `async` or call `async void`
 class FooBarUpdater : IUpdatable
 {        
     // This is the same as having the UpdateInterval code omitted and is not valid for a async Update method
-	IUpdatable.UpdateInterval => IntervalBehaviour.NoAsync; 
+    IUpdatable.UpdateInterval => IntervalBehaviour.NoAsync; 
     
     public async void Update(TimeSpan delta)
     {
