@@ -42,7 +42,7 @@ Where game objects should be constructed and registered in a scene class depends
 
 Scene initialisation will be broken down into different scenarios depending on what host is being used if any. The tables below are in order in which methods are executed. They also specify if calls to `RegisterClientObject` and `RegisterHostObject` are allowed.
 
-**Scene Initialisation With Client And No Host**
+**Scene Initialisation Order With Client And No Host**
 
 | Method                        | Side        | Register Client Objects | Register Host Objects |
 | ----------------------------- | ----------- | ----------------------- | --------------------- |
@@ -56,7 +56,28 @@ Scene initialisation will be broken down into different scenarios depending on w
 | `Initialised`                 | Application | No                      | No                    |
 | `SubscribeInputs`             | Client      | No                      | No                    |
 
-**Scene Initialisation With Client And Host**
+**Scene Initialisation Order With Client And Local Host**
+
+| Method                        | Side        | Register Client Objects | Register Host Objects |
+| ----------------------------- | ----------- | ----------------------- | --------------------- |
+| `.ctor`                       | Application | No                      | No                    |
+| `PreInitialise`               | Application | No                      | No                    |
+| `Initialise`                  | Application | No                      | No                    |
+| `HostInitialise`              | Host        | No                      | **Yes**               |
+| `SharedInitialise`            | Shared      | **Yes**                 | **Yes**               |
+| `HostInitialised`             | Host        | No                      | No                    |
+| `SharedInitialised`           | Shared      | No                      | No                    |
+| `ClientInitialise`            | Client      | **Yes**                 | No                    |
+| `InitialiseChannels`          | Shared      | No                      | No                    |
+| `InitialiseGraphicsResources` | Client      | No                      | No                    |
+| `InitialiseSoundResources`    | Client      | No                      | No                    |
+| `ClientInitialised`           | Client      | No                      | No                    |
+| `UpSynchronise`               | Shared      | No                      | No                    |
+| `DownSynchronise`             | Shared      | No                      | No                    |
+| `Initialised`                 | Application | No                      | No                    |
+| `SubscribeInputs`             | Client      | No                      | No                    |
+
+**Scene Initialisation Order With Client And Remote Host**
 
 | Method                        | Side        | Register Client Objects | Register Host Objects |
 | ----------------------------- | ----------- | ----------------------- | --------------------- |
@@ -86,6 +107,7 @@ Majority of scene initialisation and disposal methods support `async`. The metho
 | Method                        | Support Async |
 | ----------------------------- | ------------- |
 | `Initialise`                  | Yes           |
+| `HostInitialise`              | Yes           |
 | `SharedInitialise`            | Yes           |
 | `ClientInitialise`            | Yes           |
 | `InitialiseGraphicsResources` | Yes           |
@@ -99,6 +121,7 @@ Majority of scene initialisation and disposal methods support `async`. The metho
 | `PreInitialise`               | No            |
 | `PreDispose`                  | No            |
 | `Initialised`                 | No            |
+| `HostInitialised`             | No            |
 | `SharedInitialised`           | No            |
 | `ClientInitialised`           | No            |
 | `UpSynchronise`               | No            |
@@ -124,8 +147,8 @@ Methods provided by interfaces for game objects likewise also support `async`. T
 | `DownSynchronise`             | `IDispatchable`       | No            |
 | `SubscribeInputs`             | `IInputListener`      | No`*`         |
 | `UnsubscribeInputs`           | `IInputListener`      | No`*`         |
-| `Tick`                        | `ITickable`           | Yes           |
-| `Update`                      | `IUpdatable`          | Yes           |
+| `Tick`                        | `ITickable`           | Yes`**`       |
+| `Update`                      | `IUpdatable`          | Yes`**`       |
 | `Render`                      | `IRenderable`         | Yes`**`       |
 | `ForkTick`                    | `IParallelTickable`   | No            |
 | `JoinTick`                    | `IParallelTickable`   | No            |
@@ -134,58 +157,46 @@ Methods provided by interfaces for game objects likewise also support `async`. T
 | `ForkRender`                  | `IParallelRenderable` | No            |
 | `JoinRender`                  | `IParallelRenderable` | No            |
 
-`*` - while methods `SubscribeInputs` and `UnsubscribeInputs` don't support `async`, any method they subscribe to listen for user input do support `async`. For example a method subscribed to a key press can be modified with `async`.
+`*` - The `SubscribeInputs` and `UnsubscribeInputs` methods do not support `async`, however any method they subscribe to listen for user input do support `async`. For example a method subscribed to a key press can be modified with `async`.
 
-`**` - By default the `Render` method does not support `async` but can be configured to do so. See *Async & Interval Behaviour*.
+`**` - The `Tick`, `Update` and `Render` methods require explicit configuration to enable `async` support. See *Async & Interval Behaviour*.
 
 ### Async & Interval Behaviour
 
-JankWorks Game Framework has explicit support for `async await` for two main reasons... retain order of execution and supporting APIs with shared contextual state. Its because of this, usage of `ConfigureAwait(false)` is discouraged as the framework will utilise `SynchronisationContext` where it deems necessary. For example, where graphics are concerned libraries such as OpenGL have a context associated with a thread and thus any `await` statement involved in graphical resources need to resume or yield back to the thread with that context. 
+Game objects with `Tick`, `Update` or `Render` methods have some special rules regarding asynchronous execution. These methods are considered *Interval Methods* and their respective interface has a default property used to determine how the framework should handle asynchronous execution every tick/frame interval. The configurable Interval behaviour is as follows:
 
-**Execution Order Guarantee**
-
-Guaranteeing the execution order of certain procedures is the other main requirement by the framework. For example, all initialisation and disposal methods require to be executed in a certain order and so the framework assures `async` methods don't break that order or overlap execution. Even though scene loading and disposing is done on a dedicated thread removing any concern for blocking the main UI thread, the `async` support is there as a nicety more than anything else.
-
-The other important order of execution the framework guarantees is any `await` statements in`Tick`, `Update` and `Render` methods will yield back and resume execution in the order the game objects are processed, avoiding any unexpected out of order processing.
-
-Please only use `ConfigureAwait(false)` on tasks where you are confident yielding back to the framework isn't required. 
-
-**Interval Behaviour**
-
-Game objects with `Tick`, `Update` or `Render` methods have some special rules regarding asynchronous execution. These methods are considered *Interval Methods* and their respective interface has a default property used to determine how the framework should handle asynchronous execution. The configurable Interval behaviour is as follows:
-
-- `Asynchronous` -  Method is invoked or resumes awaited tasks on interval. Default for `Update` and `Tick`
+- `NoAsync` -  Method is invoked every interval and does not support async method invocation. This is the default behaviour.
+- `Asynchronous` -  Method is invoked or resumes awaited tasks on interval. Suitable for most `async` uses.
 - `Synchronous` -  Method is invoked every interval. If the method is async it will block until all awaited tasks are completed.
 - `Overlapped` -  Method is invoked every interval. If the method is async it can be invoked multiple times while awaiting tasks.
-- `NoAsync` -  Method is invoked every interval and does not support async method invocation. Default for `Render`
-
-By default, `Render` does not support `async` but can support it the same way as `Tick` and `Update` using the `Interval` property provided by `IRenderable`.
-
-```csharp
-class FooBarRenderer : IRenderable
-{
-    // enable async for Render method
-    IRenderable.RenderInterval => IntervalBehaviour.Asynchronous;
-        
-    public async void Render(Frame frame)
-    {
-        // some outlandish rendering state machine
-    }
-}
-```
-
-If you have `IUpdatable` or `ITickable` game objects that will not utilise `async` you can communicate this to the framework with the Interval property. This would remove the `SynchronisationContext` overhead associated with the game object.
 
 ```csharp
 class FooBarThinker : ITickable
 {
-    // we garantee to the framework this object doesn't use async Tick or call async methods
-    ITickable.TickInterval => IntervalBehaviour.NoAsync; 
+    // enable async for Tick method
+    ITickable.TickInterval => IntervalBehaviour.Asynchronous; 
         
-    public void Tick(ulong tick, TimeSpan delta)
+    public async void Tick(ulong tick, TimeSpan delta)
     {
-        // simple thinks
+        // every tick will either invoke this method or resume awaited tasks
     }
 }
 ```
+
+Its important to only mark the interval method with `async` or call `async void` methods if the Interval property has been set to a value other than `NoAsync`. The example below is considered a bug because the `Update` will be called every update interval and any completed tasks running asynchronously will resume on a different thread to the game loop and likely not in the order game objects are processed either.
+
+```csharp
+class FooBarUpdater : IUpdatable
+{        
+    // This is the same as having the UpdateInterval code omitted and is not valid for a async Update method
+	IUpdatable.UpdateInterval => IntervalBehaviour.NoAsync; 
+    
+    public async void Update(TimeSpan delta)
+    {
+         // any await statements will resume out of order and on any thread
+    }
+}
+```
+
+Finally, its also discouraged to use `ConfigureAwait(false)` on awaited tasks as yielding back to the game loop thread is important to retain order game objects are processed. Where graphics is concerned, its also important to yield back to the game loop thread if the graphics API has context to track like OpenGL does.
 

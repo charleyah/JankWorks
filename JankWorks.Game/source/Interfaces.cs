@@ -45,7 +45,7 @@ namespace JankWorks.Game
     /// </summary>
     public interface ITickable : INameable
     {
-        IntervalBehaviour TickInterval => IntervalBehaviour.Asynchronous;
+        IntervalBehaviour TickInterval => IntervalBehaviour.NoAsync;
 
         void Tick(ulong tick, TimeSpan delta);
     }
@@ -67,7 +67,7 @@ namespace JankWorks.Game
     /// </summary>
     public interface IUpdatable : INameable
     {
-        IntervalBehaviour UpdateInterval => IntervalBehaviour.Asynchronous;
+        IntervalBehaviour UpdateInterval => IntervalBehaviour.NoAsync;
 
         void Update(TimeSpan delta);
     }

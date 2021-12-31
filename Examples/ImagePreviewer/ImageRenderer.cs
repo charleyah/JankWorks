@@ -3,8 +3,6 @@ using System.Numerics;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-
 
 using JankWorks.Graphics;
 using JankWorks.Game;
@@ -17,6 +15,7 @@ namespace ImagePreviewer
         private SpriteRenderer renderer;
         private Texture2D texture;
 
+        IntervalBehaviour IUpdatable.UpdateInterval => IntervalBehaviour.Asynchronous;            
 
         public void InitialiseGraphicsResources(GraphicsDevice device, AssetManager assets)
         {
