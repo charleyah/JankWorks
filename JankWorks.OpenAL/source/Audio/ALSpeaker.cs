@@ -176,7 +176,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
                 var error = alGetError();
                 if(error != ALError.NoError)
                 {
-                    throw new AudioException($"ALEmitter Sound {error}");
+                    throw new AudioException($"ALSpeaker Sound {error}");
                 }
 
                 this.sound = value;
@@ -201,7 +201,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
             if(error != ALError.NoError)
             {
-                throw new AudioException($"ALEmitter { error }");
+                throw new AudioException($"ALSpeaker { error }");
             }
 
             this.handle = handle;
