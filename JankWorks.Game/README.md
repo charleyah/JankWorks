@@ -114,6 +114,7 @@ Majority of scene initialisation and disposal methods support `async`. The metho
 | `InitialiseSoundResources`    | Yes           |
 | `InitialiseChannels`          | Yes           |
 | `Dispose`                     | Yes           |
+| `HostDispose`                 | Yes           |
 | `SharedDispose`               | Yes           |
 | `ClientDispose`               | Yes           |
 | `DisposeSoundResources`       | Yes           |
