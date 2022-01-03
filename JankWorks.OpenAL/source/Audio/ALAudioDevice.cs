@@ -129,12 +129,20 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
         public override Sound LoadSound(Stream stream, AudioFormat format)
         {
-            var decoder = Decoder.GetDecoder(format);
+            const int bufferSize = 1048576;
+
+            using Decoder decoder = format switch
+            {
+                AudioFormat.Wav => new WavDecoder(stream, bufferSize),
+                AudioFormat.OggVorbis => new OggVorbisDecoder(stream, bufferSize),
+                _ => throw new NotImplementedException()
+            };
+
             var sound = new ALSound();
 
             try
             {
-                decoder.Load(stream, sound.buffer);
+                decoder.Load(sound.buffer);
             }
             catch
             {
@@ -147,27 +155,18 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
         public override Sound LoadSound(ReadOnlySpan<byte> data, AudioFormat format)
         {
-            var decoder = Decoder.GetDecoder(format);
-            var sound = new ALSound();
-
-            try
+            unsafe
             {
-                decoder.Load(data, sound.buffer);
+                fixed(byte* dataptr = data)
+                {
+                    var ums = new UnmanagedMemoryStream(dataptr, data.Length);
+                    return this.LoadSound(ums, format);
+                }
             }
-            catch
-            {
-                sound.Dispose();
-                throw;
-            }
-
-            return sound;
         }
 
-        public override Music LoadMusic(Stream stream, AudioFormat format)
-        {
-            throw new NotImplementedException();
-        }
-
+        public override Music LoadMusic(Stream stream, AudioFormat format) => new ALMusic(stream, format);
+        
         protected override void Dispose(bool finalising)
         {
             alcDestroyContext(this.context);

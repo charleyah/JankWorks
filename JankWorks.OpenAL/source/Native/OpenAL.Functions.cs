@@ -46,6 +46,8 @@ namespace JankWorks.Drivers.OpenAL.Native
         private static delegate* unmanaged[Cdecl]<uint, bool> alIsBufferPtr;
         private static delegate* unmanaged[Cdecl]<uint, ALFormat, void*, int, int, void> alBufferDataPtr;
         private static delegate* unmanaged[Cdecl]<uint, ALBufferi, int*, void> alGetBufferiPtr;
+        private static delegate* unmanaged[Cdecl]<uint, int, uint*, void> alSourceQueueBuffersPtr;
+        private static delegate* unmanaged[Cdecl]<uint, int, uint*, void> alSourceUnqueueBuffersPtr;
 
         public static LibraryLoader loader;
 
@@ -57,7 +59,7 @@ namespace JankWorks.Drivers.OpenAL.Native
             {
                 SystemPlatform.Windows => env.LoadLibrary("soft_oal.dll", "openal32.dll"),
                 SystemPlatform.MacOS => env.LoadLibrary("/System/Library/Frameworks/OpenAL.framework/OpenAL"),
-                SystemPlatform.Linux => env.LoadLibrary("libopenal.so.1"),
+                SystemPlatform.Linux => env.LoadLibrary("libopenal.so"),
                 _ => throw new NotSupportedException()
             };
 
@@ -99,10 +101,11 @@ namespace JankWorks.Drivers.OpenAL.Native
             Functions.alIsBufferPtr = (delegate* unmanaged[Cdecl]<uint, bool>)Functions.LoadFunction("alIsBuffer");
             Functions.alBufferDataPtr = (delegate* unmanaged[Cdecl]<uint, ALFormat, void*, int, int, void>)Functions.LoadFunction("alBufferData");
             Functions.alGetBufferiPtr = (delegate* unmanaged[Cdecl]<uint, ALBufferi, int*, void>)Functions.LoadFunction("alGetBufferi");
+            Functions.alSourceQueueBuffersPtr = (delegate* unmanaged[Cdecl]<uint, int, uint*, void>)Functions.LoadFunction("alSourceQueueBuffers");
+            Functions.alSourceUnqueueBuffersPtr = (delegate* unmanaged[Cdecl]<uint, int, uint*, void>)Functions.LoadFunction("alSourceUnqueueBuffers");
         }
 
         private static void* LoadFunction(string name) => Functions.loader.LoadFunction(name).ToPointer();
-
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -331,6 +334,18 @@ namespace JankWorks.Drivers.OpenAL.Native
         public static void alGetBufferi(uint buffer, ALBufferi parm, int* value)
         {
             Functions.alGetBufferiPtr(buffer, parm, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void alSourceQueueBuffers(uint source, int count, uint* buffers)
+        {
+            Functions.alSourceQueueBuffersPtr(source, count, buffers);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void alSourceUnqueueBuffers(uint source, int count, uint* buffers)
+        {
+            Functions.alSourceUnqueueBuffersPtr(source, count, buffers);
         }
     }
 }

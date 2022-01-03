@@ -2,58 +2,121 @@
 using System.Runtime.InteropServices;
 using System.IO;
 
+using JankWorks.Audio;
+
 namespace JankWorks.Drivers.OpenAL.Audio.Decoders
 {
     sealed class WavDecoder : Decoder
     {
-        public override void Load(Stream stream, ALBuffer buffer)
+        public override long TotalSamples => this.totalSamples;
+
+        public override int SampleRate => this.sampleRate;
+
+        public override int SampleSize => this.sampleSize;
+
+        public override int Channels => this.channels;
+
+        public override bool EndOfStream => this.stream.Position >= this.stream.Length;
+
+        public override AudioFormat Format => AudioFormat.Wav;
+
+        private Stream stream;
+        private long totalSamples;
+        private int sampleRate;
+        private int sampleSize;
+        private int channels;
+
+        private byte[] sampleBuffer;
+
+        public WavDecoder(Stream stream, int sampleBufferSize) : base(sampleBufferSize)
         {
-            var header = WavHeader.Read(stream);
-           
-            if (header.AudioFormat != 1)
+            this.sampleBuffer = new byte[sampleBufferSize + (sampleBufferSize % sizeof(short))];
+            this.ChangeStream(stream);
+
+        }
+
+        public override void ChangeStream(Stream stream)
+        {
+            if(!stream.CanRead)
             {
-                throw new NotSupportedException("WavDecoder only supports 16-bit pcm format");
+                throw new ArgumentException("WavDecoder stream can not be read");
+            }
+            
+            var header = WavHeader.Read(stream);
+
+            if(header.AudioFormat != 1)
+            {
+                throw new ArgumentException("WavDecoder can not decode compressed wave");
             }
 
-            int dataLength = (int)header.SubChunk2Size;
+            var sampleSizeInBytes = header.BitsPerSample / 8;
 
+            this.totalSamples = header.SubChunk2Size / sampleSizeInBytes;
+            this.sampleRate = (int)header.SampleRate;
+            this.sampleSize = header.BitsPerSample;
+            this.channels = header.NumChannels;
+
+            if(this.sampleBuffer.Length % sampleSizeInBytes != 0)
+            {
+                var bufferSize = this.SampleBufferSize;
+                Array.Resize(ref this.sampleBuffer, bufferSize + (bufferSize % sampleSizeInBytes));
+            }
+
+            this.stream?.Dispose();
+            this.stream = stream;
+        }
+
+        public override void Reset()
+        {
+            if(this.stream.CanSeek)
+            {
+                this.stream.Seek(Marshal.SizeOf<WavHeader>(), SeekOrigin.Begin);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        public override bool Decode(ALBuffer buffer)
+        {
+            if(this.EndOfStream)
+            {
+                return false;
+            }
+
+            var read = this.stream.Read(this.sampleBuffer);
+
+            buffer.Write(sampleBuffer.AsSpan().Slice(0, read), (short)this.channels, (short)this.sampleSize, this.sampleRate);
+
+            return true;
+        }
+
+        public override void Load(ALBuffer buffer)
+        {
             if (stream is UnmanagedMemoryStream ums)
             {
                 ReadOnlySpan<byte> umsData;
                 unsafe
                 {
-                    umsData = new ReadOnlySpan<byte>(ums.PositionPointer, dataLength);
+                    umsData = new ReadOnlySpan<byte>(ums.PositionPointer, (int)ums.Length);
                 }
-                buffer.Write(umsData, (short)header.NumChannels, (short)header.BitsPerSample, (int)header.SampleRate);
+                buffer.Write(umsData, (short)this.channels, (short)this.sampleSize, this.sampleRate);
             }
             else
             {
-                MemoryStream ms;
+                var sampleData = new byte[this.totalSamples * (this.sampleSize / 8)];
 
-                if (stream is MemoryStream sms)
-                {
-                    ms = sms;
-                }
-                else
-                {
-                    ms = new MemoryStream(dataLength);
-                    stream.Read(ms.GetBuffer(), 0, dataLength);
-                }
+                stream.Write(sampleData);
 
-                buffer.Write(ms.GetBuffer(), (short)header.NumChannels, (short)header.BitsPerSample, (int)header.SampleRate);
+                buffer.Write(sampleData, (short)this.channels, (short)this.sampleSize, this.sampleRate);
             }
         }
 
-        public override void Load(ReadOnlySpan<byte> data, ALBuffer buffer)
+        protected override void Dispose(bool finalising)
         {
-            var header = WavHeader.Read(ref data);
-
-            if (header.AudioFormat != 1)
-            {
-                throw new NotSupportedException("WavDecoder only supports 16-bit pcm format");
-            }
-            
-            buffer.Write(data, (short)header.NumChannels, (short)header.BitsPerSample, (int)header.SampleRate);
+            this.stream.Dispose();
+            base.Dispose(finalising);
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]

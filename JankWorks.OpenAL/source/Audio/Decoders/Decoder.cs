@@ -1,27 +1,37 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
+using JankWorks.Core;
 using JankWorks.Audio;
 
 namespace JankWorks.Drivers.OpenAL.Audio.Decoders
 {
-    abstract class Decoder
+    abstract class Decoder : Disposable
     {
-        public abstract void Load(Stream stream, ALBuffer buffer);        
+        public abstract long TotalSamples { get; }
 
-        public abstract void Load(ReadOnlySpan<byte> data, ALBuffer buffer);
+        public abstract int SampleRate { get; }
 
-        public static Decoder GetDecoder(AudioFormat format)
+        public abstract int SampleSize { get; }
+
+        public abstract int Channels { get; }
+
+        public abstract bool EndOfStream { get; }
+
+        protected int SampleBufferSize { get; init; }
+
+        public abstract AudioFormat Format { get; }
+
+        public Decoder(int sampleBufferSize)
         {
-            return format switch
-            {
-                AudioFormat.Wav => Decoder.Wav,
-                AudioFormat.OggVorbis => Decoder.OggVorbis,
-                _ => throw new NotImplementedException()
-            };
+            this.SampleBufferSize = sampleBufferSize;
         }
 
-        public static readonly Decoder Wav = new WavDecoder();
-        public static readonly Decoder OggVorbis = new OggVorbisDecoder();
+        public abstract void Reset();
+
+        public abstract void Load(ALBuffer buffer);
+
+        public abstract bool Decode(ALBuffer buffer);
+
+        public abstract void ChangeStream(Stream stream);
     }
 }

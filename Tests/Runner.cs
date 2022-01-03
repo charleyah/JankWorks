@@ -56,6 +56,7 @@ namespace Tests
                         test?.Dispose(graphics, audio, window);
                         test = (Test)Activator.CreateInstance(tests.Current);
                         test.Setup(graphics, audio, window);
+                        GC.Collect();
                     }
                 }
             };
