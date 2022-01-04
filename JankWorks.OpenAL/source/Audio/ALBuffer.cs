@@ -37,11 +37,20 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
         public void Write(ReadOnlySpan<byte> pcm, short channels, short sampleSize, int frequency)
         {
+            var format = sampleSize switch
+            {
+                16 when channels == 1 => ALFormat.Mono16,
+                16 when channels == 2 => ALFormat.Stereo16,
+                8 when channels == 1 => ALFormat.Mono8,
+                8 when channels == 2 => ALFormat.Stereo8,
+                _ => throw new NotSupportedException($"ALBuffer.Write does not support {sampleSize}-bit PCM with {channels} channels"),
+            };
+
             unsafe
             {
                 fixed (byte* data = pcm)
                 {
-                    alBufferData(this.handle, GetFormat(channels, sampleSize), data, pcm.Length, frequency);
+                    alBufferData(this.handle, format, data, pcm.Length, frequency);
                 }
             }
 
@@ -50,18 +59,6 @@ namespace JankWorks.Drivers.OpenAL.Audio
             if (error != ALError.NoError)
             {
                 throw new AudioException($"ALBuffer.Write {error}");
-            }
-
-            ALFormat GetFormat(short channels, short sampleSize)
-            {
-                if (sampleSize >= 16)
-                {
-                    return channels > 1 ? ALFormat.Stereo16 : ALFormat.Mono16;
-                }
-                else
-                {
-                    return channels > 1 ? ALFormat.Stereo8 : ALFormat.Mono8;
-                }
             }
         }
 

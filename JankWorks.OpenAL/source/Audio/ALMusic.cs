@@ -55,8 +55,6 @@ namespace JankWorks.Drivers.OpenAL.Audio
         private ALBuffer bufferOne, bufferTwo;
         private Decoder decoder;
 
-        const int bufferSize = 1048576;
-
         public ALMusic(Stream stream, AudioFormat format)
         {
             uint handle = 0;
@@ -78,12 +76,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
             this.bufferOne.Create();
             this.bufferTwo.Create();
 
-            this.decoder = format switch
-            {
-                AudioFormat.Wav => new WavDecoder(stream, bufferSize),
-                AudioFormat.OggVorbis => new OggVorbisDecoder(stream, bufferSize),
-                _ => throw new NotImplementedException()
-            };
+            this.decoder = Decoder.Create(stream, format);
         }
 
         public override void ChangeStream(Stream stream, AudioFormat format)
@@ -102,13 +95,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
             else
             {
                 this.decoder.Dispose();
-                this.decoder = format switch
-                {
-                    AudioFormat.Wav => new WavDecoder(stream, bufferSize),
-                    AudioFormat.OggVorbis => new OggVorbisDecoder(stream, bufferSize),
-                    _ => throw new NotImplementedException()
-                };
-
+                this.decoder = Decoder.Create(stream, format);
             }
         }
 

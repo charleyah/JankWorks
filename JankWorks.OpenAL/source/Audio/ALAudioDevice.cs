@@ -129,14 +129,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
         public override Sound LoadSound(Stream stream, AudioFormat format)
         {
-            const int bufferSize = 1048576;
-
-            using Decoder decoder = format switch
-            {
-                AudioFormat.Wav => new WavDecoder(stream, bufferSize),
-                AudioFormat.OggVorbis => new OggVorbisDecoder(stream, bufferSize),
-                _ => throw new NotImplementedException()
-            };
+            using var decoder = Decoder.Create(stream, format);
 
             var sound = new ALSound();
 
