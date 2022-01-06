@@ -74,7 +74,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             var vao = this.vaoId;
 
@@ -83,7 +83,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 glDeleteVertexArrays(1, &vao);
             }
 
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

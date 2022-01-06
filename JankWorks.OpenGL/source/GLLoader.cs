@@ -39,10 +39,10 @@ namespace JankWorks.Drivers.OpenGL
             return fnptr;          
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.osloader.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

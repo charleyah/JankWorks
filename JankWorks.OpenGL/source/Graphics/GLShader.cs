@@ -332,12 +332,12 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.ClearUniformTextures();
             this.UnBind();
             glDeleteProgram(this.ProgramId);
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
              
         private struct Sampler : IEquatable<Sampler>

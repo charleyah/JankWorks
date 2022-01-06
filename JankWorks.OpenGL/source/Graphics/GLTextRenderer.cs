@@ -413,7 +413,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.DrawToSurface(surface);
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.Clear();
             this.fontTexture.Dispose();
@@ -421,7 +421,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             this.layout.Dispose();
             this.vertexBuffer.Delete();
 
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
 
         private static bool IsCharDrawable(char c) => !char.IsWhiteSpace(c);

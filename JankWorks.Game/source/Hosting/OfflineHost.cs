@@ -270,7 +270,7 @@ namespace JankWorks.Game.Hosting
             this.state = HostState.LoadingScene;
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             if(Thread.CurrentThread.ManagedThreadId == this.runner.ManagedThreadId)
             {
@@ -283,7 +283,7 @@ namespace JankWorks.Game.Hosting
                 this.DisposeAsync().Wait();
             }
             
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
 
         public override Task DisposeAsync()

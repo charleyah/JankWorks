@@ -127,7 +127,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         protected override void ApplyDrawState(in DrawState drawState) => drawState.Process();
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.texture.Dispose();
             unsafe
@@ -137,7 +137,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 id = this.fbo;
                 glDeleteFramebuffers(1, &id);
             }
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

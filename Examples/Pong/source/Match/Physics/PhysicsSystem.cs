@@ -152,10 +152,10 @@ namespace Pong.Match.Physics
             this.events.Dispose();
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.OnCollisionHandler.ClearSubscribers();             
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

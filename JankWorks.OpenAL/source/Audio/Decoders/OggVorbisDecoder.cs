@@ -140,11 +140,11 @@ namespace JankWorks.Drivers.OpenAL.Audio.Decoders
             return true;
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.reader.Dispose();
             this.stream.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

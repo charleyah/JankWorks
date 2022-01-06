@@ -21,10 +21,10 @@ namespace JankWorks.Game.Assets
             return entry != null ? entry.Open() : throw new ApplicationException($"Missing asset {name}");
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.zip.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

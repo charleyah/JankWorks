@@ -500,7 +500,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             glGenerateMipmap(GL_TEXTURE_2D);
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.UnBind();
             unsafe
@@ -509,7 +509,7 @@ namespace JankWorks.Drivers.OpenGL.Graphics
                 glDeleteTextures(1, &id);
             }
 
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

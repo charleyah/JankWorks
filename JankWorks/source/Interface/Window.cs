@@ -93,7 +93,7 @@ namespace JankWorks.Interface
         public abstract void Activate();
         public abstract void Deactivate();
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.ResizeHandler.ClearSubscribers();
             this.HideHandler.ClearSubscribers();
@@ -113,7 +113,7 @@ namespace JankWorks.Interface
             this.TextEnteredHandler.ClearSubscribers();
                 
 
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
 
         public static Window Create(WindowSettings settings)

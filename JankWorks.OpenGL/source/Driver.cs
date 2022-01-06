@@ -24,10 +24,10 @@ namespace JankWorks.Drivers.OpenGL
         
         public bool IsShaderFormatSupported(ShaderFormat format) => format == ShaderFormat.GLSL;
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             Functions.loader.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

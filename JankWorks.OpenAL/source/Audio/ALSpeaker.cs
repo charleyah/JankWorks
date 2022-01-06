@@ -246,7 +246,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
         public override void Resume() => alSourcePlay(this.handle);
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.Stop();
 
@@ -256,7 +256,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
             {
                 alDeleteSources(1, &handle);
             }
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

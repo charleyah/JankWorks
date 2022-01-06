@@ -18,10 +18,10 @@ namespace JankWorks.Platform
             return func;
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             NativeLibrary.Free(this.libhandle);
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

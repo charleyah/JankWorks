@@ -179,7 +179,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
             return true;                  
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.Stop();
 
@@ -194,7 +194,7 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
             this.decoder.Dispose();
             
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

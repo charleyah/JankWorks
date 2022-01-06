@@ -248,13 +248,13 @@ namespace JankWorks.Drivers.OpenGL.Graphics
             }
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.program.Dispose();
             this.layout.Dispose();
             this.vertexBuffer.Delete();
             this.vertices = Array.Empty<Vertex>();            
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

@@ -113,10 +113,10 @@ namespace JankWorks.Drivers.OpenAL.Audio.Decoders
             }
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.stream.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]

@@ -17,10 +17,10 @@ namespace JankWorks.Game.Hosting.Messaging
 
         public abstract void ClearChannels();
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.ClearChannels();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

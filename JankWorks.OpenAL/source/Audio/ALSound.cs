@@ -20,10 +20,10 @@ namespace JankWorks.Drivers.OpenAL.Audio
             this.Samples = sampleSize;
         }
        
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.buffer.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

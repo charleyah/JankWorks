@@ -546,7 +546,7 @@ namespace JankWorks.Game.Local
 
         public void Close() => this.window.Close();
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             var ls = this.loadingScreen;
 
@@ -561,7 +561,7 @@ namespace JankWorks.Game.Local
 
             Threads.ClientThread = null;
 
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 

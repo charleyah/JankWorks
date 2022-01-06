@@ -60,12 +60,12 @@ namespace JankWorks.Drivers.Glfw
         
         public Monitor GetPrimaryMonitor() => new GlfwMonitor(glfwGetPrimaryMonitor());        
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             glfwSetErrorCallback(null);
             glfwTerminate();
             Functions.loader.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

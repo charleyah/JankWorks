@@ -8,23 +8,21 @@ namespace JankWorks.Core
 
         public void Dispose()
         {
-            if (!this.Disposed) { this.Dispose(false); }
-        }
-
-        protected virtual void Dispose(bool finalising)
-        {
-            if(!finalising)
-            {
+            if (!this.Disposed) 
+            { 
+                this.Dispose(true);
                 GC.SuppressFinalize(this);
                 this.Disposed = true;
             }
         }
 
+        protected virtual void Dispose(bool disposing) { }
+
         ~Disposable()
         {
             if(!this.Disposed)
             {
-                this.Dispose(true);
+                this.Dispose(false);
             }
         }
     }

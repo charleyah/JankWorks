@@ -67,10 +67,10 @@ namespace JankWorks.Drivers.DotNet.Graphics
 
         public override void Save(Stream stream, JankWorks.Graphics.ImageFormat format) => this.bitmap.Save(stream, format.GetDotNetImageFormat());
         
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.bitmap.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

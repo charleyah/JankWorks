@@ -83,10 +83,10 @@ namespace JankWorks.Drivers.FreeType
             return new FreeTypeFont(face, source);
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             FT_Done_FreeType(this.library);
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

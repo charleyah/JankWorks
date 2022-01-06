@@ -160,12 +160,12 @@ namespace JankWorks.Drivers.OpenAL.Audio
 
         public override Music LoadMusic(Stream stream, AudioFormat format) => new ALMusic(stream, format);
         
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             alcDestroyContext(this.context);
             alcCloseDevice(this.device);
 
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

@@ -42,10 +42,10 @@ namespace JankWorks.Drivers.OpenAL
             }            
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             Functions.loader.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

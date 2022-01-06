@@ -60,14 +60,14 @@ namespace JankWorks.Game.Assets
             }
         }
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             foreach(var disposableBundle in this.disposableBundles)
             {
                 disposableBundle.Dispose();
             }
             this.disposableBundles.Clear();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

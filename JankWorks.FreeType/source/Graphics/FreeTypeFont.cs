@@ -124,11 +124,11 @@ namespace JankWorks.Drivers.FreeType.Graphics
 
         public override IEnumerator<Glyph> GetGlyphs() => new GlyphIterator(this);
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             FT_Done_Face(this.face);
             this.source.Dispose();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
 
         private sealed class GlyphIterator : IEnumerator<Glyph>

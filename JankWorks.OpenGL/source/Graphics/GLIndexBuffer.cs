@@ -28,11 +28,11 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override void Update(ReadOnlySpan<uint> data, int offset) => this.buffer.Update(GL_ELEMENT_ARRAY_BUFFER, this.Usage, data, offset);
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             this.buffer.Delete();
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }

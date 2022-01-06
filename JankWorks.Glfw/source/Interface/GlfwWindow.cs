@@ -278,11 +278,11 @@ namespace JankWorks.Drivers.Glfw.Interface
         public override void Activate() => glfwMakeContextCurrent(this.window);
         public override void Deactivate() => glfwMakeContextCurrent(IntPtr.Zero);
 
-        protected override void Dispose(bool finalising)
+        protected override void Dispose(bool disposing)
         {
             this.ClearCallbacks();
             glfwDestroyWindow(this.window);
-            base.Dispose(finalising);
+            base.Dispose(disposing);
         }
     }
 }
