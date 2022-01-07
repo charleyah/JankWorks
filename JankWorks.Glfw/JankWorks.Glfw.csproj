@@ -3,6 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>JankWorks.Drivers.Glfw</RootNamespace>
+    <Authors>Ross Fuge</Authors>
+    <Copyright>© 2022 Ross Fuge</Copyright>
+    <RepositoryUrl>https://github.com/DangerRoss/jankWorks</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>WIP</PackageReleaseNotes>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

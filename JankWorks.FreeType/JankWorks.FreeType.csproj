@@ -4,6 +4,12 @@
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>disable</Nullable>
     <RootNamespace>JankWorks.Drivers.FreeType</RootNamespace>
+    <Version>0.1.0</Version>
+    <Authors>Ross Fuge</Authors>
+    <Copyright>© 2022 Ross Fuge</Copyright>
+    <RepositoryUrl>https://github.com/DangerRoss/jankWorks</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>WIP</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

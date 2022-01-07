@@ -3,6 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>JankWorks.Drivers.DotNet</RootNamespace>
+    <Version>0.1.0</Version>
+    <RepositoryUrl>https://github.com/DangerRoss/jankWorks</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>WIP</PackageReleaseNotes>
+    <Authors>Ross Fuge</Authors>
+    <Copyright>© 2022 Ross Fuge</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
