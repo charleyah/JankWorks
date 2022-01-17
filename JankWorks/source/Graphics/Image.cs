@@ -15,7 +15,7 @@ namespace JankWorks.Graphics
 
         public abstract void CopyTo(Texture2D texture, Vector2i position);
 
-        public abstract void WriteFrom(Texture2D texture);
+        public abstract void Read(Texture2D texture);
 
         public abstract void Save(Stream stream, ImageFormat format);
 

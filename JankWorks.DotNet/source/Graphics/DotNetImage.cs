@@ -63,7 +63,7 @@ namespace JankWorks.Drivers.DotNet.Graphics
             }
         }
 
-        public override void WriteFrom(Texture2D texture)
+        public override void Read(Texture2D texture)
         {
             var size = this.Size;
 
