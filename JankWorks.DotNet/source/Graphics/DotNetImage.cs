@@ -40,6 +40,29 @@ namespace JankWorks.Drivers.DotNet.Graphics
             }
         }
 
+
+        public override void CopyTo(Texture2D texture, Vector2i position)
+        {
+            var size = this.Size;
+            var data = this.bitmap.LockBits(new System.Drawing.Rectangle(0, 0, size.X, size.Y), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            try
+            {
+                ReadOnlySpan<ARGB32> pixels;
+
+                unsafe
+                {
+                    pixels = new ReadOnlySpan<ARGB32>(data.Scan0.ToPointer(), size.X * size.Y);
+                }
+
+                texture.SetPixels(size, position, pixels);
+            }
+            finally
+            {
+                this.bitmap.UnlockBits(data);
+            }
+        }
+
         public override void WriteFrom(Texture2D texture)
         {
             var size = this.Size;
