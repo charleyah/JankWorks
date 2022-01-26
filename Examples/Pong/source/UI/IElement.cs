@@ -2,6 +2,7 @@
 using System.Numerics;
 
 using JankWorks.Graphics;
+using JankWorks.Game;
 
 namespace Pong.UI
 {
@@ -15,7 +16,7 @@ namespace Pong.UI
        
         RGBA Colour { get; set; }
 
-        void Update(TimeSpan delta);
+        void Update(GameTime time);
 
         void Draw(TextRenderer textRenderer, ShapeRenderer shapeRenderer);        
     }

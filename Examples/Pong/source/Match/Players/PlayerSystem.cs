@@ -69,6 +69,7 @@ namespace Pong.Match.Players
             var player = this.players[number];
             ref var phys = ref this.physics.GetComponent(player.physId);
             phys.position = position;
+            phys.destination = position;
             phys.origin = origin;
         }
 
@@ -78,7 +79,7 @@ namespace Pong.Match.Players
             return ref this.physics.GetComponent(player.physId);
         }
 
-        public void Tick(ulong tick, TimeSpan delta)
+        public void Tick(ulong tick, GameTime time)
         {
             PlayerEvent e;
 

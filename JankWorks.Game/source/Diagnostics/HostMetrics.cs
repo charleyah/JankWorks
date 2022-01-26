@@ -10,6 +10,8 @@ namespace JankWorks.Game.Diagnostics
 
         public int TicksPerSecond { get; set; }
 
+        public double TickLag { get; set; }
+
         public HostMetrics()
         {
             this.TicksPerSecond = 0;

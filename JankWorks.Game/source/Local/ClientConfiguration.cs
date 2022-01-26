@@ -16,7 +16,7 @@ namespace JankWorks.Game.Local
 
         public WindowStyle WindowStyle { get; set; }
 
-        public uint FrameRate { get; set; }
+        public uint UpdateRate { get; set; }
 
         public bool Vsync { get; set; }
 
@@ -29,7 +29,7 @@ namespace JankWorks.Game.Local
         const string BitsEntry = "Bits";
         const string RefreshRateEntry = "RefreshRate";
 
-        const string FrameRateEntry = "FrameRate";
+        const string UpdateRateEntry = "UpdateRate";
         const string VsyncEntry = "Vsync";
 
         public void Save(Settings settings)
@@ -43,7 +43,7 @@ namespace JankWorks.Game.Local
             settings.SetEntry(BitsEntry, displaymode.BitsPerPixel.ToString(), DisplaySection);
             settings.SetEntry(RefreshRateEntry, displaymode.RefreshRate.ToString(), DisplaySection);
 
-            settings.SetEntry(FrameRateEntry, this.FrameRate.ToString(), DisplaySection);
+            settings.SetEntry(UpdateRateEntry, this.UpdateRate.ToString(), DisplaySection);
             settings.SetEntry(VsyncEntry, this.Vsync.ToString(), DisplaySection);
         }
 
@@ -69,7 +69,7 @@ namespace JankWorks.Game.Local
                 }
 
                 this.WindowStyle = settings.GetEntry(WindowStyleEntry, (entry) => Enum.Parse<WindowStyle>(entry), DisplaySection, this.WindowStyle);
-                this.FrameRate = settings.GetEntry(FrameRateEntry, (entry) => uint.Parse(entry), DisplaySection, this.FrameRate);
+                this.UpdateRate = settings.GetEntry(UpdateRateEntry, (entry) => uint.Parse(entry), DisplaySection, this.UpdateRate);
                 this.Vsync = settings.GetEntry(VsyncEntry, (entry) => bool.Parse(entry), DisplaySection, this.Vsync);
             }
         }
@@ -87,8 +87,8 @@ namespace JankWorks.Game.Local
                     {
                         Monitor = monitor,
                         DisplayMode = new DisplayMode(1280, 800, 32, 60),
-                        FrameRate = displaymode.RefreshRate,
-                        Vsync = false,
+                        UpdateRate = displaymode.RefreshRate,
+                        Vsync = true,
                         WindowStyle = WindowStyle.Windowed
                     };
                 }
@@ -98,7 +98,7 @@ namespace JankWorks.Game.Local
                     {
                         Monitor = monitor,
                         DisplayMode = displaymode,
-                        FrameRate = displaymode.RefreshRate,
+                        UpdateRate = displaymode.RefreshRate,
                         Vsync = false,
                         WindowStyle = WindowStyle.FullScreen
                     };

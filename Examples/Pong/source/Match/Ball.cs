@@ -31,6 +31,7 @@ namespace Pong.Match
                 colour = Pong.UI.Colours.Forground,
                 size = new Vector2(25, 25),
                 position = area.Size / 2,
+                destination = area.Size / 2,
                 origin = new Vector2(0.5f)
             };
             

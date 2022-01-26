@@ -38,7 +38,7 @@ namespace ImagePreviewer
                 var conf = base.DefaultClientConfiguration;
                 conf.DisplayMode = new DisplayMode(1024, 768, 32, conf.DisplayMode.RefreshRate);
                 conf.Vsync = false;
-                conf.FrameRate = conf.DisplayMode.RefreshRate;
+                conf.UpdateRate = conf.DisplayMode.RefreshRate;
                 conf.WindowStyle = WindowStyle.Windowed;
                 return conf;
             }

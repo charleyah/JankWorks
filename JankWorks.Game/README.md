@@ -177,7 +177,7 @@ class FooBarThinker : ITickable
     // enable async for Tick method
     ITickable.TickInterval => IntervalBehaviour.Asynchronous; 
         
-    public async void Tick(ulong tick, TimeSpan delta)
+    public async void Tick(ulong tick, GameTime time)
     {
         // every tick will either invoke this method or resume awaited tasks
     }
@@ -192,7 +192,7 @@ class FooBarUpdater : IUpdatable
     // This is the same as having the UpdateInterval code omitted and is not valid for a async Update method
     IUpdatable.UpdateInterval => IntervalBehaviour.NoAsync; 
     
-    public async void Update(TimeSpan delta)
+    public async void Update(GameTime time)
     {
          // any await statements will resume out of order and on any thread
     }

@@ -9,6 +9,7 @@ namespace Pong.Match.Physics
     struct PhysicsComponent
     {
         public Vector2 position;
+        public Vector2 destination;
         public Vector2 origin;
         public Vector2 velocity;
 

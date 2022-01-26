@@ -14,10 +14,10 @@ namespace ImagePreviewer
             base.ClientInitialise(client);
         }
 
-        public override void Render(Surface surface, Frame frame)
+        public override void Render(Surface surface, GameTime time)
         {
             surface.Clear();
-            base.Render(surface, frame);
+            base.Render(surface, time);
         }
     }
 }

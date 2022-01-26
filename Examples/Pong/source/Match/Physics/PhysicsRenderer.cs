@@ -43,7 +43,7 @@ namespace Pong.Match.Physics
 
         public void DownSynchronise() => this.ProcessEvents();
 
-        public void Update(TimeSpan delta) => this.ProcessEvents();
+        public void Update(GameTime time) => this.ProcessEvents();
         
         private void ProcessEvents()
         {
@@ -72,7 +72,7 @@ namespace Pong.Match.Physics
             }
         }
 
-        public void Render(Surface surface, Frame frame)
+        public void Render(Surface surface, GameTime time)
         {
             var totalComponents = this.components.GetSpan();
 
@@ -80,7 +80,10 @@ namespace Pong.Match.Physics
             for(int i = 0; i < totalComponents.Length; i++)
             {
                 var com = totalComponents[i];
-                this.renderer.DrawRectangle(com.size, com.position, com.origin, 0f, com.colour);
+
+                var pos = com.position;
+
+                this.renderer.DrawRectangle(com.size, pos, com.origin, 0f, com.colour);
             }
             this.renderer.EndDraw(surface);
         }

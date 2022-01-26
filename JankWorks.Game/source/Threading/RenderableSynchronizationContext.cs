@@ -24,7 +24,7 @@ namespace JankWorks.Game.Threading
 
         public void DisposeGraphicsResources(GraphicsDevice device) => this.renderable.DisposeGraphicsResources(device);
 
-        public void Render(Surface surface, Frame frame)
+        public void Render(Surface surface, GameTime time)
         {
             try
             {
@@ -41,19 +41,19 @@ namespace JankWorks.Game.Threading
                         }
                         else
                         {
-                            this.renderable.Render(surface, frame);
+                            this.renderable.Render(surface, time);
                         }
 
                         break;
 
                     case IntervalBehaviour.Synchronous:
-                        this.renderable.Render(surface, frame);
+                        this.renderable.Render(surface, time);
                         this.Join();
                         break;
 
                     case IntervalBehaviour.Overlapped:
                         this.Yield();
-                        this.renderable.Render(surface, frame);
+                        this.renderable.Render(surface, time);
                         break;
 
                     default:

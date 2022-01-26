@@ -49,42 +49,57 @@ namespace JankWorks.Game.Diagnostics
             this.renderer = device.CreateTextRenderer(new OrthoCamera(device.Viewport.Size), font);
         }
 
-        public void Update(TimeSpan delta)
+        public void Update(GameTime time)
         {
             this.textBuffer.WritePosition = 0;
 
-            this.UpdateHostMetrics();
+            HostMetrics hostMetrics = null;
+            ClientMetrics clientMetrics = this.client.Metrics;
 
-            this.UpdateClientMetrics();
+            if (this.host != null && !(this.host is NullHost))
+            {
+                hostMetrics = this.host.Metrics;
+            }
 
+            this.UpdateRates(clientMetrics, hostMetrics);
+
+            this.UpdateLags(clientMetrics, hostMetrics);
+            
             this.UpdateMemoryMetrics();
 
             this.UpdateMetricCounters();
         }
 
-        private void UpdateHostMetrics()
+        private void UpdateRates(ClientMetrics clientMetrics, HostMetrics hostMetrics)
         {
-            if (this.host != null && !(this.host is NullHost))
+            if(hostMetrics != null)
             {
-                var hostmetrics = this.host.Metrics;
-
                 this.textBuffer.Write("TPS ");
-                this.textBuffer.WriteInt(hostmetrics.TicksPerSecond);
+                this.textBuffer.WriteInt(hostMetrics.TicksPerSecond);
                 this.textBuffer.Write('\n');
-            }            
-        }
-
-        private void UpdateClientMetrics()
-        {
-            var clientMetrics = this.client.Metrics;
-
+            }
+            
             this.textBuffer.Write("UPS ");
             this.textBuffer.WriteInt(clientMetrics.UpdatesPerSecond);
             this.textBuffer.Write('\n');
 
             this.textBuffer.Write("FPS ");
             this.textBuffer.WriteInt(clientMetrics.FramesPerSecond);
-            this.textBuffer.Write('\n');
+            this.textBuffer.Write("\n\n");
+        }
+
+        private void UpdateLags(ClientMetrics clientMetrics, HostMetrics hostMetrics)
+        {
+            if (hostMetrics != null)
+            {
+                this.textBuffer.Write("TL ");
+                this.textBuffer.WriteDouble(Math.Round(hostMetrics.TickLag, 2), 2);
+                this.textBuffer.Write('\n');
+            }
+            
+            this.textBuffer.Write("UL ");
+            this.textBuffer.WriteDouble(Math.Round(clientMetrics.UpdateLag, 2), 2);
+            this.textBuffer.Write("\n");
         }
 
         private void UpdateMemoryMetrics()
@@ -173,8 +188,8 @@ namespace JankWorks.Game.Diagnostics
             }
         }
 
-        public void Render(Surface surface, Frame frame)
-        {
+        public void Render(Surface surface, GameTime time)
+        {                       
             this.renderer.BeginDraw();
             this.renderer.Draw(this.textBuffer.GetSpan(), this.Position, this.Colour);
             this.renderer.EndDraw(surface);

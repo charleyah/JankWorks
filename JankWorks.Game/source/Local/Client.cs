@@ -15,7 +15,7 @@ using JankWorks.Game.Threading;
 
 namespace JankWorks.Game.Local
 {
-    public sealed class Client : Disposable
+    public sealed class Client : Disposable, IRunner<ClientState, ClientState>
     {
         private struct NewSceneRequest
         {
@@ -37,6 +37,17 @@ namespace JankWorks.Game.Local
 
         public ClientState State => this.state;
 
+        Stopwatch IRunner<ClientState, ClientState>.Timer => this.timer;
+
+        TimeSpan IRunner<ClientState, ClientState>.TotalElapsed { get; set; }
+        TimeSpan IRunner<ClientState, ClientState>.Accumulated { get; set; }
+        TimeSpan IRunner<ClientState, ClientState>.TargetElapsed => this.updateTime;
+
+        long IRunner<ClientState, ClientState>.LastRunTick { get; set; }
+
+        private Stopwatch timer;
+        private TimeSpan updateTime;
+
         private Application application;
 
         private ClientHost host;
@@ -55,8 +66,6 @@ namespace JankWorks.Game.Local
 
         private volatile ClientState state;
 
-        private ClientParameters parameters;
-
         private NewSceneRequest newSceneRequest;
 
         private Counter upsCounter;
@@ -64,6 +73,8 @@ namespace JankWorks.Game.Local
 
         public Client(Application application, ClientHost host)
         {
+            this.timer = new Stopwatch();
+
             this.inputContext = new ScopedSynchronizationContext(false);
             this.Metrics = new ClientMetrics();
 
@@ -75,17 +86,21 @@ namespace JankWorks.Game.Local
             this.application = application;
             this.host = host;
 
+            var parms = application.ClientParameters;
+
             var settings = application.GetClientSettings();
 
             var config = application.DefaultClientConfiguration;
 
             config.Load(settings);
+
+            var updateRate = (config.Vsync) ? config.DisplayMode.RefreshRate : config.UpdateRate;
+            this.updateTime = TimeSpan.FromMilliseconds((1f / updateRate) * 1000);
+
             this.Configuration = config;
             this.Settings = settings;
-
-            var parms = application.ClientParameters;
-            this.parameters = parms;
-
+          
+                        
             var winds = new WindowSettings()
             {
                 Title = application.Name,
@@ -372,9 +387,49 @@ namespace JankWorks.Game.Local
             this.graphicsDevice.Display();
                 
             this.ChangeScene(scene, host, initState);
+
             this.Run();
         }
 
+        private void Run()
+        {
+            var clientThread = Thread.CurrentThread;
+            clientThread.Name = $"{this.application.Name} Client Thread";
+            Threads.ClientThread = clientThread;
+
+            this.upsCounter.Start();
+            this.fpsCounter.Start();
+
+
+            var runner = this as IRunner<ClientState, ClientState>;
+            runner.BeginRun();
+
+            while (this.window.IsOpen)
+            {
+                var state = this.CheckForStateChange();
+
+                var updateDuration = runner.Run(state, state);
+
+                this.Metrics.UpdateLag = 1d * (updateDuration.TotalMilliseconds / updateTime.TotalMilliseconds);
+            }
+
+            runner.StopRun();
+
+            this.UnloadScene();
+            this.host.Dispose();
+        }
+
+        void IRunner<ClientState, ClientState>.Simulate(GameTime time, ClientState state)
+        {
+            this.Update(state, time);            
+        }
+
+        void IRunner<ClientState, ClientState>.Interpolate(GameTime time, ClientState state)
+        {            
+            this.Render(state, time);
+        }
+
+        /*
         private void Run()
         {
             var clientThread = Thread.CurrentThread;
@@ -441,8 +496,12 @@ namespace JankWorks.Game.Local
             this.UnloadScene();           
             this.host.Dispose();
         }
+        */
 
-        private void Update(ClientState state, TimeSpan delta)
+
+
+
+        private void Update(ClientState state, GameTime time)
         {
             this.Metrics.UpdatesPerSecond = this.upsCounter.Frequency;
             
@@ -459,28 +518,28 @@ namespace JankWorks.Game.Local
                        
             if (state > ClientState.BeginLoadingScene)
             {
-                this.loadingScreen?.Update(delta);
+                this.loadingScreen?.Update(time);
             }
             else
             {
                 this.host.SynchroniseClientUpdate();
-                this.scene.Update(delta);
+                this.scene.Update(time);
             }
 
             this.upsCounter.Count();
         }
 
-        private void Render(ClientState state, Frame frame, TimeSpan timeout)
+        private void Render(ClientState state, GameTime time)
         {
-            this.Metrics.FramesPerSecond = this.fpsCounter.Frequency;            
+            this.Metrics.FramesPerSecond = this.fpsCounter.Frequency;
 
             if (state > ClientState.BeginLoadingScene)
             {
-                if (this.loadingScreen != null && this.graphicsDevice.Activate(timeout))
+                if (this.loadingScreen != null && this.graphicsDevice.Activate(this.updateTime))
                 {
                     try
                     {
-                        this.loadingScreen.Render(this.graphicsDevice, frame);
+                        this.loadingScreen.Render(this.graphicsDevice, time);
                         this.graphicsDevice.Display();
                         this.fpsCounter.Count();
                     }
@@ -492,7 +551,7 @@ namespace JankWorks.Game.Local
             }
             else
             {
-                this.scene.Render(this.graphicsDevice, frame);
+                this.scene.Render(this.graphicsDevice, time);
                 this.graphicsDevice.Display();
                 this.fpsCounter.Count();
             }

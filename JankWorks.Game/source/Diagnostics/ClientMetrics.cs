@@ -16,10 +16,13 @@ namespace JankWorks.Game.Diagnostics
 
         public int UpdatesPerSecond { get; set; }
 
+        public double UpdateLag { get; set; }
+
         public ClientMetrics()
         {
             this.FramesPerSecond = 0;
             this.UpdatesPerSecond = 0;
+            this.UpdateLag = 0;
 
             this.UpdatableMetricCounters = Array.Empty<MetricCounter>();
             this.ParallelUpdatableMetricCounters = Array.Empty<MetricCounter>();

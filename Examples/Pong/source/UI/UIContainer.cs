@@ -133,15 +133,15 @@ namespace Pong.UI
             }            
         }
 
-        public void Update(TimeSpan delta)
+        public void Update(GameTime time)
         {
             for (int i = 0; i < this.elements.Count; i++)
             {
-                this.elements[i].Update(delta);
+                this.elements[i].Update(time);
             }
         }
 
-        public void Render(Surface surface, Frame frame)
+        public void Render(Surface surface, GameTime time)
         {
             if (!this.active)
             {

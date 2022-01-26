@@ -16,7 +16,7 @@ namespace JankWorks.Game.Threading
 
         public string GetName() => this.tickable.GetName();
 
-        public void Tick(ulong tick, TimeSpan delta)
+        public void Tick(ulong tick, GameTime time)
         {
             try
             {
@@ -32,19 +32,19 @@ namespace JankWorks.Game.Threading
                         }
                         else
                         {
-                            this.tickable.Tick(tick, delta);
+                            this.tickable.Tick(tick, time);
                         }
 
                         break;
 
                     case IntervalBehaviour.Synchronous:
-                        this.tickable.Tick(tick, delta);
+                        this.tickable.Tick(tick, time);
                         this.Join();
                         break;
 
                     case IntervalBehaviour.Overlapped:
                         this.Yield();
-                        this.tickable.Tick(tick, delta);
+                        this.tickable.Tick(tick, time);
                         break;
 
                     default:

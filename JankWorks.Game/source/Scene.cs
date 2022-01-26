@@ -53,7 +53,7 @@ namespace JankWorks.Game
         }
     }
 
-    public abstract class HostScene : ApplicationScene, ITickable
+    public abstract class HostScene : ApplicationScene
     {
         private List<object> hostObjects;
 
@@ -201,21 +201,21 @@ namespace JankWorks.Game
             this.hostObjects.Clear();
         }
 
-        public virtual void Tick(ulong tick, TimeSpan delta)
+        public virtual void Tick(ulong tick, GameTime time)
         {
             for(int index = 0; index < this.parallelTickables.Length; index++)
             {
-                this.parallelTickables[index].ForkTick(tick, delta);
+                this.parallelTickables[index].ForkTick(tick, time);
             }
 
             for (int index = 0; index < this.tickables.Length; index++)
             {
-                this.tickables[index].Tick(tick, delta);
+                this.tickables[index].Tick(tick, time);
             }
 
             for (int index = 0; index < this.parallelTickables.Length; index++)
             {
-                this.parallelTickables[index].JoinTick(tick, delta);
+                this.parallelTickables[index].JoinTick(tick, time);
             }
         }
     }
@@ -467,39 +467,39 @@ namespace JankWorks.Game
             this.soundResources = Array.Empty<ISoundResource>();
         }
 
-        public virtual void Update(TimeSpan delta) 
+        public virtual void Update(GameTime time) 
         {
             for (int index = 0; index < this.parallelUpdatables.Length; index++)
             {
-                this.parallelUpdatables[index].ForkUpdate(delta);
+                this.parallelUpdatables[index].ForkUpdate(time);
             }
 
             for (int index = 0; index < this.updatables.Length; index++)
             {
-                this.updatables[index].Update(delta);
+                this.updatables[index].Update(time);
             }
 
             for (int index = 0; index < this.parallelUpdatables.Length; index++)
             {
-                this.parallelUpdatables[index].JoinUpdate(delta);
+                this.parallelUpdatables[index].JoinUpdate(time);
             }
         }
 
-        public virtual void Render(Surface surface, Frame frame) 
+        public virtual void Render(Surface surface, GameTime time) 
         {
             for(int index = 0; index < this.parallelRenderables.Length; index++)
             {
-                this.parallelRenderables[index].ForkRender(surface, frame);
+                this.parallelRenderables[index].ForkRender(surface, time);
             }
 
             for (int index = 0; index < this.renderables.Length; index++)
             {
-                this.renderables[index].Render(surface, frame);
+                this.renderables[index].Render(surface, time);
             }
 
             for (int index = 0; index < this.parallelRenderables.Length; index++)
             {
-                this.parallelRenderables[index].JoinRender(surface, frame);
+                this.parallelRenderables[index].JoinRender(surface, time);
             }
         }
     }

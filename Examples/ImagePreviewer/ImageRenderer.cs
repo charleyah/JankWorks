@@ -29,7 +29,7 @@ namespace ImagePreviewer
             this.renderer.Dispose();
         }
 
-        public async void Update(TimeSpan delta)
+        public async void Update(GameTime time)
         {                
             Console.WriteLine("Enter a url to an image to display...");
             var loc = await Task.Run(Console.ReadLine);
@@ -75,7 +75,7 @@ namespace ImagePreviewer
             return await Task.Run(() => Image.Load(response.Content.ReadAsStream(), format));
         }
 
-        public void Render(Surface surface, Frame frame)
+        public void Render(Surface surface, GameTime time)
         {
             if(!this.renderer.ReDraw(surface))
             {

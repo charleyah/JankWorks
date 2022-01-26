@@ -47,7 +47,7 @@ namespace JankWorks.Game
     {
         IntervalBehaviour TickInterval => IntervalBehaviour.NoAsync;
 
-        void Tick(ulong tick, TimeSpan delta);
+        void Tick(ulong tick, GameTime time);
     }
 
     /// <summary>
@@ -55,11 +55,11 @@ namespace JankWorks.Game
     /// </summary>
     public interface IParallelTickable : INameable
     {
-        void ForkTick(ulong tick, TimeSpan delta) => this.ForkTick(tick, delta, null);
+        void ForkTick(ulong tick, GameTime time) => this.ForkTick(tick, time, null);
 
-        void ForkTick(ulong tick, TimeSpan delta, Action<IParallelTickable> callback);
+        void ForkTick(ulong tick, GameTime time, Action<IParallelTickable> callback);
 
-        void JoinTick(ulong tick, TimeSpan delta);
+        void JoinTick(ulong tick, GameTime time);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ namespace JankWorks.Game
     {
         IntervalBehaviour UpdateInterval => IntervalBehaviour.NoAsync;
 
-        void Update(TimeSpan delta);
+        void Update(GameTime time);
     }
 
     /// <summary>
@@ -77,11 +77,11 @@ namespace JankWorks.Game
     /// </summary>
     public interface IParallelUpdatable : INameable
     {
-        void ForkUpdate(TimeSpan delta) => this.ForkUpdate(delta, null);
+        void ForkUpdate(GameTime time) => this.ForkUpdate(time, null);
 
-        void ForkUpdate(TimeSpan delta, Action<IParallelUpdatable> callback);
+        void ForkUpdate(GameTime time, Action<IParallelUpdatable> callback);
 
-        void JoinUpdate(TimeSpan delta);
+        void JoinUpdate(GameTime time);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ namespace JankWorks.Game
     {
         IntervalBehaviour RenderInterval => IntervalBehaviour.NoAsync;
 
-        void Render(Surface surface, Frame frame);
+        void Render(Surface surface, GameTime time);
     }
 
     /// <summary>
@@ -131,11 +131,11 @@ namespace JankWorks.Game
     /// </summary>
     public interface IParallelRenderable : IGraphicsResource, INameable
     {
-        void ForkRender(Surface surface, Frame frame) => this.ForkRender(surface, frame, null);
+        void ForkRender(Surface surface, GameTime time) => this.ForkRender(surface, time, null);
 
-        void ForkRender(Surface surface, Frame frame, Action<IParallelRenderable> callback);
+        void ForkRender(Surface surface, GameTime time, Action<IParallelRenderable> callback);
 
-        void JoinRender(Surface surface, Frame frame);
+        void JoinRender(Surface surface, GameTime time);
     }
 
 
@@ -164,31 +164,4 @@ namespace JankWorks.Game
         /// </summary>
         Asynchronous
     }
-
-    /// <summary>
-    /// Provides infomation about a given frame to render
-    /// </summary>
-    public readonly struct Frame : IEquatable<Frame>
-    {
-        public static readonly Frame Complete = new Frame(1d);
-
-        public readonly double Interpolation;
-
-        public Frame(double interpolation)
-        {
-            this.Interpolation = interpolation;
-        }
-
-        public override string ToString() => this.Interpolation.ToString();
-
-        public override int GetHashCode() => this.Interpolation.GetHashCode();
-
-        public override bool Equals(object obj) => obj is Frame other && this == other;
-
-        public bool Equals(Frame other) => this == other;
-
-        public static bool operator ==(Frame left, Frame right) => left.Interpolation == right.Interpolation;
-
-        public static bool operator !=(Frame left, Frame right) => left.Interpolation != right.Interpolation;
-    } 
 }

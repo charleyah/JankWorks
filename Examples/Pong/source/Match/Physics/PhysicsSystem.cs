@@ -80,7 +80,7 @@ namespace Pong.Match.Physics
 
         public ref PhysicsComponent GetComponent(int id) => ref this.components[id];
 
-        public void Tick(ulong tick, TimeSpan delta)
+        public void Tick(ulong tick, GameTime time)
         {
             var components = this.components.GetSpan();
 
@@ -90,11 +90,15 @@ namespace Pong.Match.Physics
 
                 if(com.velocity != Vector2.Zero)
                 {
-                    com.position += com.velocity;
-
-                    this.CheckCollision(ref com, i);
-                    this.CheckYBounds(ref com);
+                    com.destination = com.position + com.velocity;
                 }
+
+
+                com.position += com.velocity;
+
+                this.CheckCollision(ref com, i);
+                this.CheckYBounds(ref com);
+
                 this.BroadcastData(in com, i);
             }
         }
@@ -115,7 +119,7 @@ namespace Pong.Match.Physics
                 {
                     if (components[i].GetBounds().Intersects(source))
                     {
-                        com.velocity = new Vector2(-com.velocity.X, com.velocity.Y);
+                        com.velocity = new Vector2(-com.velocity.X, com.velocity.Y);                        
                         this.OnCollisionHandler.Notify(id);
                         break;
                     }

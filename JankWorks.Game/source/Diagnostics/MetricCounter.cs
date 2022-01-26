@@ -30,10 +30,10 @@ namespace JankWorks.Game.Diagnostics
             this.tickable = tickable;
         }
 
-        void ITickable.Tick(ulong tick, TimeSpan delta)
+        void ITickable.Tick(ulong tick, GameTime time)
         {
             this.Start();
-            tickable.Tick(tick, delta);
+            tickable.Tick(tick, time);
             this.End();
         }
     }
@@ -49,10 +49,10 @@ namespace JankWorks.Game.Diagnostics
             this.updatable = updatable;
         }
 
-        void IUpdatable.Update(TimeSpan delta)
+        void IUpdatable.Update(GameTime time)
         {
             this.Start();
-            this.updatable.Update(delta);
+            this.updatable.Update(time);
             this.End();
         }
     }
@@ -68,10 +68,10 @@ namespace JankWorks.Game.Diagnostics
             this.renderable = renderable;
         }
 
-        void IRenderable.Render(Surface surface, Frame frame)
+        void IRenderable.Render(Surface surface, GameTime time)
         {
             this.Start();
-            this.renderable.Render(surface, frame);
+            this.renderable.Render(surface, time);
             this.End();
         }
 
@@ -114,20 +114,20 @@ namespace JankWorks.Game.Diagnostics
             this.tickable = tickable;
         }
 
-        public void ForkTick(ulong tick, TimeSpan delta)
+        public void ForkTick(ulong tick, GameTime time)
         {
-            this.ForkTick(tick, delta, this.callbackHandler);
+            this.ForkTick(tick, time, this.callbackHandler);
         }
 
-        public void ForkTick(ulong tick, TimeSpan delta, Action<IParallelTickable> callback)
+        public void ForkTick(ulong tick, GameTime time, Action<IParallelTickable> callback)
         {
             this.Start();
-            this.tickable.ForkTick(tick, delta, callback);
+            this.tickable.ForkTick(tick, time, callback);
         }
 
-        public void JoinTick(ulong tick, TimeSpan delta)
+        public void JoinTick(ulong tick, GameTime time)
         {
-            this.tickable.JoinTick(tick, delta);
+            this.tickable.JoinTick(tick, time);
             this.UpdateElpased();
         }
     }
@@ -143,20 +143,20 @@ namespace JankWorks.Game.Diagnostics
             this.updatable = updatable;
         }
 
-        public void ForkUpdate(TimeSpan delta)
+        public void ForkUpdate(GameTime time)
         {
-            this.ForkUpdate(delta, this.callbackHandler);
+            this.ForkUpdate(time, this.callbackHandler);
         }
 
-        public void ForkUpdate(TimeSpan delta, Action<IParallelUpdatable> callback)
+        public void ForkUpdate(GameTime time, Action<IParallelUpdatable> callback)
         {
             this.Start();
-            this.updatable.ForkUpdate(delta, callback);
+            this.updatable.ForkUpdate(time, callback);
         }
 
-        public void JoinUpdate(TimeSpan delta)
+        public void JoinUpdate(GameTime time)
         {
-            this.updatable.JoinUpdate(delta);
+            this.updatable.JoinUpdate(time);
             this.UpdateElpased();
         }
     }
@@ -172,20 +172,20 @@ namespace JankWorks.Game.Diagnostics
             this.renderable = renderable;
         }
 
-        public void ForkRender(Surface surface, Frame frame)
+        public void ForkRender(Surface surface, GameTime time)
         {
-            this.ForkRender(surface, frame, this.callbackHandler);
+            this.ForkRender(surface, time, this.callbackHandler);
         }
 
-        public void ForkRender(Surface surface, Frame frame, Action<IParallelRenderable> callback)
+        public void ForkRender(Surface surface, GameTime time, Action<IParallelRenderable> callback)
         {
             this.Start();
-            this.renderable.ForkRender(surface, frame, callback);
+            this.renderable.ForkRender(surface, time, callback);
         }
 
-        public void JoinRender(Surface surface, Frame frame)
+        public void JoinRender(Surface surface, GameTime time)
         {
-            this.renderable.JoinRender(surface, frame);
+            this.renderable.JoinRender(surface, time);
             this.UpdateElpased();
         }
 

@@ -16,7 +16,7 @@ namespace JankWorks.Game.Threading
 
         public string GetName() => this.updatable.GetName();
 
-        public void Update(TimeSpan delta)
+        public void Update(GameTime time)
         {
             try
             {
@@ -32,19 +32,19 @@ namespace JankWorks.Game.Threading
                         }
                         else
                         {
-                            this.updatable.Update(delta);
+                            this.updatable.Update(time);
                         }
 
                         break;
 
                     case IntervalBehaviour.Synchronous:
-                        this.updatable.Update(delta);
+                        this.updatable.Update(time);
                         this.Join();
                         break;
 
                     case IntervalBehaviour.Overlapped:
                         this.Yield();
-                        this.updatable.Update(delta);                        
+                        this.updatable.Update(time);                        
                         break;
 
                     default:

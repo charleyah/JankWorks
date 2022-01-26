@@ -17,9 +17,9 @@ namespace JankWorks.Game.Local
         public abstract void DisposeResources();
 
 
-        public abstract void Render(Surface surface, Frame frame);
+        public abstract void Render(Surface surface, GameTime time);
 
-        public abstract void Update(TimeSpan delta);
+        public abstract void Update(GameTime time);
 
 
         public abstract void UpdateLoadingProgress(ClientState state);

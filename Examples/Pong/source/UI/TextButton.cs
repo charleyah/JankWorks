@@ -2,6 +2,7 @@
 using System.Numerics;
 
 using JankWorks.Graphics;
+using JankWorks.Game;
 
 namespace Pong.UI
 {
@@ -40,7 +41,7 @@ namespace Pong.UI
 
         public void Click() => this.OnClick?.Invoke();
 
-        public void Update(TimeSpan delta)
+        public void Update(GameTime time)
         {
             if (this.hover)
             {

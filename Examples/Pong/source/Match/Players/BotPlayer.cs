@@ -28,7 +28,7 @@ namespace Pong.Match.Players
             this.targetY = this.resetY;
         }
 
-        public void Tick(ulong tick, TimeSpan delta)
+        public void Tick(ulong tick, GameTime time)
         {
             ref var ballPhysics = ref this.physics.GetComponent(this.ball.PhysicsComponentId);
             ref var botPhysics = ref this.players.GetPlayerPhysicsComponent(this.PlayerNumber);

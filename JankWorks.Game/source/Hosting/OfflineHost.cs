@@ -14,7 +14,7 @@ using JankWorks.Game.Hosting.Messaging.Memory;
 
 namespace JankWorks.Game.Hosting
 {
-    public sealed class OfflineHost : ClientHost
+    public sealed class OfflineHost : ClientHost, IRunner<object, object>
     {
         private HostScene scene;
         private Client client;
@@ -30,7 +30,10 @@ namespace JankWorks.Game.Hosting
         private Counter tickCounter;
         private HostMetrics metrics;
         private Dispatcher dispatcher;
-        private Thread runner;
+        private Thread thread;
+
+        private Stopwatch timer;
+        private TimeSpan tickTime;
 
         public override bool IsRemote => false;
 
@@ -44,24 +47,34 @@ namespace JankWorks.Game.Hosting
 
         public override HostMetrics Metrics => this.metrics;
 
+        Stopwatch IRunner<object, object>.Timer => this.timer;
+
+        TimeSpan IRunner<object, object>.TotalElapsed { get; set; }
+        TimeSpan IRunner<object, object>.Accumulated { get; set; }
+        TimeSpan IRunner<object, object>.TargetElapsed => this.tickTime;
+
+        long IRunner<object, object>.LastRunTick { get; set; }
 
         public OfflineHost(Application application) : base(application, application.GetClientSettings())
         {
             var parms = application.HostParameters;
             this.parameters = parms;
+            this.tickTime = TimeSpan.FromMilliseconds((1f / this.parameters.TickRate) * 1000);
+
             this.tickCounter = new Counter(TimeSpan.FromSeconds(1));
             this.metrics = new HostMetrics();
             this.state = HostState.Constructed;
 
             this.dispatcher = new MemoryDispatcher(application);
-            this.runner = new Thread(new ThreadStart(this.Run));            
+            this.thread = new Thread(new ThreadStart(this.Run));
+            this.timer = new Stopwatch();
         }
       
         public override Task RunAsync(Client client)
         {
             this.client = client;
-            var task = new Task(() => this.runner.Join());
-            this.runner.Start();
+            var task = new Task(() => this.thread.Join());
+            this.thread.Start();
             return task;
         }
 
@@ -75,21 +88,21 @@ namespace JankWorks.Game.Hosting
             };
             this.state = HostState.LoadingScene;
             Thread.MemoryBarrier();
-            var task = new Task(() => this.runner.Join());
-            this.runner.Start();
+            var task = new Task(() => this.thread.Join());
+            this.thread.Start();
             return task;
         }
 
         public override void Start(Client client)
         {
             this.client = client;
-            this.runner.Start();
+            this.thread.Start();
         }
 
         public override void Start(Client client, int scene, object initState = null)
         {
-            this.runner = new Thread(new ThreadStart(() => this.Run(client, scene, initState)));
-            this.runner.Start();
+            this.thread = new Thread(new ThreadStart(() => this.Run(client, scene, initState)));
+            this.thread.Start();
         }
 
         public override void Run(Client client, int scene, object initState = null)
@@ -101,9 +114,94 @@ namespace JankWorks.Game.Hosting
                 InitState = initState
             };
             this.state = HostState.LoadingScene;
+
             this.Run();
         }
 
+
+        private void Run()
+        {
+            var hostThread = Thread.CurrentThread;
+            hostThread.Name = $"{this.Application.Name} Host Thread";
+            Threads.HostThread = hostThread;
+            this.tickCounter.Start();
+
+            var runner = this as IRunner<object, object>;
+
+            while (true)
+            {
+                var state = this.state;
+
+                switch (state)
+                {
+                    case HostState.RunningScene:
+                        var tickDuration = runner.Run(null, null);
+                        this.Metrics.TickLag = 1d * (tickDuration.TotalMilliseconds / this.tickTime.TotalMilliseconds);
+                        continue;
+
+                    case HostState.LoadingScene:
+                        runner.StopRun();
+                        this.LoadScene();
+                        continue;
+
+                    case HostState.UnloadingScene:
+                        runner.StopRun();
+
+                        using (var sync = new ScopedSynchronizationContext(true))
+                        {
+                            this.scene.HostDispose(this);
+                            sync.Join();
+
+                            this.scene.SharedDispose(this, this.client);
+                            sync.Join();
+                        }
+
+                        this.scene.SharedDisposed();
+
+                        this.dispatcher.ClearChannels();
+                        this.scene = null;
+                        this.state = HostState.Constructed;
+                        continue;
+
+                    case HostState.WaitingOnClients:
+
+                        if (this.client.State == ClientState.WaitingOnHost)
+                        {
+                            this.tick = 0;
+                            this.state = HostState.RunningScene;
+                            runner.BeginRun();
+                        }
+                        else
+                        {
+                            Thread.Yield();
+                        }
+                        continue;
+
+                    case HostState.Constructed:
+                        Thread.Yield();
+                        continue;
+
+                    case HostState.BeginShutdown:
+                        runner.StopRun();
+                        this.Dispose();
+                        return;
+                    case HostState.Shutdown:
+                        return;
+                }
+            }
+        }
+
+
+        void IRunner<object, object>.Simulate(GameTime time, object state)
+        {
+            this.metrics.TicksPerSecond = this.tickCounter.Frequency;
+            lock (this) { this.scene.Tick(this.tick++, time); }
+            this.tickCounter.Count();            
+        }
+
+        void IRunner<object, object>.Interpolate(GameTime time, object state) { }        
+
+        /*
         private void Run()
         {
             var hostThread = Thread.CurrentThread;
@@ -213,6 +311,7 @@ namespace JankWorks.Game.Hosting
                 lastrun = now;
             }
         }
+        */
 
         public override void SynchroniseClientUpdate() 
         {
@@ -272,7 +371,7 @@ namespace JankWorks.Game.Hosting
 
         protected override void Dispose(bool disposing)
         {
-            if(Thread.CurrentThread.ManagedThreadId == this.runner.ManagedThreadId)
+            if(Thread.CurrentThread.ManagedThreadId == this.thread.ManagedThreadId)
             {
                 this.dispatcher.Dispose();
                 Threads.HostThread = null;
@@ -288,7 +387,7 @@ namespace JankWorks.Game.Hosting
 
         public override Task DisposeAsync()
         {            
-            if (Thread.CurrentThread.ManagedThreadId == this.runner.ManagedThreadId)
+            if (Thread.CurrentThread.ManagedThreadId == this.thread.ManagedThreadId)
             {
                 // returning a async task of yourself doing something is pretty deep
                 throw new InvalidOperationException();
@@ -314,7 +413,7 @@ namespace JankWorks.Game.Hosting
                 this.state = HostState.BeginShutdown;
 
                 // important this join only happens once the host thread is actually shutting down
-                this.runner.Join();
+                this.thread.Join();
             });                 
         }
     }
