@@ -429,78 +429,6 @@ namespace JankWorks.Game.Local
             this.Render(state, time);
         }
 
-        /*
-        private void Run()
-        {
-            var clientThread = Thread.CurrentThread;
-            clientThread.Name = $"{this.application.Name} Client Thread";
-            Threads.ClientThread = clientThread;
-
-            var updateTime = TimeSpan.FromMilliseconds((1f / this.parameters.UpdateRate) * 1000);
-            var frameTime = TimeSpan.FromMilliseconds((1f / this.Configuration.FrameRate) * 1000);
-
-            var timer = new Stopwatch();
-            timer.Start();
-
-            var accumulator = TimeSpan.Zero;            
-            var lag = TimeSpan.Zero;
-            var lastrun = timer.Elapsed;
-
-            this.upsCounter.Start();
-            this.fpsCounter.Start();
-
-            while (this.window.IsOpen)
-            {
-                var state = this.CheckForStateChange();
-
-                TimeSpan now = timer.Elapsed;
-                TimeSpan since = now - lastrun;
-                accumulator += since;
-                lag += since;
-
-                if (accumulator >= frameTime)
-                {
-                    if(lag >= updateTime)
-                    {                        
-                        do
-                        {
-                            var delta = (lag > updateTime) ? updateTime : lag;
-
-                            this.Update(state, delta);
-
-                            lag -= updateTime;
-                        }
-                        while (lag >= updateTime);
-                    }
-                    
-                    var frame = new Frame(accumulator.TotalMilliseconds / updateTime.TotalMilliseconds);
-
-                    this.Render(state, frame, updateTime);
-
-                    accumulator -= frameTime;
-                    accumulator = (accumulator > frameTime) ? frameTime : accumulator;
-                }
-                else
-                {
-                    var remaining = frameTime - accumulator;
-
-                    if (remaining > TimeSpan.Zero)
-                    {
-                        PlatformApi.Instance.Sleep(remaining);
-                    }
-                }
-
-                lastrun = now;
-            }
-
-            this.UnloadScene();           
-            this.host.Dispose();
-        }
-        */
-
-
-
-
         private void Update(ClientState state, GameTime time)
         {
             this.Metrics.UpdatesPerSecond = this.upsCounter.Frequency;
@@ -570,6 +498,11 @@ namespace JankWorks.Game.Local
                         this.graphicsDevice.Activate();
                         state = ClientState.RunningScene;
                         this.state = state;
+
+                        var runner = this as IRunner<ClientState, ClientState>;
+
+                        runner.StopRun();
+                        runner.BeginRun();
 
                         this.scene.Initialised();
                         this.scene.SubscribeInputs(this.window);
