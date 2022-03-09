@@ -89,11 +89,12 @@ namespace JankWorks.Graphics
 
         private readonly Vector2 size;
 
-        public PerspectiveCamera(Surface surface)
+        public PerspectiveCamera(Surface surface) : this((Vector2)surface.Viewport.Size) { }
+
+        public PerspectiveCamera(Vector2 viewport)
         {
-            var size = (Vector2)surface.Viewport.Size;
             this.VerticalFieldOfView = 45;
-            this.size = size;
+            this.size = viewport;
 
             this.Position = Vector3.Zero;
             this.Up = Vector3.UnitY;
