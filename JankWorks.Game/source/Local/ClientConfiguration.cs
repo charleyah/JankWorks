@@ -10,27 +10,39 @@ namespace JankWorks.Game.Local
 {
     public struct ClientConfgiuration
     {
-        public Monitor Monitor { get; set; }
+        public Monitor Monitor { get => this.monitor; set => this.monitor = value; }
 
-        public DisplayMode DisplayMode { get; set; }
+        public DisplayMode DisplayMode { get => this.displayMode; set => this.displayMode = value; }
 
-        public WindowStyle WindowStyle { get; set; }
+        public WindowStyle WindowStyle { get => this.windowStyle; set => this.windowStyle = value; }
 
-        public uint UpdateRate { get; set; }
+        public uint UpdateRate 
+        {
+            get => this.updateRate;
+            set => this.updateRate = Math.Min(MaxUpdateRate, value);
+        }
 
-        public bool Vsync { get; set; }
+        public bool Vsync { get => this.vsync; set => this.vsync = value; }
 
-        const string DisplaySection = "Display";
-        const string MonitorEntry = "Monitor";
-        const string WindowStyleEntry = "WindowStyle";
+        public const uint MaxUpdateRate = 360;
 
-        const string WidthEntry = "Width";
-        const string HeightEntry = "Height";
-        const string BitsEntry = "Bits";
-        const string RefreshRateEntry = "RefreshRate";
+        private Monitor monitor;
+        private DisplayMode displayMode;
+        private WindowStyle windowStyle;
+        private uint updateRate;
+        private bool vsync;
 
-        const string UpdateRateEntry = "UpdateRate";
-        const string VsyncEntry = "Vsync";
+        private const string DisplaySection = "Display";
+        private const string MonitorEntry = "Monitor";
+        private const string WindowStyleEntry = "WindowStyle";
+
+        private const string WidthEntry = "Width";
+        private const string HeightEntry = "Height";
+        private const string BitsEntry = "Bits";
+        private const string RefreshRateEntry = "RefreshRate";
+
+        private const string UpdateRateEntry = "UpdateRate";
+        private const string VsyncEntry = "Vsync";
 
         public void Save(Settings settings)
         {
