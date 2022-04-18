@@ -163,6 +163,7 @@ namespace JankWorks.Game.Local
             var scene = this.scene;
             if (scene != null)
             {
+                this.inputContext.Join();
                 scene.UnsubscribeInputs(this.window);
 
                 this.inputContext = new ScopedSynchronizationContext(false);
