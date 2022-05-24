@@ -93,14 +93,13 @@ namespace JankWorks.Game.Local
             var config = application.DefaultClientConfiguration;
 
             config.Load(settings);
-
+            config.Save(settings);
             var updateRate = (config.Vsync) ? config.DisplayMode.RefreshRate : config.UpdateRate;
             this.updateTime = TimeSpan.FromMilliseconds((1f / updateRate) * 1000);
 
             this.Configuration = config;
             this.Settings = settings;
-          
-                        
+                                  
             var winds = new WindowSettings()
             {
                 Title = application.Name,

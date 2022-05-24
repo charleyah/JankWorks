@@ -91,7 +91,7 @@ namespace JankWorks.Game
         public virtual ClientConfgiuration DefaultClientConfiguration => ClientConfgiuration.Default;
 
 
-        public Settings GetApplicationSettings()
+        internal Settings GetApplicationSettings()
         {
             if (this.ApplicationParameters.AppSettingsMode == ApplicationParameters.SettingsMode.NoSettings)
             {
@@ -103,7 +103,7 @@ namespace JankWorks.Game
             }
         }
 
-        public Settings GetHostSettings()
+        internal Settings GetHostSettings()
         {
             if (this.ApplicationParameters.HostSettingsMode == ApplicationParameters.SettingsMode.NoSettings)
             {
@@ -115,7 +115,7 @@ namespace JankWorks.Game
             }
         }
 
-        public Settings GetClientSettings()
+        internal Settings GetClientSettings()
         {
             if (this.ApplicationParameters.ClientSettingsMode == ApplicationParameters.SettingsMode.NoSettings)
             {
