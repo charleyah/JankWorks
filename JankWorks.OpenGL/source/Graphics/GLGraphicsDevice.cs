@@ -183,8 +183,6 @@ namespace JankWorks.Drivers.OpenGL.Graphics
 
         public override TextRenderer CreateTextRenderer(Camera camera, Font font) => new GLTextRenderer(this, font, camera);
 
-        public override ShapeRenderer CreateShapeRenderer(Camera camera) => new GLShapeRenderer(this, camera);
-
         public override VertexBuffer<T> CreateVertexBuffer<T>() => new GLVertexBuffer<T>();
 
         public override VertexLayout CreateVertexLayout() => new GLVertexLayout();

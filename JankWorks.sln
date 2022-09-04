@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks", "JankWorks\JankWorks.csproj", "{4A15D24C-66B8-4777-8C62-D107EE7A0E31}"
 EndProject
@@ -25,8 +25,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{06F01A5C-BF69-49F6-B87A-1E42A6A4B381}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JankWorks.OpenAL", "JankWorks.OpenAL\JankWorks.OpenAL.csproj", "{4D692140-78AF-498A-B995-E6B70400E86B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pong", "Examples\Pong\Pong.csproj", "{194B4A24-74CB-430B-9409-A5A3230965A6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImagePreviewer", "Examples\ImagePreviewer\ImagePreviewer.csproj", "{0D3E1E63-335B-48CA-8494-3EE74A2F783D}"
 EndProject
@@ -74,10 +72,6 @@ Global
 		{4D692140-78AF-498A-B995-E6B70400E86B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D692140-78AF-498A-B995-E6B70400E86B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D692140-78AF-498A-B995-E6B70400E86B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{194B4A24-74CB-430B-9409-A5A3230965A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{194B4A24-74CB-430B-9409-A5A3230965A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{194B4A24-74CB-430B-9409-A5A3230965A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{194B4A24-74CB-430B-9409-A5A3230965A6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0D3E1E63-335B-48CA-8494-3EE74A2F783D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0D3E1E63-335B-48CA-8494-3EE74A2F783D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D3E1E63-335B-48CA-8494-3EE74A2F783D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -88,7 +82,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{69A42AD0-F66B-4B5C-BB0F-8F9B1E514432} = {B23F146D-0486-4AC9-8860-5CAE22F1D989}
-		{194B4A24-74CB-430B-9409-A5A3230965A6} = {B23F146D-0486-4AC9-8860-5CAE22F1D989}
 		{0D3E1E63-335B-48CA-8494-3EE74A2F783D} = {B23F146D-0486-4AC9-8860-5CAE22F1D989}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
